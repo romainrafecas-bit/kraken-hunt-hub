@@ -1,40 +1,42 @@
-import { Search, ShoppingCart, Eye, TrendingUp } from "lucide-react";
-import Sidebar from "@/components/dashboard/Sidebar";
-import StatsCard from "@/components/dashboard/StatsCard";
-import ProductTable from "@/components/dashboard/ProductTable";
-import ScannerStatus from "@/components/dashboard/ScannerStatus";
-import HeroBanner from "@/components/dashboard/HeroBanner";
-import CategoryChart from "@/components/dashboard/CategoryChart";
+import { Search, ShoppingCart, Eye, TrendingUp, Zap, Target } from "lucide-react";
+import KrakkenSidebar from "@/components/dashboard/KrakkenSidebar";
+import StatCard from "@/components/dashboard/StatCard";
+import DashboardHeader from "@/components/dashboard/DashboardHeader";
+import ProductAnalysis from "@/components/dashboard/ProductAnalysis";
+import TopBrands from "@/components/dashboard/TopBrands";
+import CategoryBreakdown from "@/components/dashboard/CategoryBreakdown";
 
 const stats = [
-  { title: "Produits scannés", value: "54,892", change: "+12.5%", changeType: "up" as const, icon: Search },
-  { title: "Best-sellers détectés", value: "1,247", change: "+8.3%", changeType: "up" as const, icon: ShoppingCart },
-  { title: "Vues aujourd'hui", value: "8,934", change: "+23.1%", changeType: "up" as const, icon: Eye },
-  { title: "Score moyen", value: "87.4", change: "-2.1%", changeType: "down" as const, icon: TrendingUp },
+  { label: "PRODUITS SCANNÉS", value: "54,892", sub: "+3,241 depuis hier", icon: Search },
+  { label: "BEST-SELLERS", value: "1,247", sub: "Score > 80", icon: ShoppingCart },
+  { label: "RÉDUCTIONS MOY.", value: "-27%", sub: "Sur top 100", icon: Target },
+  { label: "SCORE MAX", value: "98", sub: "Galaxy S24 Ultra", icon: Zap },
+  { label: "VENTES TOTALES", value: "112K", sub: "Top 25 produits", icon: TrendingUp },
+  { label: "MARQUES ACTIVES", value: "847", sub: "12 catégories", icon: Eye },
 ];
 
 const Index = () => {
   return (
-    <div className="min-h-screen ocean-gradient">
-      <Sidebar />
-      <main className="pl-20 lg:pl-64 p-6 lg:p-8">
-        <HeroBanner />
+    <div className="min-h-screen abyss-gradient">
+      <KrakkenSidebar />
+      <main className="pl-16 xl:pl-56 p-4 lg:p-6 space-y-5">
+        <DashboardHeader />
 
-        {/* Stats row */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
+        {/* Stats */}
+        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3">
           {stats.map((stat, i) => (
-            <StatsCard key={stat.title} {...stat} delay={0.1 + i * 0.08} />
+            <StatCard key={stat.label} {...stat} index={i} />
           ))}
         </div>
 
         {/* Main content */}
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mt-6">
-          <div className="xl:col-span-2">
-            <ProductTable />
+        <div className="grid grid-cols-1 xl:grid-cols-4 gap-5">
+          <div className="xl:col-span-3">
+            <ProductAnalysis />
           </div>
-          <div className="space-y-6">
-            <ScannerStatus />
-            <CategoryChart />
+          <div className="space-y-5">
+            <TopBrands />
+            <CategoryBreakdown />
           </div>
         </div>
       </main>
