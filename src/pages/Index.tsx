@@ -8,11 +8,13 @@ import { motion } from "framer-motion";
 import { products } from "@/data/products";
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 
+const bestDiscount = Math.max(...products.map(p => Math.round(((p.originalPrice - p.price) / p.originalPrice) * 100)));
+
 const stats = [
   { label: "PRODUITS TRAQUÉS", value: "10", sub: "Dernière plongée", icon: Search },
   { label: "EN SURFACE", value: "8", sub: "Disponibles", icon: ShoppingCart },
   { label: "DANS L'ABÎME", value: "2", sub: "À surveiller", icon: Target },
-  { label: "SCORE MOYEN", value: "9.5", sub: "Sur 10", icon: Zap },
+  { label: "MEILLEURE PRISE", value: `-${bestDiscount}%`, sub: "Réduction max", icon: TrendingUp },
 ];
 
 const chartData = [
