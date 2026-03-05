@@ -1,8 +1,10 @@
-import { motion } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { Link } from "react-router-dom";
+import { useRef } from "react";
 import { Search, TrendingUp, Bell, BarChart3, Shield, Zap, ChevronRight, Check, Anchor, Eye, ArrowUpDown, Filter, Star } from "lucide-react";
 import krakkenLogo from "@/assets/krakken-logo.png";
 import krakenHero from "@/assets/kraken-landing-hero.jpg";
+import { Tentacle, FloatingKraken, Particles } from "@/components/landing/KrakenAnimations";
 
 const features = [
   {
@@ -125,13 +127,32 @@ const Landing = () => {
 
       {/* HERO — Full visual with Kraken image */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-        {/* Background Kraken image */}
-        <img
-          src={krakenHero}
-          alt=""
-          className="absolute inset-0 w-full h-full object-cover"
-          style={{ opacity: 0.35 }}
-        />
+        {/* Floating Kraken background */}
+        <motion.div
+          className="absolute inset-0"
+          animate={{
+            y: [0, -12, 0, 8, 0],
+            x: [0, 6, 0, -4, 0],
+            scale: [1, 1.03, 1, 0.98, 1],
+            rotate: [0, 0.5, 0, -0.3, 0],
+          }}
+          transition={{
+            duration: 14,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+        >
+          <img
+            src={krakenHero}
+            alt=""
+            className="absolute inset-0 w-full h-full object-cover"
+            style={{ opacity: 0.35, scale: 1.1 }}
+          />
+        </motion.div>
+
+        {/* Particles */}
+        <Particles />
+
         {/* Gradient overlays */}
         <div className="absolute inset-0" style={{
           background: `
@@ -234,6 +255,14 @@ const Landing = () => {
           background: 'linear-gradient(180deg, transparent, hsl(228 42% 3%))',
         }} />
       </section>
+
+      {/* Tentacles between sections */}
+      <Tentacle side="left" top="90vh" color="174 72% 46%" delay={0} size={250} />
+      <Tentacle side="right" top="140vh" color="262 52% 58%" delay={1.5} size={280} />
+      <Tentacle side="left" top="220vh" color="188 78% 52%" delay={0.8} size={220} />
+      <Tentacle side="right" top="300vh" color="174 72% 46%" delay={2} size={260} />
+      <Tentacle side="left" top="380vh" color="262 52% 58%" delay={0.5} size={240} />
+      <Tentacle side="right" top="450vh" color="38 92% 56%" delay={1} size={200} />
 
       {/* FEATURES */}
       <section id="features" className="py-24 px-6 relative" style={{ background: 'hsl(228 42% 3%)' }}>
