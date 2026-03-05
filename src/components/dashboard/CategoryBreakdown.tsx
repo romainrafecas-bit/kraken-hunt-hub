@@ -2,14 +2,14 @@ import { motion } from "framer-motion";
 import { products } from "@/data/products";
 
 const catColors = [
-  "hsl(174, 90%, 45%)",
-  "hsl(199, 85%, 50%)",
-  "hsl(16, 85%, 58%)",
-  "hsl(38, 95%, 55%)",
-  "hsl(160, 80%, 45%)",
-  "hsl(280, 50%, 55%)",
-  "hsl(340, 60%, 55%)",
-  "hsl(120, 50%, 45%)",
+  "hsl(176, 88%, 55%)",
+  "hsl(190, 82%, 63%)",
+  "hsl(188, 78%, 52%)",
+  "hsl(194, 88%, 67%)",
+  "hsl(168, 70%, 50%)",
+  "hsl(204, 64%, 60%)",
+  "hsl(262, 48%, 62%)",
+  "hsl(186, 55%, 46%)",
 ];
 
 const CategoryBreakdown = () => {

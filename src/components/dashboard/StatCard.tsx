@@ -18,7 +18,7 @@ const StatCard = ({ label, value, sub, icon: Icon, index }: StatCardProps) => (
   >
     <div className="flex items-start gap-3">
       <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-primary/10 group-hover:bg-primary/15 transition-colors" style={{
-        boxShadow: '0 0 10px -4px hsl(174 90% 45% / 0.15)'
+        boxShadow: '0 0 10px -4px hsl(var(--primary) / 0.25)'
       }}>
         <Icon className="w-[18px] h-[18px] text-primary" />
       </div>

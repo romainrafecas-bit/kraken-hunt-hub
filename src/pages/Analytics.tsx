@@ -40,14 +40,14 @@ const radarData = categoryData.slice(0, 6).map(c => ({
 }));
 
 const COLORS = [
-  "hsl(185, 80%, 42%)",
-  "hsl(185, 60%, 55%)",
-  "hsl(195, 70%, 48%)",
-  "hsl(12, 75%, 55%)",
-  "hsl(38, 90%, 55%)",
-  "hsl(160, 60%, 42%)",
-  "hsl(280, 45%, 50%)",
-  "hsl(190, 65%, 58%)",
+  "hsl(176, 88%, 55%)",
+  "hsl(190, 82%, 63%)",
+  "hsl(188, 78%, 52%)",
+  "hsl(194, 88%, 67%)",
+  "hsl(168, 70%, 50%)",
+  "hsl(204, 64%, 60%)",
+  "hsl(262, 48%, 62%)",
+  "hsl(186, 55%, 46%)",
 ];
 
 const topProducts = [...products].sort((a, b) => b.score - a.score).slice(0, 5);
@@ -107,7 +107,7 @@ const Analytics = () => {
                 <p className="text-xs text-muted-foreground">En baisse</p>
               </div>
               <div className="text-center">
-                <span className="text-sm font-bold text-coral">-{avgDiscount}%</span>
+                <span className="text-sm font-bold text-accent">-{avgDiscount}%</span>
                 <p className="text-xs text-muted-foreground">Réduction moy.</p>
               </div>
             </div>
@@ -149,7 +149,7 @@ const Analytics = () => {
             className="glass-panel-glow p-5"
           >
             <h3 className="font-display text-sm font-bold text-foreground mb-4 flex items-center gap-2">
-              <ShoppingCart className="w-4 h-4 text-coral" />
+              <ShoppingCart className="w-4 h-4 text-accent" />
               Ventes par catégorie
             </h3>
             <ResponsiveContainer width="100%" height={220}>
