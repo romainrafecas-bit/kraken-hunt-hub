@@ -120,19 +120,11 @@ const Index = () => {
                   {products.reduce((s, p) => s + p.recurrences, 0).toLocaleString("fr-FR")}
                 </p>
               </div>
-              <div className="px-5 py-3 text-center flex items-center gap-2" style={{ background: 'hsl(225 25% 7%)' }}>
-                <div>
-                  <p className="text-[8px] font-display uppercase tracking-[0.2em] text-muted-foreground/35 mb-1">En surface</p>
-                  <p className="text-xl font-display font-black tabular-nums text-foreground/80">
-                    {products.length.toLocaleString("fr-FR")}
-                  </p>
-                </div>
-                <span className="w-2 h-2 rounded-full flex-shrink-0" style={{
-                  backgroundColor: 'hsl(162 68% 44%)',
-                  boxShadow: '0 0 8px hsl(162 68% 44% / 0.6)',
-                  animation: 'bioluminescence 2s ease-in-out infinite',
-                }} />
-              </div>
+              <span className="w-2 h-2 rounded-full flex-shrink-0" style={{
+                backgroundColor: 'hsl(162 68% 44%)',
+                boxShadow: '0 0 8px hsl(162 68% 44% / 0.6)',
+                animation: 'bioluminescence 2s ease-in-out infinite',
+              }} />
             </motion.div>
           </div>
         </div>
@@ -147,7 +139,7 @@ const Index = () => {
           <div className="flex items-end justify-between mb-6">
             <div>
               <p className="text-[9px] font-display uppercase tracking-[0.3em] text-muted-foreground/40 mb-1">
-                Cette semaine
+                Ce mois-ci
               </p>
               <div className="flex items-baseline gap-3">
                 <p className="text-4xl font-display font-black tabular-nums" style={{
