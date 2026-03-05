@@ -1,15 +1,15 @@
 import KrakkenSidebar from "@/components/dashboard/KrakkenSidebar";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { products } from "@/data/products";
-import { AreaChart, Area, XAxis, Tooltip, ResponsiveContainer, BarChart, Bar, Cell } from "recharts";
+import { useState } from "react";
+import krakkenLogo from "@/assets/krakken-logo.png";
 
 /* ── data ── */
-const chartData = [
-  { d: "19", v: 3 }, { d: "20", v: 4 }, { d: "21", v: 5 }, { d: "22", v: 5 },
-  { d: "23", v: 7 }, { d: "24", v: 7 }, { d: "25", v: 8 }, { d: "26", v: 9 },
-  { d: "27", v: 9 }, { d: "28", v: 9 }, { d: "01", v: 9 }, { d: "02", v: 10 },
-  { d: "03", v: 10 }, { d: "04", v: 10 }, { d: "05", v: 10 },
+const dailyData = [
+  { day: "Lun", v: 3 }, { day: "Mar", v: 5 }, { day: "Mer", v: 7 },
+  { day: "Jeu", v: 4 }, { day: "Ven", v: 9 }, { day: "Sam", v: 6 }, { day: "Dim", v: 10 },
 ];
+const maxDaily = Math.max(...dailyData.map(d => d.v));
 
 const catIcons: Record<string, string> = {
   "Électroménager": "⚡", "TV & Son": "🔊", "Smartphones": "📱",
@@ -17,9 +17,9 @@ const catIcons: Record<string, string> = {
   "Mode": "👟", "Maison": "🏠", "Beauté": "✨",
 };
 
-const catPalette = [
+const catHues = [
   "174 72% 46%", "262 52% 58%", "188 78% 52%", "38 92% 56%",
-  "162 68% 44%", "348 72% 56%", "310 55% 50%", "200 65% 55%",
+  "162 68% 44%", "348 72% 56%", "310 55% 50%", "200 65% 55%", "38 72% 50%",
 ];
 
 const catStats = Object.entries(
@@ -30,346 +30,375 @@ const catStats = Object.entries(
     return acc;
   }, {} as Record<string, { sales: number; count: number }>)
 ).map(([name, d]) => ({ name, ...d })).sort((a, b) => b.sales - a.sales);
-
 const catTotal = catStats.reduce((s, c) => s + c.sales, 0);
 
-const topProducts = [...products].sort((a, b) => b.score - a.score).slice(0, 8);
+const topProducts = [...products].sort((a, b) => b.score - a.score).slice(0, 6);
 
-/* ── tooltip ── */
-const ChartTip = ({ active, payload, label }: any) => {
-  if (!active || !payload?.[0]) return null;
-  return (
-    <div className="px-3 py-2 rounded-lg" style={{
-      background: 'hsl(225 32% 6% / 0.95)',
-      border: '1px solid hsl(174 72% 46% / 0.15)',
-      backdropFilter: 'blur(12px)',
-    }}>
-      <span className="text-[11px] text-muted-foreground">Jour {label}</span>
-      <p className="text-sm font-black font-mono" style={{ color: 'hsl(174 72% 56%)' }}>
-        {payload[0].value} produits
-      </p>
-    </div>
-  );
-};
-
-/* ── component ── */
 const Index = () => {
-  return (
-    <div className="min-h-screen abyss-gradient">
-      <KrakkenSidebar />
-      <main className="pl-16 xl:pl-56 min-h-screen">
+  const [hoveredCat, setHoveredCat] = useState<string | null>(null);
+  const [hoveredProduct, setHoveredProduct] = useState<number | null>(null);
 
-        {/* ═══ HERO STRIP ═══ */}
-        <div className="px-5 pt-5 pb-0">
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="flex items-end justify-between"
-          >
+  return (
+    <div className="min-h-screen abyss-gradient overflow-hidden">
+      <KrakkenSidebar />
+      <main className="pl-16 xl:pl-56 min-h-screen relative">
+
+        {/* ═══ Ambient background glow ═══ */}
+        <div className="fixed inset-0 pointer-events-none" style={{
+          background: `
+            radial-gradient(ellipse 600px 400px at 70% 30%, hsl(174 72% 46% / 0.03), transparent),
+            radial-gradient(ellipse 500px 500px at 30% 70%, hsl(262 52% 58% / 0.025), transparent)
+          `,
+        }} />
+
+        {/* ═══ TOP BAR — minimal ═══ */}
+        <div className="px-6 lg:px-10 pt-8 pb-2 relative z-10">
+          <div className="flex items-start justify-between">
             <div>
-              <p className="text-[11px] uppercase tracking-[0.3em] text-muted-foreground mb-1">
-                Tableau de bord
-              </p>
-              <h1 className="font-display text-3xl font-black tracking-tight text-foreground">
-                Vos <span className="kraken-title">profondeurs</span>
-              </h1>
+              <motion.p
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-[10px] font-mono uppercase tracking-[0.4em] text-muted-foreground/60 mb-3"
+              >
+                05.03.2026 — session active
+              </motion.p>
+              <motion.h1
+                initial={{ opacity: 0, x: -30 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+                className="text-[clamp(2.5rem,5vw,4.5rem)] font-display font-black leading-[0.9] tracking-tight"
+              >
+                <span className="text-foreground">Vos</span>
+                <br />
+                <span className="kraken-title">profondeurs</span>
+              </motion.h1>
             </div>
-            <div className="flex items-center gap-6 pb-1">
-              {[
-                { n: products.length.toString(), l: "traqués" },
-                { n: catStats.length.toString(), l: "catégories" },
-                { n: products.filter(p => p.sellers > 0).length.toString(), l: "en surface" },
-              ].map((s, i) => (
-                <div key={i} className="text-right">
-                  <p className="font-display text-xl font-black" style={{
-                    color: `hsl(${catPalette[i]})`,
-                    textShadow: `0 0 14px hsl(${catPalette[i]} / 0.4)`,
-                  }}>{s.n}</p>
-                  <p className="text-[10px] text-muted-foreground uppercase tracking-wider">{s.l}</p>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-          <div className="tentacle-line mt-4" />
+
+            {/* Live indicator */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5 }}
+              className="flex items-center gap-2 mt-2"
+            >
+              <span className="w-1.5 h-1.5 rounded-full" style={{
+                backgroundColor: 'hsl(162 68% 44%)',
+                boxShadow: '0 0 8px hsl(162 68% 44% / 0.6)',
+                animation: 'bioluminescence 2s ease-in-out infinite',
+              }} />
+              <span className="text-[10px] font-mono text-muted-foreground/50">LIVE</span>
+            </motion.div>
+          </div>
         </div>
 
-        {/* ═══ MAIN GRID — 3 columns ═══ */}
-        <div className="grid grid-cols-12 gap-0 min-h-[calc(100vh-100px)]">
-
-          {/* ── LEFT: Chart (full height, dominant) ── */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.1, duration: 0.5 }}
-            className="col-span-12 lg:col-span-5 p-5 relative"
-          >
-            <div className="h-full flex flex-col">
-              <div className="flex items-center justify-between mb-2">
-                <p className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
-                  Activité de traque
-                </p>
-                <span className="text-[10px] font-mono px-2 py-0.5 rounded-md" style={{
-                  background: 'hsl(174 72% 46% / 0.08)',
-                  color: 'hsl(174 72% 56%)',
-                  border: '1px solid hsl(174 72% 46% / 0.15)',
-                }}>15j</span>
-              </div>
-
-              {/* Big number */}
-              <div className="mb-4">
-                <p className="font-display text-6xl font-black leading-none" style={{
-                  color: 'hsl(174 72% 56%)',
-                  textShadow: '0 0 40px hsl(174 72% 46% / 0.3), 0 0 80px hsl(174 72% 46% / 0.1)',
-                }}>
-                  {products.length}
-                </p>
-                <p className="text-sm text-muted-foreground mt-1">
-                  produits détectés ce mois
-                </p>
-              </div>
-
-              {/* Chart */}
-              <div className="flex-1 min-h-[200px] relative">
-                <div className="absolute inset-0 rounded-2xl overflow-hidden" style={{
-                  background: 'hsl(225 32% 6% / 0.4)',
-                  border: '1px solid hsl(225 20% 12% / 0.5)',
-                }}>
-                  <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={chartData} margin={{ top: 20, right: 10, left: 10, bottom: 10 }}>
-                      <defs>
-                        <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="0%" stopColor="hsl(174, 72%, 46%)" stopOpacity={0.3} />
-                          <stop offset="60%" stopColor="hsl(262, 52%, 58%)" stopOpacity={0.05} />
-                          <stop offset="100%" stopColor="hsl(228, 42%, 5%)" stopOpacity={0} />
-                        </linearGradient>
-                      </defs>
-                      <XAxis dataKey="d" tick={{ fontSize: 10, fill: "hsl(210, 10%, 28%)" }} axisLine={false} tickLine={false} />
-                      <Tooltip content={<ChartTip />} />
-                      <Area
-                        type="monotone"
-                        dataKey="v"
-                        stroke="hsl(174, 72%, 50%)"
-                        fill="url(#areaGrad)"
-                        strokeWidth={2}
-                        style={{ filter: 'drop-shadow(0 0 8px hsl(174 72% 46% / 0.5))' }}
-                        dot={false}
-                        activeDot={{
-                          r: 4,
-                          fill: 'hsl(174 72% 56%)',
-                          stroke: 'hsl(228 42% 5%)',
-                          strokeWidth: 2,
-                        }}
-                      />
-                    </AreaChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
-
-              {/* Micro stats under chart */}
-              <div className="grid grid-cols-3 gap-3 mt-4">
-                {[
-                  { v: "+7", l: "nouveaux", c: "162 68% 44%" },
-                  { v: "2", l: "ruptures", c: "348 72% 56%" },
-                  { v: "96", l: "score max", c: "38 92% 56%" },
-                ].map((s, i) => (
-                  <div key={i} className="text-center py-3 rounded-xl" style={{
-                    background: `hsl(${s.c} / 0.05)`,
-                    border: `1px solid hsl(${s.c} / 0.1)`,
-                  }}>
-                    <p className="font-display text-lg font-black" style={{
-                      color: `hsl(${s.c})`,
-                      textShadow: `0 0 10px hsl(${s.c} / 0.3)`,
-                    }}>{s.v}</p>
-                    <p className="text-[9px] uppercase tracking-wider text-muted-foreground">{s.l}</p>
-                  </div>
-                ))}
-              </div>
+        {/* ═══ DAILY ACTIVITY — horizontal rhythm bars ═══ */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.2 }}
+          className="px-6 lg:px-10 mt-10 relative z-10"
+        >
+          <div className="flex items-end gap-1 lg:gap-2">
+            <div className="mr-4 pb-2">
+              <p className="text-[9px] font-mono uppercase tracking-[0.3em] text-muted-foreground/40 mb-1">
+                Cette semaine
+              </p>
+              <p className="text-3xl font-display font-black tabular-nums" style={{
+                color: 'hsl(174 72% 56%)',
+                textShadow: '0 0 30px hsl(174 72% 46% / 0.4)',
+              }}>
+                {dailyData.reduce((s, d) => s + d.v, 0)}
+              </p>
+              <p className="text-[10px] text-muted-foreground/50 mt-0.5">produits scannés</p>
             </div>
 
-            {/* Vertical separator */}
-            <div className="hidden lg:block absolute top-8 bottom-8 right-0 tentacle-line-v" />
-          </motion.div>
-
-          {/* ── CENTER: Categories (vertical bars visual) ── */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2, duration: 0.5 }}
-            className="col-span-12 lg:col-span-3 p-5 relative"
-          >
-            <p className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground mb-5">
-              Répartition catégories
-            </p>
-
-            {/* Vertical bar visualization */}
-            <div className="flex items-end gap-[6px] h-[180px] mb-5">
-              {catStats.map((cat, i) => {
-                const pct = (cat.sales / catTotal) * 100;
-                const hue = catPalette[i % catPalette.length];
-                return (
+            {dailyData.map((d, i) => {
+              const h = (d.v / maxDaily) * 120;
+              const isToday = i === dailyData.length - 1;
+              return (
+                <motion.div
+                  key={d.day}
+                  className="flex-1 flex flex-col items-center gap-2"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 + i * 0.06, ease: [0.16, 1, 0.3, 1] }}
+                >
+                  <span className="text-[10px] font-mono font-bold tabular-nums" style={{
+                    color: isToday ? 'hsl(174 72% 56%)' : 'hsl(210 10% 30%)',
+                  }}>{d.v}</span>
                   <motion.div
-                    key={cat.name}
-                    initial={{ height: 0 }}
-                    animate={{ height: `${Math.max(pct * 3.5, 8)}%` }}
-                    transition={{ delay: 0.3 + i * 0.06, duration: 0.6, ease: "easeOut" }}
-                    className="flex-1 rounded-t-lg cursor-pointer group relative"
+                    className="w-full rounded-t-md relative overflow-hidden cursor-pointer group"
                     style={{
-                      background: `linear-gradient(180deg, hsl(${hue}), hsl(${hue} / 0.3))`,
-                      boxShadow: `0 0 16px -4px hsl(${hue} / 0.4)`,
+                      height: `${h}px`,
+                      background: isToday
+                        ? 'linear-gradient(180deg, hsl(174 72% 50%), hsl(174 72% 30%))'
+                        : 'linear-gradient(180deg, hsl(225 20% 18%), hsl(225 20% 10%))',
+                      boxShadow: isToday ? '0 0 24px -4px hsl(174 72% 46% / 0.4)' : 'none',
+                    }}
+                    whileHover={{ 
+                      filter: 'brightness(1.3)',
+                      boxShadow: '0 0 20px -4px hsl(174 72% 46% / 0.3)',
                     }}
                   >
-                    {/* Hover tooltip */}
-                    <div className="absolute -top-10 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10">
-                      <span className="text-[10px] font-bold px-2 py-1 rounded" style={{
-                        background: 'hsl(225 32% 6% / 0.95)',
-                        color: `hsl(${hue})`,
-                        border: `1px solid hsl(${hue} / 0.2)`,
-                      }}>{Math.round(pct)}%</span>
-                    </div>
+                    {isToday && (
+                      <div className="absolute inset-0" style={{
+                        background: 'linear-gradient(180deg, hsl(174 72% 70% / 0.2), transparent)',
+                      }} />
+                    )}
                   </motion.div>
-                );
-              })}
+                  <span className="text-[9px] font-mono uppercase" style={{
+                    color: isToday ? 'hsl(174 72% 56%)' : 'hsl(210 10% 25%)',
+                  }}>{d.day}</span>
+                </motion.div>
+              );
+            })}
+          </div>
+        </motion.div>
+
+        {/* ═══ DIVIDER ═══ */}
+        <div className="px-6 lg:px-10 my-8">
+          <div className="tentacle-line" />
+        </div>
+
+        {/* ═══ CATEGORIES — circular orbit layout ═══ */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.4 }}
+          className="px-6 lg:px-10 relative z-10"
+        >
+          <div className="flex items-start gap-8 lg:gap-16">
+            {/* Left: title + hovered detail */}
+            <div className="w-48 flex-shrink-0">
+              <p className="text-[9px] font-mono uppercase tracking-[0.3em] text-muted-foreground/40 mb-3">
+                Catégories
+              </p>
+              <AnimatePresence mode="wait">
+                {hoveredCat ? (
+                  <motion.div
+                    key={hoveredCat}
+                    initial={{ opacity: 0, y: 5 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -5 }}
+                    transition={{ duration: 0.15 }}
+                  >
+                    <p className="text-lg font-display font-black text-foreground">
+                      {catIcons[hoveredCat]} {hoveredCat}
+                    </p>
+                    <p className="text-sm font-mono mt-1" style={{ color: 'hsl(174 72% 56%)' }}>
+                      {catStats.find(c => c.name === hoveredCat)?.count} produits
+                    </p>
+                    <p className="text-[11px] text-muted-foreground font-mono">
+                      {catStats.find(c => c.name === hoveredCat)?.sales.toLocaleString("fr-FR")} ventes
+                    </p>
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="default"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                  >
+                    <p className="text-2xl font-display font-black text-foreground">{catStats.length}</p>
+                    <p className="text-[11px] text-muted-foreground">zones de chasse actives</p>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
 
-            {/* Category list */}
-            <div className="space-y-1.5">
+            {/* Right: horizontal category pills */}
+            <div className="flex-1 flex flex-wrap gap-2">
               {catStats.map((cat, i) => {
-                const hue = catPalette[i % catPalette.length];
-                const icon = catIcons[cat.name] || "📦";
                 const pct = Math.round((cat.sales / catTotal) * 100);
+                const hue = catHues[i % catHues.length];
+                const icon = catIcons[cat.name] || "📦";
+                const isHovered = hoveredCat === cat.name;
+
                 return (
                   <motion.div
                     key={cat.name}
-                    initial={{ opacity: 0, x: -8 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.4 + i * 0.04 }}
-                    className="flex items-center gap-2.5 py-1.5 px-2 rounded-lg cursor-pointer group hover:bg-card/40 transition-colors"
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.5 + i * 0.05, ease: [0.16, 1, 0.3, 1] }}
+                    onMouseEnter={() => setHoveredCat(cat.name)}
+                    onMouseLeave={() => setHoveredCat(null)}
+                    className="cursor-pointer relative"
                   >
-                    <span className="text-xs">{icon}</span>
-                    <span className="w-2 h-2 rounded-full flex-shrink-0" style={{
-                      background: `hsl(${hue})`,
-                      boxShadow: `0 0 6px hsl(${hue} / 0.5)`,
-                    }} />
-                    <span className="text-[11px] text-foreground/80 flex-1 truncate group-hover:text-foreground transition-colors">
-                      {cat.name}
-                    </span>
-                    <span className="text-[10px] font-mono font-bold" style={{
-                      color: `hsl(${hue})`,
-                    }}>{pct}%</span>
-                    <span className="text-[9px] text-muted-foreground font-mono">
-                      {cat.count}
-                    </span>
+                    <motion.div
+                      className="flex items-center gap-2 px-4 py-2.5 rounded-2xl transition-all duration-300"
+                      style={{
+                        background: isHovered ? `hsl(${hue} / 0.15)` : 'hsl(225 20% 8% / 0.6)',
+                        border: `1px solid ${isHovered ? `hsl(${hue} / 0.4)` : 'hsl(225 20% 12% / 0.4)'}`,
+                        boxShadow: isHovered ? `0 0 30px -8px hsl(${hue} / 0.3)` : 'none',
+                      }}
+                      whileHover={{ scale: 1.05 }}
+                    >
+                      <span className="text-sm">{icon}</span>
+                      <span className="text-[11px] font-semibold" style={{
+                        color: isHovered ? `hsl(${hue})` : 'hsl(210 10% 55%)',
+                        transition: 'color 0.2s',
+                      }}>{cat.name}</span>
+                      <span className="text-[10px] font-mono font-black ml-1" style={{
+                        color: `hsl(${hue})`,
+                        textShadow: isHovered ? `0 0 8px hsl(${hue} / 0.5)` : 'none',
+                      }}>{pct}%</span>
+                    </motion.div>
                   </motion.div>
                 );
               })}
             </div>
+          </div>
+        </motion.div>
 
-            {/* Vertical separator */}
-            <div className="hidden lg:block absolute top-8 bottom-8 right-0 tentacle-line-v" />
-          </motion.div>
+        {/* ═══ DIVIDER ═══ */}
+        <div className="px-6 lg:px-10 my-8">
+          <div className="tentacle-line" />
+        </div>
 
-          {/* ── RIGHT: Top Products ── */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.3, duration: 0.5 }}
-            className="col-span-12 lg:col-span-4 p-5"
-          >
-            <div className="flex items-center justify-between mb-5">
-              <p className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
+        {/* ═══ TOP PRODUCTS — editorial cards ═══ */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.6 }}
+          className="px-6 lg:px-10 pb-16 relative z-10"
+        >
+          <div className="flex items-end justify-between mb-8">
+            <div>
+              <p className="text-[9px] font-mono uppercase tracking-[0.3em] text-muted-foreground/40 mb-2">
+                Meilleures prises
+              </p>
+              <p className="text-xl font-display font-black text-foreground">
                 Top produits
               </p>
-              <span className="text-[10px] font-mono text-muted-foreground">
-                par score
-              </span>
             </div>
+            <p className="text-[10px] font-mono text-muted-foreground/40">
+              triés par score de vélocité
+            </p>
+          </div>
 
-            <div className="space-y-1">
-              {topProducts.map((p, i) => {
-                const isTop3 = i < 3;
-                const rankHues = [
-                  "38 92% 56%", "174 72% 46%", "262 52% 58%",
-                ];
-                const hue = isTop3 ? rankHues[i] : "210 10% 30%";
+          {/* Product grid — 2 rows of 3, editorial style */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {topProducts.map((p, i) => {
+              const isHovered = hoveredProduct === p.id;
+              const scoreColor = p.score >= 90
+                ? "162 72% 52%"
+                : p.score >= 80
+                ? "174 72% 56%"
+                : "210 10% 50%";
+              const isFirst = i === 0;
 
-                return (
+              return (
+                <motion.div
+                  key={p.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.65 + i * 0.07, ease: [0.16, 1, 0.3, 1] }}
+                  onMouseEnter={() => setHoveredProduct(p.id)}
+                  onMouseLeave={() => setHoveredProduct(null)}
+                  className="group cursor-pointer relative"
+                >
                   <motion.div
-                    key={p.id}
-                    initial={{ opacity: 0, y: 6 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.35 + i * 0.05 }}
-                    className="flex items-center gap-3 p-2.5 rounded-xl group cursor-pointer transition-all duration-200"
-                    whileHover={{
-                      backgroundColor: 'hsl(225 32% 8% / 0.6)',
+                    className="relative rounded-2xl overflow-hidden"
+                    style={{
+                      background: 'hsl(225 25% 7%)',
+                      border: isHovered
+                        ? `1px solid hsl(${scoreColor} / 0.3)`
+                        : '1px solid hsl(225 20% 10%)',
+                      boxShadow: isHovered
+                        ? `0 8px 40px -12px hsl(${scoreColor} / 0.2), 0 0 0 1px hsl(${scoreColor} / 0.1)`
+                        : '0 2px 20px -8px hsl(228 50% 2% / 0.5)',
+                      transition: 'border-color 0.3s, box-shadow 0.3s',
                     }}
+                    whileHover={{ y: -4 }}
+                    transition={{ duration: 0.3 }}
                   >
-                    {/* Rank */}
-                    <div className="w-6 flex-shrink-0 text-center">
-                      {isTop3 ? (
-                        <span className="text-sm font-black font-display" style={{
-                          color: `hsl(${hue})`,
-                          textShadow: `0 0 12px hsl(${hue} / 0.5)`,
-                        }}>{i + 1}</span>
-                      ) : (
-                        <span className="text-xs font-mono text-muted-foreground">{i + 1}</span>
-                      )}
+                    {/* Image band */}
+                    <div className="h-28 relative overflow-hidden">
+                      <img
+                        src={p.image}
+                        alt={p.name}
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                        style={{ filter: 'brightness(0.7) saturate(0.8)' }}
+                      />
+                      <div className="absolute inset-0" style={{
+                        background: 'linear-gradient(180deg, transparent 30%, hsl(225 25% 7%) 100%)',
+                      }} />
+
+                      {/* Rank badge */}
+                      <div className="absolute top-3 left-3 flex items-center gap-1.5">
+                        <span className="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black font-display" style={{
+                          background: isFirst ? 'hsl(38 92% 56%)' : 'hsl(225 20% 12% / 0.8)',
+                          color: isFirst ? 'hsl(228 42% 5%)' : 'hsl(210 10% 50%)',
+                          boxShadow: isFirst ? '0 0 16px hsl(38 92% 56% / 0.4)' : 'none',
+                          backdropFilter: 'blur(8px)',
+                        }}>
+                          {i + 1}
+                        </span>
+                      </div>
+
+                      {/* Score — top right */}
+                      <div className="absolute top-3 right-3">
+                        <span className="text-xs font-black font-mono px-2 py-0.5 rounded-md" style={{
+                          background: `hsl(${scoreColor} / 0.15)`,
+                          color: `hsl(${scoreColor})`,
+                          textShadow: `0 0 10px hsl(${scoreColor} / 0.4)`,
+                          backdropFilter: 'blur(8px)',
+                          border: `1px solid hsl(${scoreColor} / 0.2)`,
+                        }}>
+                          {p.score}
+                        </span>
+                      </div>
                     </div>
 
-                    {/* Image */}
-                    <div className="w-9 h-9 rounded-lg overflow-hidden flex-shrink-0 relative" style={{
-                      border: isTop3 ? `1px solid hsl(${hue} / 0.2)` : '1px solid hsl(225 20% 12%)',
-                      boxShadow: isTop3 ? `0 0 12px -4px hsl(${hue} / 0.3)` : 'none',
-                    }}>
-                      <img src={p.image} alt="" className="w-full h-full object-cover" />
-                    </div>
-
-                    {/* Info */}
-                    <div className="flex-1 min-w-0">
-                      <p className="text-[12px] font-semibold text-foreground/90 truncate group-hover:text-foreground transition-colors">
+                    {/* Content */}
+                    <div className="p-4 pt-2">
+                      <p className="text-[10px] text-muted-foreground/50 font-mono uppercase tracking-wider mb-1">
+                        {p.brand} — {p.category}
+                      </p>
+                      <p className="text-sm font-semibold text-foreground/90 leading-tight group-hover:text-foreground transition-colors line-clamp-2 min-h-[2.5rem]">
                         {p.name}
                       </p>
-                      <div className="flex items-center gap-2">
-                        <span className="text-[10px] text-muted-foreground">{p.brand}</span>
-                        <span className="text-[9px] text-muted-foreground/60">•</span>
-                        <span className="text-[10px] text-muted-foreground">{p.category}</span>
-                      </div>
-                    </div>
 
-                    {/* Score + Price */}
-                    <div className="flex items-center gap-3 flex-shrink-0">
-                      <div className="text-right">
-                        <p className="text-[10px] font-bold font-mono" style={{
-                          color: p.score >= 90 ? 'hsl(162 72% 52%)' : p.score >= 80 ? 'hsl(174 72% 56%)' : 'hsl(210 10% 45%)',
-                          textShadow: p.score >= 90 ? '0 0 8px hsl(162 68% 44% / 0.4)' : 'none',
-                        }}>{p.score}</p>
+                      <div className="flex items-end justify-between mt-3 pt-3" style={{
+                        borderTop: '1px solid hsl(225 20% 10%)',
+                      }}>
+                        <div>
+                          <p className="text-[9px] text-muted-foreground/40 uppercase tracking-wider">Prix</p>
+                          <p className="text-lg font-black font-mono text-foreground leading-none mt-0.5">
+                            {p.price}<span className="text-xs text-muted-foreground">€</span>
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-[9px] text-muted-foreground/40 uppercase tracking-wider">Vendeurs</p>
+                          <p className="text-sm font-bold font-mono text-muted-foreground leading-none mt-0.5">
+                            {p.sellers}
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-[9px] text-muted-foreground/40 uppercase tracking-wider">Vélocité</p>
+                          <p className="text-sm font-bold font-mono leading-none mt-0.5" style={{
+                            color: `hsl(${scoreColor})`,
+                          }}>
+                            {p.recurrences.toLocaleString("fr-FR")}
+                          </p>
+                        </div>
                       </div>
-                      <p className="text-[12px] font-black font-mono text-foreground">
-                        {p.price}€
-                      </p>
                     </div>
                   </motion.div>
-                );
-              })}
-            </div>
+                </motion.div>
+              );
+            })}
+          </div>
+        </motion.div>
 
-            {/* Score legend */}
-            <div className="mt-5 flex items-center gap-4 px-2">
-              {[
-                { label: "90+", c: "162 72% 52%" },
-                { label: "80+", c: "174 72% 56%" },
-                { label: "<80", c: "210 10% 45%" },
-              ].map(s => (
-                <div key={s.label} className="flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full" style={{
-                    background: `hsl(${s.c})`,
-                    boxShadow: `0 0 4px hsl(${s.c} / 0.4)`,
-                  }} />
-                  <span className="text-[9px] text-muted-foreground font-mono">{s.label}</span>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-        </div>
+        {/* ═══ Floating Kraken watermark ═══ */}
+        <motion.img
+          src={krakkenLogo}
+          alt=""
+          className="fixed bottom-6 right-6 w-12 h-12 opacity-[0.04] pointer-events-none select-none"
+          animate={{ y: [0, -4, 0] }}
+          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+        />
       </main>
     </div>
   );
