@@ -1,7 +1,7 @@
 import KrakkenSidebar from "@/components/dashboard/KrakkenSidebar";
 import ProductAnalysis from "@/components/dashboard/ProductAnalysis";
 import { motion } from "framer-motion";
-import { Package } from "lucide-react";
+import { Radar } from "lucide-react";
 
 const Produits = () => {
   return (
@@ -12,15 +12,27 @@ const Produits = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5 }}
-          className="glass-panel-glow p-5"
+          className="glass-panel-glow p-5 relative overflow-hidden"
         >
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-coral/12 flex items-center justify-center">
-              <Package className="w-4 h-4 text-coral" />
+          {/* Atmospheric ink */}
+          <div className="absolute top-0 right-0 w-48 h-48 pointer-events-none" style={{
+            background: 'radial-gradient(ellipse at 100% 0%, hsl(262 52% 58% / 0.06), transparent 60%)',
+          }} />
+          
+          <div className="flex items-center gap-3 relative z-10">
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{
+              background: 'hsl(262 52% 58% / 0.12)',
+              border: '1px solid hsl(262 52% 58% / 0.2)',
+              boxShadow: '0 0 12px -2px hsl(262 52% 58% / 0.2)',
+            }}>
+              <Radar className="w-5 h-5" style={{
+                color: 'hsl(262 72% 72%)',
+                filter: 'drop-shadow(0 0 4px hsl(262 52% 58% / 0.4))',
+              }} />
             </div>
             <div>
-              <h1 className="font-display text-xl font-extrabold text-foreground">Produits</h1>
-              <p className="text-sm text-muted-foreground">Catalogue complet des produits analysés sur Cdiscount</p>
+              <h1 className="kraken-title text-xl">Produits traqués</h1>
+              <p className="text-sm text-muted-foreground">Catalogue des proies repérées sur Cdiscount</p>
             </div>
           </div>
         </motion.div>
