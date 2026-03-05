@@ -127,7 +127,7 @@ const Index = () => {
                     </div>
                     <div className="flex items-center gap-3 flex-shrink-0">
                       <span className="text-xs font-semibold text-primary">⚡ {p.score}</span>
-                      <span className={`text-sm font-bold font-mono ${p.sales > 5000 ? 'text-foreground' : 'text-coral'}`}>
+                      <span className={`text-sm font-bold font-mono ${p.sales > 5000 ? 'text-foreground' : 'text-accent'}`}>
                         {p.price}€
                       </span>
                     </div>
