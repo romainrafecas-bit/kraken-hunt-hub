@@ -19,25 +19,25 @@ const TopBrands = () => {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 12 }}
+      initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, delay: 0.35 }}
-      className="glass-panel rounded-md p-4"
+      transition={{ duration: 0.4, delay: 0.3 }}
+      className="glass-panel p-5"
     >
-      <h3 className="font-display text-xs font-bold tracking-[0.2em] text-foreground mb-4">TOP MARQUES</h3>
+      <h3 className="font-display text-sm font-bold text-foreground mb-4">🏆 Top marques</h3>
       <div className="space-y-3">
         {sorted.map((brand, i) => (
           <div key={brand.name} className="group">
-            <div className="flex justify-between text-xs mb-1">
-              <span className="font-mono text-secondary-foreground group-hover:text-foreground transition-colors">{brand.name}</span>
-              <span className="font-mono text-muted-foreground">{brand.sales.toLocaleString()}</span>
+            <div className="flex justify-between text-xs mb-1.5">
+              <span className="text-secondary-foreground font-medium group-hover:text-foreground transition-colors">{brand.name}</span>
+              <span className="text-muted-foreground font-mono text-[11px]">{brand.sales.toLocaleString()}</span>
             </div>
-            <div className="w-full h-1 rounded-full bg-muted overflow-hidden">
+            <div className="w-full h-1.5 rounded-full bg-muted/60 overflow-hidden">
               <motion.div
                 initial={{ width: 0 }}
                 animate={{ width: `${(brand.sales / maxSales) * 100}%` }}
-                transition={{ duration: 0.8, delay: 0.4 + i * 0.06 }}
-                className="h-full rounded-full bg-gradient-to-r from-primary/80 to-accent/60"
+                transition={{ duration: 0.7, delay: 0.35 + i * 0.05 }}
+                className="h-full rounded-full bg-gradient-to-r from-primary to-ocean-light"
               />
             </div>
           </div>
