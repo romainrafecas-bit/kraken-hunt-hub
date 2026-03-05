@@ -12,11 +12,6 @@ const dailyData = [
 const maxDaily = Math.max(...dailyData.map(d => d.v));
 
 
-const catIcons: Record<string, string> = {
-  "Électroménager": "⚡", "TV & Son": "🔊", "Smartphones": "📱",
-  "Gaming": "🎮", "Informatique": "💻", "Jouets": "🧸",
-  "Mode": "👟", "Maison": "🏠", "Beauté": "✨",
-};
 
 const catHues = [
   "174 72% 46%", "262 52% 58%", "188 78% 52%", "38 92% 56%",
@@ -228,86 +223,108 @@ const Index = () => {
           <div className="tentacle-line" />
         </div>
 
-        {/* ═══ CATEGORIES — stacked horizontal bars ═══ */}
+        {/* ═══ CATEGORIES — donut + legend ═══ */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4 }}
           className="px-6 lg:px-10 relative z-10"
         >
-          <p className="text-[9px] font-display uppercase tracking-[0.3em] text-muted-foreground/40 mb-6">
+          <p className="text-[9px] font-display uppercase tracking-[0.3em] text-muted-foreground/40 mb-8">
             Répartition par zone
           </p>
 
-          <div className="space-y-[3px]">
-            {catStats.map((cat, i) => {
-              const pct = Math.round((cat.sales / catTotal) * 100);
-              const hue = catHues[i % catHues.length];
-              const icon = catIcons[cat.name] || "📦";
-              const isHovered = hoveredCat === cat.name;
+          <div className="flex flex-col lg:flex-row items-center gap-10">
+            {/* Donut chart */}
+            <div className="relative w-48 h-48 flex-shrink-0">
+              <svg viewBox="0 0 100 100" className="w-full h-full -rotate-90">
+                {(() => {
+                  let cumulative = 0;
+                  const radius = 38;
+                  const circumference = 2 * Math.PI * radius;
 
-              return (
-                <motion.div
-                  key={cat.name}
-                  initial={{ opacity: 0, x: -30 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.45 + i * 0.04, ease: [0.16, 1, 0.3, 1] }}
-                  onMouseEnter={() => setHoveredCat(cat.name)}
-                  onMouseLeave={() => setHoveredCat(null)}
-                  className="flex items-center gap-3 cursor-pointer group"
-                >
-                  {/* Label */}
-                  <div className="w-32 flex-shrink-0 flex items-center gap-2 overflow-hidden">
-                    <span className="text-xs">{icon}</span>
-                    <span className="text-[11px] font-medium truncate transition-colors duration-200" style={{
-                      color: isHovered ? `hsl(${hue})` : 'hsl(210 10% 45%)',
-                    }}>{cat.name}</span>
-                  </div>
+                  return catStats.map((cat, i) => {
+                    const pct = cat.sales / catTotal;
+                    const offset = cumulative * circumference;
+                    cumulative += pct;
+                    const hue = catHues[i % catHues.length];
+                    const isHovered = hoveredCat === cat.name;
 
-                  {/* Bar */}
-                  <div className="flex-1 h-7 rounded-sm overflow-hidden relative" style={{
-                    background: 'hsl(225 20% 7%)',
-                  }}>
-                    <motion.div
-                      initial={{ width: 0 }}
-                      animate={{ width: `${pct}%` }}
-                      transition={{ delay: 0.5 + i * 0.04, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-                      className="h-full rounded-sm relative overflow-hidden"
+                    return (
+                      <motion.circle
+                        key={cat.name}
+                        cx="50" cy="50" r={radius}
+                        fill="none"
+                        stroke={`hsl(${hue})`}
+                        strokeWidth={isHovered ? 10 : 7}
+                        strokeDasharray={`${pct * circumference} ${circumference}`}
+                        strokeDashoffset={-offset}
+                        strokeLinecap="round"
+                        className="cursor-pointer transition-all duration-300"
+                        style={{
+                          filter: isHovered ? `drop-shadow(0 0 6px hsl(${hue} / 0.5))` : 'none',
+                          opacity: hoveredCat && !isHovered ? 0.3 : 1,
+                        }}
+                        onMouseEnter={() => setHoveredCat(cat.name)}
+                        onMouseLeave={() => setHoveredCat(null)}
+                        initial={{ strokeDasharray: `0 ${circumference}` }}
+                        animate={{ strokeDasharray: `${pct * circumference} ${circumference}` }}
+                        transition={{ delay: 0.5 + i * 0.06, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                      />
+                    );
+                  });
+                })()}
+              </svg>
+              {/* Center label */}
+              <div className="absolute inset-0 flex flex-col items-center justify-center">
+                <span className="text-2xl font-display font-black text-foreground">
+                  {catStats.length}
+                </span>
+                <span className="text-[9px] font-display text-muted-foreground/40 uppercase tracking-wider">
+                  zones
+                </span>
+              </div>
+            </div>
+
+            {/* Legend */}
+            <div className="flex-1 grid grid-cols-2 gap-x-6 gap-y-2 w-full">
+              {catStats.map((cat, i) => {
+                const pct = Math.round((cat.sales / catTotal) * 100);
+                const hue = catHues[i % catHues.length];
+                const isHovered = hoveredCat === cat.name;
+
+                return (
+                  <motion.div
+                    key={cat.name}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.55 + i * 0.04 }}
+                    onMouseEnter={() => setHoveredCat(cat.name)}
+                    onMouseLeave={() => setHoveredCat(null)}
+                    className="flex items-center gap-3 py-1.5 cursor-pointer group"
+                    style={{ opacity: hoveredCat && !isHovered ? 0.4 : 1, transition: 'opacity 0.2s' }}
+                  >
+                    <span className="w-2.5 h-2.5 rounded-full flex-shrink-0 transition-transform duration-200 group-hover:scale-125"
                       style={{
-                        background: `linear-gradient(90deg, hsl(${hue} / 0.6), hsl(${hue} / 0.25))`,
-                        boxShadow: isHovered ? `0 0 20px -4px hsl(${hue} / 0.4)` : 'none',
-                        transition: 'box-shadow 0.3s',
+                        backgroundColor: `hsl(${hue})`,
+                        boxShadow: isHovered ? `0 0 8px hsl(${hue} / 0.5)` : 'none',
                       }}
-                    >
-                      {isHovered && (
-                        <motion.div
-                          className="absolute inset-0"
-                          initial={{ x: '-100%' }}
-                          animate={{ x: '200%' }}
-                          transition={{ duration: 1, ease: "easeInOut" }}
-                          style={{
-                            background: `linear-gradient(90deg, transparent, hsl(${hue} / 0.3), transparent)`,
-                            width: '50%',
-                          }}
-                        />
-                      )}
-                    </motion.div>
-                  </div>
-
-                  {/* Values */}
-                  <div className="w-20 flex-shrink-0 flex items-center justify-end gap-3">
-                    <span className="text-[11px] font-display font-black tabular-nums" style={{
-                      color: `hsl(${hue})`,
-                      textShadow: isHovered ? `0 0 10px hsl(${hue} / 0.5)` : 'none',
-                      transition: 'text-shadow 0.3s',
-                    }}>{pct}%</span>
-                    <span className="text-[9px] font-display text-muted-foreground/40 tabular-nums w-6 text-right">
-                      {cat.count}
+                    />
+                    <span className="text-[11px] font-display font-semibold truncate flex-1 transition-colors duration-200"
+                      style={{ color: isHovered ? `hsl(${hue})` : 'hsl(210 10% 55%)' }}>
+                      {cat.name}
                     </span>
-                  </div>
-                </motion.div>
-              );
-            })}
+                    <span className="text-[11px] font-display font-black tabular-nums"
+                      style={{
+                        color: `hsl(${hue})`,
+                        textShadow: isHovered ? `0 0 10px hsl(${hue} / 0.4)` : 'none',
+                      }}>
+                      {pct}%
+                    </span>
+                  </motion.div>
+                );
+              })}
+            </div>
           </div>
         </motion.div>
 
