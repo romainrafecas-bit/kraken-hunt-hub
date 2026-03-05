@@ -12,7 +12,7 @@ const Produits = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5 }}
-          className="glass-panel p-5"
+          className="glass-panel-glow p-5"
         >
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-coral/12 flex items-center justify-center">

@@ -79,7 +79,7 @@ const Analytics = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5 }}
-          className="glass-panel p-5"
+          className="glass-panel-glow p-5"
         >
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -120,7 +120,7 @@ const Analytics = () => {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="glass-panel p-5"
+            className="glass-panel-glow p-5"
           >
             <h3 className="font-display text-sm font-bold text-foreground mb-4 flex items-center gap-2">
               <TrendingUp className="w-4 h-4 text-primary" />
@@ -146,7 +146,7 @@ const Analytics = () => {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.15 }}
-            className="glass-panel p-5"
+            className="glass-panel-glow p-5"
           >
             <h3 className="font-display text-sm font-bold text-foreground mb-4 flex items-center gap-2">
               <ShoppingCart className="w-4 h-4 text-coral" />
@@ -170,7 +170,7 @@ const Analytics = () => {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="glass-panel p-5"
+            className="glass-panel-glow p-5"
           >
             <h3 className="font-display text-sm font-bold text-foreground mb-4">
               Distribution des prix
@@ -199,7 +199,7 @@ const Analytics = () => {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.25 }}
-            className="glass-panel p-5"
+            className="glass-panel-glow p-5"
           >
             <h3 className="font-display text-sm font-bold text-foreground mb-4">
               Score par catégorie
@@ -221,7 +221,7 @@ const Analytics = () => {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="glass-panel p-5"
+          className="glass-panel-glow p-5"
         >
           <h3 className="font-display text-sm font-bold text-foreground mb-4 flex items-center gap-2">
             <Star className="w-4 h-4 text-kraken-eye" />

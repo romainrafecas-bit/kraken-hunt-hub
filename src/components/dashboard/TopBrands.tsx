@@ -3,15 +3,14 @@ import { products } from "@/data/products";
 
 const TopBrands = () => {
   const brandStats = products.reduce((acc, p) => {
-    if (!acc[p.brand]) acc[p.brand] = { sales: 0, count: 0, avgScore: 0 };
+    if (!acc[p.brand]) acc[p.brand] = { sales: 0, count: 0 };
     acc[p.brand].sales += p.sales;
     acc[p.brand].count += 1;
-    acc[p.brand].avgScore += p.score;
     return acc;
-  }, {} as Record<string, { sales: number; count: number; avgScore: number }>);
+  }, {} as Record<string, { sales: number; count: number }>);
 
   const sorted = Object.entries(brandStats)
-    .map(([name, data]) => ({ name, sales: data.sales, count: data.count, avgScore: Math.round(data.avgScore / data.count) }))
+    .map(([name, data]) => ({ name, sales: data.sales }))
     .sort((a, b) => b.sales - a.sales)
     .slice(0, 8);
 
@@ -22,7 +21,7 @@ const TopBrands = () => {
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: 0.3 }}
-      className="glass-panel p-5"
+      className="glass-panel-glow p-5"
     >
       <h3 className="font-display text-sm font-bold text-foreground mb-4">🏆 Top marques</h3>
       <div className="space-y-3">
@@ -32,12 +31,16 @@ const TopBrands = () => {
               <span className="text-secondary-foreground font-medium group-hover:text-foreground transition-colors">{brand.name}</span>
               <span className="text-muted-foreground font-mono text-[11px]">{brand.sales.toLocaleString()}</span>
             </div>
-            <div className="w-full h-1.5 rounded-full bg-muted/60 overflow-hidden">
+            <div className="w-full h-2 rounded-full bg-muted/40 overflow-hidden">
               <motion.div
                 initial={{ width: 0 }}
                 animate={{ width: `${(brand.sales / maxSales) * 100}%` }}
                 transition={{ duration: 0.7, delay: 0.35 + i * 0.05 }}
-                className="h-full rounded-full bg-gradient-to-r from-primary to-ocean-light"
+                className="h-full rounded-full"
+                style={{
+                  background: `linear-gradient(90deg, hsl(174, 90%, 45%), hsl(199, 85%, 50%))`,
+                  boxShadow: '0 0 8px hsl(174 90% 45% / 0.3)'
+                }}
               />
             </div>
           </div>
