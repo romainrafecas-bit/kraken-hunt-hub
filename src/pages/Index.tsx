@@ -11,23 +11,6 @@ const dailyData = [
 ];
 const maxDaily = Math.max(...dailyData.map(d => d.v));
 
-/* ── smooth curve helper ── */
-function buildSmoothPath(points: { x: number; y: number }[]): string {
-  if (points.length < 2) return "";
-  let d = `M ${points[0].x} ${points[0].y}`;
-  for (let i = 0; i < points.length - 1; i++) {
-    const p0 = points[Math.max(0, i - 1)];
-    const p1 = points[i];
-    const p2 = points[i + 1];
-    const p3 = points[Math.min(points.length - 1, i + 2)];
-    const cp1x = p1.x + (p2.x - p0.x) / 6;
-    const cp1y = p1.y + (p2.y - p0.y) / 6;
-    const cp2x = p2.x - (p3.x - p1.x) / 6;
-    const cp2y = p2.y - (p3.y - p1.y) / 6;
-    d += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${p2.x} ${p2.y}`;
-  }
-  return d;
-}
 
 const catIcons: Record<string, string> = {
   "Électroménager": "⚡", "TV & Son": "🔊", "Smartphones": "📱",
@@ -109,15 +92,14 @@ const Index = () => {
           </div>
         </div>
 
-        {/* ═══ DAILY ACTIVITY — organic SVG curve ═══ */}
+        {/* ═══ DAILY ACTIVITY — clean area chart ═══ */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2 }}
           className="px-6 lg:px-10 mt-10 relative z-10"
         >
-          {/* Big stat + label */}
-          <div className="flex items-end justify-between mb-2">
+          <div className="flex items-end justify-between mb-6">
             <div>
               <p className="text-[9px] font-mono uppercase tracking-[0.3em] text-muted-foreground/40 mb-1">
                 Cette semaine
@@ -140,122 +122,51 @@ const Index = () => {
             </div>
           </div>
 
-          {/* SVG Curve */}
-          {(() => {
-            const W = 800, H = 160, padX = 40, padY = 20;
-            const chartW = W - padX * 2;
-            const chartH = H - padY * 2;
-            const points = dailyData.map((d, i) => ({
-              x: padX + (i / (dailyData.length - 1)) * chartW,
-              y: padY + chartH - (d.v / maxDaily) * chartH,
-            }));
-            const linePath = buildSmoothPath(points);
-            const areaPath = linePath + ` L ${points[points.length - 1].x} ${H} L ${points[0].x} ${H} Z`;
+          {/* Clean bar chart */}
+          <div className="flex items-end gap-2 h-32">
+            {dailyData.map((d, i) => {
+              const h = (d.v / maxDaily) * 100;
+              const isToday = i === dailyData.length - 1;
+              const isPeak = d.v === maxDaily;
 
-            return (
-              <div className="relative -mx-2 cursor-crosshair group">
-                <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-auto" style={{ filter: 'drop-shadow(0 0 12px hsl(174 72% 46% / 0.15))' }}>
-                  <defs>
-                    <linearGradient id="curveGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="hsl(174 72% 50%)" stopOpacity="0.25" />
-                      <stop offset="60%" stopColor="hsl(188 78% 52%)" stopOpacity="0.08" />
-                      <stop offset="100%" stopColor="hsl(228 42% 5%)" stopOpacity="0" />
-                    </linearGradient>
-                    <linearGradient id="strokeGrad" x1="0" y1="0" x2="1" y2="0">
-                      <stop offset="0%" stopColor="hsl(174 72% 46%)" />
-                      <stop offset="50%" stopColor="hsl(188 78% 62%)" />
-                      <stop offset="100%" stopColor="hsl(262 52% 58%)" />
-                    </linearGradient>
-                    <filter id="glow">
-                      <feGaussianBlur stdDeviation="3" result="blur" />
-                      <feMerge>
-                        <feMergeNode in="blur" />
-                        <feMergeNode in="SourceGraphic" />
-                      </feMerge>
-                    </filter>
-                  </defs>
-
-                  {/* Grid lines — subtle depth */}
-                  {[0.25, 0.5, 0.75].map(f => (
-                    <line key={f} x1={padX} x2={W - padX} y1={padY + chartH * (1 - f)} y2={padY + chartH * (1 - f)}
-                      stroke="hsl(225 20% 10%)" strokeWidth="0.5" strokeDasharray="4 8" />
-                  ))}
-
-                  {/* Filled area */}
-                  <motion.path
-                    d={areaPath}
-                    fill="url(#curveGrad)"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.5, duration: 0.8 }}
+              return (
+                <div key={d.day} className="flex-1 flex flex-col items-center gap-2 h-full justify-end">
+                  <motion.span
+                    initial={{ opacity: 0, y: 5 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.5 + i * 0.06 }}
+                    className="text-[10px] font-mono font-bold tabular-nums"
+                    style={{
+                      color: isToday ? 'hsl(174 72% 56%)' : isPeak ? 'hsl(262 52% 65%)' : 'hsl(210 10% 28%)',
+                    }}
+                  >
+                    {d.v}
+                  </motion.span>
+                  <motion.div
+                    initial={{ height: 0 }}
+                    animate={{ height: `${h}%` }}
+                    transition={{ delay: 0.35 + i * 0.06, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                    className="w-full rounded-md relative overflow-hidden"
+                    style={{
+                      background: isToday
+                        ? 'linear-gradient(180deg, hsl(174 72% 50%), hsl(174 72% 32%))'
+                        : isPeak
+                        ? 'linear-gradient(180deg, hsl(262 52% 58%), hsl(262 52% 38%))'
+                        : 'hsl(225 18% 11%)',
+                      boxShadow: isToday
+                        ? '0 0 24px -4px hsl(174 72% 46% / 0.35)'
+                        : isPeak
+                        ? '0 0 24px -4px hsl(262 52% 58% / 0.25)'
+                        : 'none',
+                    }}
                   />
-
-                  {/* Main curve — glowing stroke */}
-                  <motion.path
-                    d={linePath}
-                    fill="none"
-                    stroke="url(#strokeGrad)"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                    filter="url(#glow)"
-                    initial={{ pathLength: 0 }}
-                    animate={{ pathLength: 1 }}
-                    transition={{ delay: 0.3, duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
-                  />
-
-                  {/* Data points */}
-                  {points.map((pt, i) => {
-                    const isToday = i === dailyData.length - 1;
-                    const isPeak = dailyData[i].v === maxDaily;
-                    return (
-                      <g key={i}>
-                        {(isToday || isPeak) && (
-                          <circle cx={pt.x} cy={pt.y} r="8"
-                            fill="none" stroke={isToday ? "hsl(174 72% 50%)" : "hsl(262 52% 58%)"}
-                            strokeWidth="0.5" opacity="0.4">
-                            <animate attributeName="r" values="6;14;6" dur="3s" repeatCount="indefinite" />
-                            <animate attributeName="opacity" values="0.4;0;0.4" dur="3s" repeatCount="indefinite" />
-                          </circle>
-                        )}
-                        <motion.circle
-                          cx={pt.x} cy={pt.y}
-                          r={isToday ? 4 : 3}
-                          fill={isToday ? "hsl(174 72% 60%)" : isPeak ? "hsl(262 52% 65%)" : "hsl(225 20% 15%)"}
-                          stroke={isToday ? "hsl(174 72% 40%)" : isPeak ? "hsl(262 52% 50%)" : "hsl(225 20% 20%)"}
-                          strokeWidth="1.5"
-                          initial={{ scale: 0 }}
-                          animate={{ scale: 1 }}
-                          transition={{ delay: 0.4 + i * 0.08, type: "spring", stiffness: 300 }}
-                          className="cursor-pointer"
-                          style={{ filter: isToday ? 'drop-shadow(0 0 6px hsl(174 72% 50% / 0.6))' : 'none' }}
-                        />
-                        <motion.text
-                          x={pt.x} y={pt.y - 12}
-                          textAnchor="middle"
-                          className="text-[10px] font-mono font-bold"
-                          fill={isToday ? "hsl(174 72% 60%)" : isPeak ? "hsl(262 52% 65%)" : "hsl(210 10% 35%)"}
-                          initial={{ opacity: 0, y: pt.y }}
-                          animate={{ opacity: 1, y: pt.y - 12 }}
-                          transition={{ delay: 0.5 + i * 0.08 }}
-                        >
-                          {dailyData[i].v}
-                        </motion.text>
-                        <text x={pt.x} y={H - 4} textAnchor="middle"
-                          className="text-[9px] font-mono uppercase"
-                          fill={isToday ? "hsl(174 72% 56%)" : "hsl(210 10% 25%)"}>
-                          {dailyData[i].day}
-                        </text>
-                      </g>
-                    );
-                  })}
-                </svg>
-
-                <div className="absolute right-[calc(40/800*100%)] top-0 bottom-0 w-px opacity-20" style={{
-                  background: 'linear-gradient(180deg, hsl(174 72% 50%), transparent)',
-                }} />
-              </div>
-            );
-          })()}
+                  <span className="text-[9px] font-mono uppercase tracking-wider" style={{
+                    color: isToday ? 'hsl(174 72% 50%)' : 'hsl(210 10% 22%)',
+                  }}>{d.day}</span>
+                </div>
+              );
+            })}
+          </div>
         </motion.div>
 
         {/* ═══ DIVIDER ═══ */}
