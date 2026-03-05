@@ -59,7 +59,7 @@ const Index = () => {
               <motion.p
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="text-[10px] font-mono uppercase tracking-[0.4em] text-muted-foreground/60 mb-3"
+                className="text-[10px] font-display uppercase tracking-[0.4em] text-muted-foreground/60 mb-3"
               >
                 05.03.2026 — session active
               </motion.p>
@@ -87,12 +87,12 @@ const Index = () => {
                 boxShadow: '0 0 8px hsl(162 68% 44% / 0.6)',
                 animation: 'bioluminescence 2s ease-in-out infinite',
               }} />
-              <span className="text-[10px] font-mono text-muted-foreground/50">LIVE</span>
+              <span className="text-[10px] font-display text-muted-foreground/50">LIVE</span>
             </motion.div>
           </div>
         </div>
 
-        {/* ═══ DAILY ACTIVITY — clean area chart ═══ */}
+        {/* ═══ DAILY ACTIVITY — smooth area curve ═══ */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -101,7 +101,7 @@ const Index = () => {
         >
           <div className="flex items-end justify-between mb-6">
             <div>
-              <p className="text-[9px] font-mono uppercase tracking-[0.3em] text-muted-foreground/40 mb-1">
+              <p className="text-[9px] font-display uppercase tracking-[0.3em] text-muted-foreground/40 mb-1">
                 Cette semaine
               </p>
               <div className="flex items-baseline gap-3">
@@ -111,62 +111,116 @@ const Index = () => {
                 }}>
                   {dailyData.reduce((s, d) => s + d.v, 0)}
                 </p>
-                <p className="text-[10px] text-muted-foreground/50">produits scannés</p>
+                <p className="text-[10px] font-display text-muted-foreground/50">produits scannés</p>
               </div>
             </div>
             <div className="flex items-center gap-1.5">
-              <span className="text-[10px] font-mono font-bold" style={{ color: 'hsl(162 68% 52%)' }}>
+              <span className="text-[10px] font-display font-bold" style={{ color: 'hsl(162 68% 52%)' }}>
                 +{Math.round(((dailyData[6].v - dailyData[0].v) / dailyData[0].v) * 100)}%
               </span>
-              <span className="text-[9px] text-muted-foreground/40">vs lun.</span>
+              <span className="text-[9px] font-display text-muted-foreground/40">vs lun.</span>
             </div>
           </div>
 
-          {/* Clean bar chart */}
-          <div className="flex items-end gap-2 h-32">
-            {dailyData.map((d, i) => {
-              const h = (d.v / maxDaily) * 100;
-              const isToday = i === dailyData.length - 1;
-              const isPeak = d.v === maxDaily;
+          {/* SVG smooth curve */}
+          {(() => {
+            const W = 700, H = 140, padX = 30, padY = 24;
+            const chartW = W - padX * 2;
+            const chartH = H - padY * 2;
+            const pts = dailyData.map((d, i) => ({
+              x: padX + (i / (dailyData.length - 1)) * chartW,
+              y: padY + chartH - (d.v / maxDaily) * chartH,
+            }));
 
-              return (
-                <div key={d.day} className="flex-1 flex flex-col items-center gap-2 h-full justify-end">
-                  <motion.span
-                    initial={{ opacity: 0, y: 5 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.5 + i * 0.06 }}
-                    className="text-[10px] font-mono font-bold tabular-nums"
-                    style={{
-                      color: isToday ? 'hsl(174 72% 56%)' : isPeak ? 'hsl(262 52% 65%)' : 'hsl(210 10% 28%)',
-                    }}
-                  >
-                    {d.v}
-                  </motion.span>
-                  <motion.div
-                    initial={{ height: 0 }}
-                    animate={{ height: `${h}%` }}
-                    transition={{ delay: 0.35 + i * 0.06, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-                    className="w-full rounded-md relative overflow-hidden"
-                    style={{
-                      background: isToday
-                        ? 'linear-gradient(180deg, hsl(174 72% 50%), hsl(174 72% 32%))'
-                        : isPeak
-                        ? 'linear-gradient(180deg, hsl(262 52% 58%), hsl(262 52% 38%))'
-                        : 'hsl(225 18% 11%)',
-                      boxShadow: isToday
-                        ? '0 0 24px -4px hsl(174 72% 46% / 0.35)'
-                        : isPeak
-                        ? '0 0 24px -4px hsl(262 52% 58% / 0.25)'
-                        : 'none',
-                    }}
-                  />
-                  <span className="text-[9px] font-mono uppercase tracking-wider" style={{
-                    color: isToday ? 'hsl(174 72% 50%)' : 'hsl(210 10% 22%)',
-                  }}>{d.day}</span>
-                </div>
-              );
-            })}
-          </div>
+            // Catmull-Rom → cubic bezier smooth path
+            let path = `M ${pts[0].x} ${pts[0].y}`;
+            for (let i = 0; i < pts.length - 1; i++) {
+              const p0 = pts[Math.max(0, i - 1)];
+              const p1 = pts[i];
+              const p2 = pts[i + 1];
+              const p3 = pts[Math.min(pts.length - 1, i + 2)];
+              const cp1x = p1.x + (p2.x - p0.x) / 5;
+              const cp1y = p1.y + (p2.y - p0.y) / 5;
+              const cp2x = p2.x - (p3.x - p1.x) / 5;
+              const cp2y = p2.y - (p3.y - p1.y) / 5;
+              path += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${p2.x} ${p2.y}`;
+            }
+            const areaPath = path + ` L ${pts[pts.length - 1].x} ${H} L ${pts[0].x} ${H} Z`;
+
+            return (
+              <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-auto">
+                <defs>
+                  <linearGradient id="areaFill" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="hsl(174 72% 50%)" stopOpacity="0.2" />
+                    <stop offset="100%" stopColor="hsl(228 42% 5%)" stopOpacity="0" />
+                  </linearGradient>
+                  <linearGradient id="lineStroke" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0%" stopColor="hsl(174 72% 50%)" />
+                    <stop offset="60%" stopColor="hsl(188 78% 58%)" />
+                    <stop offset="100%" stopColor="hsl(262 52% 62%)" />
+                  </linearGradient>
+                </defs>
+
+                {/* Area fill */}
+                <motion.path
+                  d={areaPath}
+                  fill="url(#areaFill)"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.5, duration: 0.8 }}
+                />
+
+                {/* Smooth line */}
+                <motion.path
+                  d={path}
+                  fill="none"
+                  stroke="url(#lineStroke)"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  initial={{ pathLength: 0 }}
+                  animate={{ pathLength: 1 }}
+                  transition={{ delay: 0.3, duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+                />
+
+                {/* Dots + labels */}
+                {pts.map((pt, i) => {
+                  const isToday = i === dailyData.length - 1;
+                  return (
+                    <g key={i}>
+                      <motion.circle
+                        cx={pt.x} cy={pt.y} r={isToday ? 5 : 3.5}
+                        fill={isToday ? "hsl(174 72% 55%)" : "hsl(225 25% 8%)"}
+                        stroke={isToday ? "hsl(174 72% 40%)" : "hsl(188 60% 40%)"}
+                        strokeWidth={isToday ? 2 : 1.5}
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ delay: 0.5 + i * 0.07, type: "spring", stiffness: 300 }}
+                        style={{ filter: isToday ? 'drop-shadow(0 0 6px hsl(174 72% 50% / 0.5))' : 'none' }}
+                      />
+                      {isToday && (
+                        <circle cx={pt.x} cy={pt.y} r="10" fill="none"
+                          stroke="hsl(174 72% 50%)" strokeWidth="0.8" opacity="0.3">
+                          <animate attributeName="r" values="8;16;8" dur="2.5s" repeatCount="indefinite" />
+                          <animate attributeName="opacity" values="0.3;0;0.3" dur="2.5s" repeatCount="indefinite" />
+                        </circle>
+                      )}
+                      <text x={pt.x} y={pt.y - 10} textAnchor="middle"
+                        className="text-[10px] font-display font-bold"
+                        fill={isToday ? "hsl(174 72% 60%)" : "hsl(210 10% 38%)"}>
+                        {dailyData[i].v}
+                      </text>
+                      <text x={pt.x} y={H - 4} textAnchor="middle"
+                        className="text-[9px] font-display"
+                        fill={isToday ? "hsl(174 72% 50%)" : "hsl(210 10% 25%)"}>
+                        {dailyData[i].day}
+                      </text>
+                    </g>
+                  );
+                })}
+              </svg>
+            );
+          })()}
         </motion.div>
 
         {/* ═══ DIVIDER ═══ */}
@@ -181,7 +235,7 @@ const Index = () => {
           transition={{ delay: 0.4 }}
           className="px-6 lg:px-10 relative z-10"
         >
-          <p className="text-[9px] font-mono uppercase tracking-[0.3em] text-muted-foreground/40 mb-6">
+          <p className="text-[9px] font-display uppercase tracking-[0.3em] text-muted-foreground/40 mb-6">
             Répartition par zone
           </p>
 
@@ -242,12 +296,12 @@ const Index = () => {
 
                   {/* Values */}
                   <div className="w-20 flex-shrink-0 flex items-center justify-end gap-3">
-                    <span className="text-[11px] font-mono font-black tabular-nums" style={{
+                    <span className="text-[11px] font-display font-black tabular-nums" style={{
                       color: `hsl(${hue})`,
                       textShadow: isHovered ? `0 0 10px hsl(${hue} / 0.5)` : 'none',
                       transition: 'text-shadow 0.3s',
                     }}>{pct}%</span>
-                    <span className="text-[9px] font-mono text-muted-foreground/40 tabular-nums w-6 text-right">
+                    <span className="text-[9px] font-display text-muted-foreground/40 tabular-nums w-6 text-right">
                       {cat.count}
                     </span>
                   </div>
@@ -271,14 +325,14 @@ const Index = () => {
         >
           <div className="flex items-end justify-between mb-8">
             <div>
-              <p className="text-[9px] font-mono uppercase tracking-[0.3em] text-muted-foreground/40 mb-2">
+              <p className="text-[9px] font-display uppercase tracking-[0.3em] text-muted-foreground/40 mb-2">
                 Meilleures prises
               </p>
               <p className="text-xl font-display font-black text-foreground">
                 Top produits
               </p>
             </div>
-            <p className="text-[10px] font-mono text-muted-foreground/40">
+            <p className="text-[10px] font-display text-muted-foreground/40">
               triés par score de vélocité
             </p>
           </div>
@@ -344,7 +398,7 @@ const Index = () => {
 
                       {/* Score — top right */}
                       <div className="absolute top-3 right-3">
-                        <span className="text-xs font-black font-mono px-2 py-0.5 rounded-md" style={{
+                        <span className="text-xs font-black font-display px-2 py-0.5 rounded-md" style={{
                           background: `hsl(${scoreColor} / 0.15)`,
                           color: `hsl(${scoreColor})`,
                           textShadow: `0 0 10px hsl(${scoreColor} / 0.4)`,
@@ -358,7 +412,7 @@ const Index = () => {
 
                     {/* Content */}
                     <div className="p-4 pt-2">
-                      <p className="text-[10px] text-muted-foreground/50 font-mono uppercase tracking-wider mb-1">
+                      <p className="text-[10px] text-muted-foreground/50 font-display uppercase tracking-wider mb-1">
                         {p.brand} — {p.category}
                       </p>
                       <p className="text-sm font-semibold text-foreground/90 leading-tight group-hover:text-foreground transition-colors line-clamp-2 min-h-[2.5rem]">
@@ -370,19 +424,19 @@ const Index = () => {
                       }}>
                         <div>
                           <p className="text-[9px] text-muted-foreground/40 uppercase tracking-wider">Prix</p>
-                          <p className="text-lg font-black font-mono text-foreground leading-none mt-0.5">
+                          <p className="text-lg font-black font-display text-foreground leading-none mt-0.5">
                             {p.price}<span className="text-xs text-muted-foreground">€</span>
                           </p>
                         </div>
                         <div className="text-right">
                           <p className="text-[9px] text-muted-foreground/40 uppercase tracking-wider">Vendeurs</p>
-                          <p className="text-sm font-bold font-mono text-muted-foreground leading-none mt-0.5">
+                          <p className="text-sm font-bold font-display text-muted-foreground leading-none mt-0.5">
                             {p.sellers}
                           </p>
                         </div>
                         <div className="text-right">
                           <p className="text-[9px] text-muted-foreground/40 uppercase tracking-wider">Vélocité</p>
-                          <p className="text-sm font-bold font-mono leading-none mt-0.5" style={{
+                          <p className="text-sm font-bold font-display leading-none mt-0.5" style={{
                             color: `hsl(${scoreColor})`,
                           }}>
                             {p.recurrences.toLocaleString("fr-FR")}
