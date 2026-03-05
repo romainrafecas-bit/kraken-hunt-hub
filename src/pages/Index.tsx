@@ -333,28 +333,18 @@ const Index = () => {
           <div className="tentacle-line" />
         </div>
 
-        {/* ═══ TOP PRODUCTS — editorial cards ═══ */}
+        {/* ═══ TOP PRODUCTS ═══ */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.6 }}
           className="px-6 lg:px-10 pb-16 relative z-10"
         >
-          <div className="flex items-end justify-between mb-8">
-            <div>
-              <p className="text-[9px] font-display uppercase tracking-[0.3em] text-muted-foreground/40 mb-2">
-                Meilleures prises
-              </p>
-              <p className="text-xl font-display font-black text-foreground">
-                Top produits
-              </p>
-            </div>
-            <p className="text-[10px] font-display text-muted-foreground/40">
-              triés par score de vélocité
-            </p>
-          </div>
+          <p className="text-[9px] font-display uppercase tracking-[0.3em] text-muted-foreground/40 mb-8">
+            Meilleures prises
+          </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="space-y-2">
             {topProducts.map((p, i) => {
               const isHovered = hoveredProduct === p.id;
               const scoreColor = p.score >= 90
@@ -362,106 +352,78 @@ const Index = () => {
                 : p.score >= 80
                 ? "174 72% 56%"
                 : "210 10% 50%";
-              const isFirst = i === 0;
+              const discount = Math.round(((p.originalPrice - p.price) / p.originalPrice) * 100);
 
               return (
                 <motion.div
                   key={p.id}
-                  initial={{ opacity: 0, y: 20 }}
+                  initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.65 + i * 0.07, ease: [0.16, 1, 0.3, 1] }}
+                  transition={{ delay: 0.65 + i * 0.06, ease: [0.16, 1, 0.3, 1] }}
                   onMouseEnter={() => setHoveredProduct(p.id)}
                   onMouseLeave={() => setHoveredProduct(null)}
-                  className="group cursor-pointer relative"
+                  className="group cursor-pointer relative flex items-center gap-4 p-3 rounded-xl transition-all duration-300"
+                  style={{
+                    background: isHovered ? 'hsl(225 25% 8%)' : 'transparent',
+                    border: `1px solid ${isHovered ? `hsl(${scoreColor} / 0.15)` : 'transparent'}`,
+                  }}
                 >
-                  <motion.div
-                    className="relative rounded-2xl overflow-hidden"
+                  {/* Rank */}
+                  <span className="text-lg font-display font-black w-7 text-center tabular-nums flex-shrink-0"
                     style={{
-                      background: 'hsl(225 25% 7%)',
-                      border: isHovered
-                        ? `1px solid hsl(${scoreColor} / 0.3)`
-                        : '1px solid hsl(225 20% 10%)',
-                      boxShadow: isHovered
-                        ? `0 8px 40px -12px hsl(${scoreColor} / 0.2), 0 0 0 1px hsl(${scoreColor} / 0.1)`
-                        : '0 2px 20px -8px hsl(228 50% 2% / 0.5)',
-                      transition: 'border-color 0.3s, box-shadow 0.3s',
-                    }}
-                    whileHover={{ y: -4 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    {/* Image band */}
-                    <div className="h-28 relative overflow-hidden">
-                      <img
-                        src={p.image}
-                        alt={p.name}
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                        style={{ filter: 'brightness(0.7) saturate(0.8)' }}
-                      />
-                      <div className="absolute inset-0" style={{
-                        background: 'linear-gradient(180deg, transparent 30%, hsl(225 25% 7%) 100%)',
-                      }} />
+                      color: i === 0 ? 'hsl(38 92% 56%)' : i < 3 ? `hsl(${scoreColor})` : 'hsl(210 10% 22%)',
+                      textShadow: i === 0 ? '0 0 14px hsl(38 92% 56% / 0.4)' : 'none',
+                    }}>
+                    {i + 1}
+                  </span>
 
-                      {/* Rank badge */}
-                      <div className="absolute top-3 left-3 flex items-center gap-1.5">
-                        <span className="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black font-display" style={{
-                          background: isFirst ? 'hsl(38 92% 56%)' : 'hsl(225 20% 12% / 0.8)',
-                          color: isFirst ? 'hsl(228 42% 5%)' : 'hsl(210 10% 50%)',
-                          boxShadow: isFirst ? '0 0 16px hsl(38 92% 56% / 0.4)' : 'none',
-                          backdropFilter: 'blur(8px)',
-                        }}>
-                          {i + 1}
-                        </span>
-                      </div>
+                  {/* Image */}
+                  <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
+                    <img src={p.image} alt={p.name}
+                      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                      style={{ filter: 'brightness(0.8) saturate(0.9)' }} />
+                  </div>
 
-                      {/* Score — top right */}
-                      <div className="absolute top-3 right-3">
-                        <span className="text-xs font-black font-display px-2 py-0.5 rounded-md" style={{
-                          background: `hsl(${scoreColor} / 0.15)`,
-                          color: `hsl(${scoreColor})`,
-                          textShadow: `0 0 10px hsl(${scoreColor} / 0.4)`,
-                          backdropFilter: 'blur(8px)',
-                          border: `1px solid hsl(${scoreColor} / 0.2)`,
-                        }}>
-                          {p.score}
-                        </span>
-                      </div>
-                    </div>
+                  {/* Info */}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-display font-bold text-foreground/85 group-hover:text-foreground transition-colors truncate">
+                      {p.name}
+                    </p>
+                    <p className="text-[10px] font-display text-muted-foreground/40 mt-0.5">
+                      {p.brand} · {p.category}
+                    </p>
+                  </div>
 
-                    {/* Content */}
-                    <div className="p-4 pt-2">
-                      <p className="text-[10px] text-muted-foreground/50 font-display uppercase tracking-wider mb-1">
-                        {p.brand} — {p.category}
-                      </p>
-                      <p className="text-sm font-semibold text-foreground/90 leading-tight group-hover:text-foreground transition-colors line-clamp-2 min-h-[2.5rem]">
-                        {p.name}
-                      </p>
+                  {/* Price + discount */}
+                  <div className="text-right flex-shrink-0">
+                    <p className="text-sm font-display font-black text-foreground tabular-nums">
+                      {p.price}<span className="text-[10px] text-muted-foreground/50">€</span>
+                    </p>
+                    {discount > 0 && (
+                      <span className="text-[10px] font-display font-bold" style={{ color: 'hsl(162 68% 50%)' }}>
+                        -{discount}%
+                      </span>
+                    )}
+                  </div>
 
-                      <div className="flex items-end justify-between mt-3 pt-3" style={{
-                        borderTop: '1px solid hsl(225 20% 10%)',
-                      }}>
-                        <div>
-                          <p className="text-[9px] text-muted-foreground/40 uppercase tracking-wider">Prix</p>
-                          <p className="text-lg font-black font-display text-foreground leading-none mt-0.5">
-                            {p.price}<span className="text-xs text-muted-foreground">€</span>
-                          </p>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-[9px] text-muted-foreground/40 uppercase tracking-wider">Vendeurs</p>
-                          <p className="text-sm font-bold font-display text-muted-foreground leading-none mt-0.5">
-                            {p.sellers}
-                          </p>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-[9px] text-muted-foreground/40 uppercase tracking-wider">Vélocité</p>
-                          <p className="text-sm font-bold font-display leading-none mt-0.5" style={{
-                            color: `hsl(${scoreColor})`,
-                          }}>
-                            {p.recurrences.toLocaleString("fr-FR")}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </motion.div>
+                  {/* Recurrences */}
+                  <div className="text-right flex-shrink-0 w-20">
+                    <p className="text-sm font-display font-black tabular-nums" style={{ color: `hsl(${scoreColor})` }}>
+                      {p.recurrences.toLocaleString("fr-FR")}
+                    </p>
+                    <p className="text-[9px] font-display text-muted-foreground/30">récurrences</p>
+                  </div>
+
+                  {/* Score pill */}
+                  <span className="text-[11px] font-display font-black tabular-nums px-2.5 py-1 rounded-full flex-shrink-0"
+                    style={{
+                      background: `hsl(${scoreColor} / 0.1)`,
+                      color: `hsl(${scoreColor})`,
+                      border: `1px solid hsl(${scoreColor} / 0.15)`,
+                      textShadow: isHovered ? `0 0 8px hsl(${scoreColor} / 0.4)` : 'none',
+                    }}>
+                    {p.score}
+                  </span>
                 </motion.div>
               );
             })}
