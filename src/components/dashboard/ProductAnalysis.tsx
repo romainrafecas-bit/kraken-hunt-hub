@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
-import { ArrowUpDown, ArrowUp, ArrowDown, ChevronLeft, ChevronRight, Search, Users, CalendarDays } from "lucide-react";
+import { ArrowUpDown, ArrowUp, ArrowDown, ChevronLeft, ChevronRight, Search, Users, CalendarDays, Crosshair } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Product, products as allProducts, categories, brands } from "@/data/products";
 
@@ -17,7 +17,7 @@ const months = [
 const ProductAnalysis = () => {
   const [selectedCategory, setSelectedCategory] = useState("Tous");
   const [selectedBrand, setSelectedBrand] = useState("Toutes");
-  const [selectedMonth, setSelectedMonth] = useState(1); // February (0-indexed)
+  const [selectedMonth, setSelectedMonth] = useState(1);
   const [sortKey, setSortKey] = useState<SortKey>("score");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [page, setPage] = useState(0);
@@ -62,6 +62,20 @@ const ProductAnalysis = () => {
     </th>
   );
 
+  const getScoreStyle = (score: number) => {
+    if (score >= 90) return { color: 'hsl(162 72% 52%)', shadow: 'hsl(162 68% 44% / 0.4)', bg: 'hsl(162 68% 44%)' };
+    if (score >= 80) return { color: 'hsl(174 72% 56%)', shadow: 'hsl(174 72% 46% / 0.4)', bg: 'hsl(174 72% 46%)' };
+    if (score >= 70) return { color: 'hsl(188 80% 62%)', shadow: 'hsl(188 78% 52% / 0.4)', bg: 'hsl(188 78% 52%)' };
+    return { color: 'hsl(210 10% 50%)', shadow: 'transparent', bg: 'hsl(210 10% 40%)' };
+  };
+
+  const getRatingColor = (rating: number) => {
+    if (rating >= 4.7) return 'hsl(38 92% 60%)';
+    if (rating >= 4.4) return 'hsl(45 85% 55%)';
+    if (rating >= 4.0) return 'hsl(30 75% 55%)';
+    return 'hsl(210 10% 50%)';
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 12 }}
@@ -70,27 +84,33 @@ const ProductAnalysis = () => {
       className="glass-panel-glow overflow-hidden"
     >
       {/* Header */}
-      <div className="p-5 border-b border-border/40">
+      <div className="p-5 border-b border-border/40 relative">
+        <div className="absolute top-0 left-0 right-0 h-px tentacle-line" />
+        
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-3">
+              <Crosshair className="w-4 h-4" style={{
+                color: 'hsl(174 72% 56%)',
+                filter: 'drop-shadow(0 0 4px hsl(174 72% 46% / 0.4))',
+              }} />
               <h3 className="font-display text-base font-bold text-foreground">Résultats d'analyse</h3>
-              <span className="text-[0.65rem] font-semibold text-primary px-2.5 py-1 bg-primary/10 rounded-full">
-                {filtered.length} trouvés
+              <span className="bio-badge bio-teal">
+                {filtered.length} proies
               </span>
             </div>
-            <p className="text-xs text-muted-foreground mt-1">Dernière analyse complète — 28 fév. 2026</p>
+            <p className="text-xs text-muted-foreground mt-1 ml-7">Dernière plongée — 28 fév. 2026</p>
           </div>
 
           <div className="flex items-center gap-3">
             {/* Month selector */}
             <div className="relative flex items-center gap-2">
-              <CalendarDays className="w-3.5 h-3.5 text-accent" />
+              <CalendarDays className="w-3.5 h-3.5" style={{ color: 'hsl(262 72% 72%)' }} />
               <select
                 value={selectedMonth}
                 onChange={e => setSelectedMonth(Number(e.target.value))}
                 className="bg-secondary/60 border border-border/40 rounded-xl px-3 py-2 text-sm text-foreground focus:outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all appearance-none cursor-pointer pr-8"
-                style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2366b2b2' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 10px center' }}
+                style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%234dd4ac' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 10px center' }}
               >
                 {months.map((m, i) => (
                   <option key={m} value={i} className="bg-card text-foreground">{m} 2026</option>
@@ -103,7 +123,7 @@ const ProductAnalysis = () => {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
               <input
                 type="text"
-                placeholder="Rechercher un produit..."
+                placeholder="Traquer un produit..."
                 value={searchQuery}
                 onChange={e => { setSearchQuery(e.target.value); setPage(0); }}
                 className="bg-secondary/60 border border-border/40 rounded-xl pl-9 pr-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 w-full lg:w-56 transition-all"
@@ -123,7 +143,7 @@ const ProductAnalysis = () => {
                 className={cn(
                   "px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200",
                   selectedCategory === cat
-                    ? "bg-primary/15 text-primary border border-primary/25"
+                    ? "bio-teal"
                     : "bg-secondary/40 text-muted-foreground border border-transparent hover:text-foreground hover:bg-secondary/70"
                 )}
               >
@@ -141,7 +161,7 @@ const ProductAnalysis = () => {
                 className={cn(
                   "px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200",
                   selectedBrand === brand
-                    ? "bg-accent/15 text-accent border border-accent/25"
+                    ? "bio-violet"
                     : "bg-secondary/40 text-muted-foreground border border-transparent hover:text-foreground hover:bg-secondary/70"
                 )}
               >
@@ -149,7 +169,7 @@ const ProductAnalysis = () => {
               </button>
             ))}
             {brands.length > 10 && (
-              <span className="text-xs text-muted-foreground/50">+{brands.length - 10}</span>
+              <span className="text-xs text-muted-foreground/40">+{brands.length - 10}</span>
             )}
           </div>
         </div>
@@ -160,17 +180,11 @@ const ProductAnalysis = () => {
         <table className="w-full">
           <thead>
             <tr className="border-b border-border/30">
-              <th className="text-left px-4 py-3">
-                <span className="soft-label">#</span>
-              </th>
-              <th className="text-left px-4 py-3">
-                <span className="soft-label">Image</span>
-              </th>
+              <th className="text-left px-4 py-3"><span className="soft-label">#</span></th>
+              <th className="text-left px-4 py-3"><span className="soft-label">Image</span></th>
               <SortHeader label="Produit" sortKeyName="name" />
               <SortHeader label="Marque" sortKeyName="brand" />
-              <th className="text-left px-4 py-3">
-                <span className="soft-label">Catégorie</span>
-              </th>
+              <th className="text-left px-4 py-3"><span className="soft-label">Catégorie</span></th>
               <SortHeader label="Prix" sortKeyName="price" />
               <SortHeader label="Récurrences" sortKeyName="recurrences" />
               <SortHeader label="Note" sortKeyName="rating" />
@@ -181,30 +195,33 @@ const ProductAnalysis = () => {
           <tbody>
             {paged.map((product, i) => {
               const globalRank = page * ITEMS_PER_PAGE + i + 1;
+              const scoreStyle = getScoreStyle(product.score);
+              const ratingColor = getRatingColor(product.rating);
+
               return (
                 <motion.tr
                   key={product.id}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: i * 0.03 }}
-                  className="border-b border-border/15 hover:bg-primary/[0.03] transition-colors cursor-pointer group"
+                  className="border-b border-border/10 hover:bg-primary/[0.03] transition-all duration-200 cursor-pointer group"
                 >
                   <td className="px-4 py-3">
-                    <span className={cn(
-                      "font-display text-sm font-bold",
-                      globalRank <= 3 ? "text-primary" : "text-muted-foreground/50"
-                    )}>
+                    <span className={cn("font-display text-sm font-black")}
+                      style={globalRank <= 3 ? {
+                        color: 'hsl(174 72% 56%)',
+                        textShadow: '0 0 8px hsl(174 72% 46% / 0.3)',
+                      } : { color: 'hsl(210 10% 30%)' }}
+                    >
                       {String(globalRank).padStart(2, '0')}
                     </span>
                   </td>
                   <td className="px-4 py-3">
-                    <div className="w-10 h-10 rounded-lg overflow-hidden bg-secondary/60 border border-border/30 flex-shrink-0">
-                      <img
-                        src={product.image}
-                        alt={product.name}
-                        className="w-full h-full object-cover"
-                        loading="lazy"
-                      />
+                    <div className="w-10 h-10 rounded-xl overflow-hidden flex-shrink-0 group-hover:scale-105 transition-transform duration-300" style={{
+                      border: '1px solid hsl(225 20% 15%)',
+                      boxShadow: '0 2px 8px hsl(228 50% 2% / 0.4)',
+                    }}>
+                      <img src={product.image} alt={product.name} className="w-full h-full object-cover" loading="lazy" />
                     </div>
                   </td>
                   <td className="px-4 py-3">
@@ -214,67 +231,74 @@ const ProductAnalysis = () => {
                     <span className="text-xs text-secondary-foreground font-medium">{product.brand}</span>
                   </td>
                   <td className="px-4 py-3">
-                    <span className="text-xs px-2.5 py-1 rounded-full bg-secondary/60 text-muted-foreground border border-border/20 font-medium">{product.category}</span>
+                    <span className="bio-badge bio-cyan text-[10px]">{product.category}</span>
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex flex-col">
-                      <span className="text-sm font-mono font-semibold text-foreground">{product.price}€</span>
-                      <span className="text-xs text-muted-foreground/40 line-through">{product.originalPrice}€</span>
+                      <span className="text-sm font-mono font-bold text-foreground">{product.price}€</span>
+                      <span className="text-[10px] text-muted-foreground/35 line-through">{product.originalPrice}€</span>
                     </div>
                   </td>
                   <td className="px-4 py-3">
-                    <span className={cn(
-                      "text-sm font-mono font-semibold",
-                      product.recurrences >= 8000 ? "text-emerald-400" : product.recurrences >= 4000 ? "text-accent" : "text-foreground/80"
-                    )}>
+                    <span className="text-sm font-mono font-bold" style={{
+                      color: product.recurrences >= 8000
+                        ? 'hsl(162 72% 52%)'
+                        : product.recurrences >= 4000
+                        ? 'hsl(174 72% 56%)'
+                        : 'hsl(185 20% 60%)',
+                      textShadow: product.recurrences >= 8000
+                        ? '0 0 8px hsl(162 68% 44% / 0.3)'
+                        : undefined,
+                    }}>
                       {product.recurrences.toLocaleString()}
                     </span>
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-1.5">
-                      <span className={cn(
-                        "text-sm font-bold",
-                        product.rating >= 4.5 ? "text-amber-400" : product.rating >= 4 ? "text-yellow-400" : product.rating >= 3.5 ? "text-orange-300" : "text-muted-foreground"
-                      )}>{product.rating}</span>
+                      <span className="text-sm font-bold" style={{ color: ratingColor, textShadow: `0 0 8px ${ratingColor}40` }}>
+                        {product.rating}
+                      </span>
                       <div className="flex">
                         {[1, 2, 3, 4, 5].map(star => (
-                          <span key={star} className={cn(
-                            "text-[10px]",
-                            star <= Math.round(product.rating) ? "text-amber-400" : "text-muted-foreground/20"
-                          )}>★</span>
+                          <span key={star} className="text-[10px]" style={{
+                            color: star <= Math.round(product.rating) ? ratingColor : 'hsl(210 10% 20%)',
+                            textShadow: star <= Math.round(product.rating) ? `0 0 4px ${ratingColor}60` : undefined,
+                          }}>★</span>
                         ))}
                       </div>
                     </div>
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-1.5">
-                      <Users className="w-3 h-3 text-accent/60" />
-                      <span className={cn(
-                        "text-sm font-bold",
-                        product.sellers >= 25 ? "text-primary" : product.sellers >= 15 ? "text-accent" : "text-foreground/70"
-                      )}>
+                      <Users className="w-3 h-3" style={{ color: 'hsl(262 60% 64%)', opacity: 0.6 }} />
+                      <span className="text-sm font-bold" style={{
+                        color: product.sellers >= 25
+                          ? 'hsl(262 72% 72%)'
+                          : product.sellers >= 15
+                          ? 'hsl(262 50% 62%)'
+                          : 'hsl(210 10% 50%)',
+                        textShadow: product.sellers >= 25 ? '0 0 8px hsl(262 52% 58% / 0.3)' : undefined,
+                      }}>
                         {product.sellers}
                       </span>
                     </div>
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2">
-                      <div className="w-16 h-2 rounded-full bg-muted/40 overflow-hidden">
+                      <div className="w-16 h-2 rounded-full overflow-hidden" style={{ background: 'hsl(225 18% 12%)' }}>
                         <div
-                          className={cn(
-                            "h-full rounded-full",
-                            product.score >= 85 ? "bg-gradient-to-r from-emerald-500 to-emerald-300"
-                              : product.score >= 70 ? "bg-gradient-to-r from-primary to-accent"
-                              : product.score >= 50 ? "bg-gradient-to-r from-cyan-600 to-cyan-400"
-                              : "bg-gradient-to-r from-muted-foreground to-muted-foreground"
-                          )}
-                          style={{ width: `${product.score}%` }}
+                          className="h-full rounded-full"
+                          style={{
+                            width: `${product.score}%`,
+                            backgroundColor: scoreStyle.bg,
+                            boxShadow: `0 0 8px ${scoreStyle.shadow}`,
+                          }}
                         />
                       </div>
-                      <span className={cn(
-                        "text-xs font-bold",
-                        product.score >= 85 ? "text-emerald-400" : product.score >= 70 ? "text-primary" : product.score >= 50 ? "text-cyan-400" : "text-muted-foreground"
-                      )}>{product.score}</span>
+                      <span className="text-xs font-black font-mono" style={{
+                        color: scoreStyle.color,
+                        textShadow: `0 0 8px ${scoreStyle.shadow}`,
+                      }}>{product.score}</span>
                     </div>
                   </td>
                 </motion.tr>
@@ -286,7 +310,8 @@ const ProductAnalysis = () => {
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="p-4 border-t border-border/25 flex items-center justify-between">
+        <div className="p-4 border-t border-border/20 flex items-center justify-between relative">
+          <div className="absolute top-0 left-0 right-0 h-px tentacle-line" />
           <span className="text-xs text-muted-foreground">
             {page * ITEMS_PER_PAGE + 1}–{Math.min((page + 1) * ITEMS_PER_PAGE, filtered.length)} sur {filtered.length}
           </span>
@@ -303,8 +328,8 @@ const ProductAnalysis = () => {
                 key={i}
                 onClick={() => setPage(i)}
                 className={cn(
-                  "w-8 h-8 rounded-lg text-xs font-medium transition-all",
-                  i === page ? "bg-primary/15 text-primary border border-primary/20" : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
+                  "w-8 h-8 rounded-lg text-xs font-bold transition-all",
+                  i === page ? "bio-teal" : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
                 )}
               >
                 {i + 1}
