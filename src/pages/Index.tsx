@@ -47,27 +47,40 @@ const Index = () => {
           `,
         }} />
 
-        {/* ═══ TOP BAR — minimal ═══ */}
+        {/* ═══ TOP BAR — with Kraken ═══ */}
         <div className="px-6 lg:px-10 pt-8 pb-2 relative z-10">
           <div className="flex items-start justify-between">
-            <div>
-              <motion.p
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="text-[10px] font-display uppercase tracking-[0.4em] text-muted-foreground/60 mb-3"
+            <div className="flex items-center gap-5">
+              {/* Kraken logo */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                className="relative"
               >
-                05.03.2026 — session active
-              </motion.p>
-              <motion.h1
-                initial={{ opacity: 0, x: -30 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-                className="text-[clamp(2.5rem,5vw,4.5rem)] font-display font-black leading-[0.9] tracking-tight"
-              >
-                <span className="text-foreground">Chassez</span>
-                <br />
-                <span className="kraken-title">en eaux profondes</span>
-              </motion.h1>
+                <img src={krakkenLogo} alt="Krakken" className="w-14 h-14"
+                  style={{ filter: 'drop-shadow(0 0 12px hsl(174 72% 46% / 0.3))' }} />
+                <div className="absolute inset-0 rounded-full pointer-events-none"
+                  style={{ boxShadow: '0 0 20px 4px hsl(174 72% 46% / 0.08)' }} />
+              </motion.div>
+
+              <div>
+                <motion.p
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="text-[10px] font-display uppercase tracking-[0.4em] text-muted-foreground/60 mb-1"
+                >
+                  05.03.2026
+                </motion.p>
+                <motion.h1
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+                  className="text-2xl lg:text-3xl font-display font-black leading-[0.95] tracking-tight"
+                >
+                  <span className="kraken-title">La traque commence</span>
+                </motion.h1>
+              </div>
             </div>
 
             {/* Live indicator */}
