@@ -200,8 +200,11 @@ const ProductAnalysis = () => {
                   </td>
                   <td className="px-4 py-3">
                     <span className={cn(
-                      "text-xs font-semibold px-2 py-0.5 rounded-full",
-                      discount >= 30 ? "text-emerald-400 bg-emerald-400/10" : discount >= 15 ? "text-primary bg-primary/10" : "text-muted-foreground"
+                      "text-xs font-bold px-2.5 py-1 rounded-full",
+                      discount >= 40 ? "text-emerald-300 bg-emerald-500/15 border border-emerald-500/20" 
+                        : discount >= 25 ? "text-teal-300 bg-teal-500/12 border border-teal-500/15" 
+                        : discount >= 15 ? "text-cyan-300 bg-cyan-500/10 border border-cyan-500/15" 
+                        : "text-muted-foreground bg-secondary/40"
                     )}>
                       -{discount}%
                     </span>
@@ -210,9 +213,19 @@ const ProductAnalysis = () => {
                     <span className="text-sm font-mono text-foreground/80">{product.sales.toLocaleString()}</span>
                   </td>
                   <td className="px-4 py-3">
-                    <div className="flex items-center gap-1">
-                      <span className="text-sm text-kraken-eye font-semibold">{product.rating}</span>
-                      <span className="text-xs text-kraken-eye/50">★</span>
+                    <div className="flex items-center gap-1.5">
+                      <span className={cn(
+                        "text-sm font-bold",
+                        product.rating >= 4.5 ? "text-amber-400" : product.rating >= 4 ? "text-yellow-400" : product.rating >= 3.5 ? "text-orange-300" : "text-muted-foreground"
+                      )}>{product.rating}</span>
+                      <div className="flex">
+                        {[1, 2, 3, 4, 5].map(star => (
+                          <span key={star} className={cn(
+                            "text-[10px]",
+                            star <= Math.round(product.rating) ? "text-amber-400" : "text-muted-foreground/20"
+                          )}>★</span>
+                        ))}
+                      </div>
                     </div>
                   </td>
                   <td className="px-4 py-3">
@@ -228,13 +241,22 @@ const ProductAnalysis = () => {
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2">
-                      <div className="w-14 h-1.5 rounded-full bg-muted/60 overflow-hidden">
+                      <div className="w-16 h-2 rounded-full bg-muted/40 overflow-hidden">
                         <div
-                          className="h-full rounded-full bg-gradient-to-r from-primary to-ocean-light"
+                          className={cn(
+                            "h-full rounded-full",
+                            product.score >= 85 ? "bg-gradient-to-r from-emerald-500 to-emerald-300" 
+                              : product.score >= 70 ? "bg-gradient-to-r from-primary to-accent" 
+                              : product.score >= 50 ? "bg-gradient-to-r from-cyan-600 to-cyan-400" 
+                              : "bg-gradient-to-r from-muted-foreground to-muted-foreground"
+                          )}
                           style={{ width: `${product.score}%` }}
                         />
                       </div>
-                      <span className="text-xs font-bold text-primary">{product.score}</span>
+                      <span className={cn(
+                        "text-xs font-bold",
+                        product.score >= 85 ? "text-emerald-400" : product.score >= 70 ? "text-primary" : product.score >= 50 ? "text-cyan-400" : "text-muted-foreground"
+                      )}>{product.score}</span>
                     </div>
                   </td>
                 </motion.tr>
