@@ -47,55 +47,92 @@ const Index = () => {
           `,
         }} />
 
-        {/* ═══ TOP BAR — with Kraken ═══ */}
+        {/* ═══ TOP BAR — with Kraken + stats ═══ */}
         <div className="px-6 lg:px-10 pt-8 pb-2 relative z-10">
-          <div className="flex items-start justify-between">
+          <div className="flex items-center justify-between">
+            {/* Left: logo + title + badges */}
             <div className="flex items-center gap-5">
-              {/* Kraken logo */}
               <motion.div
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-                className="relative"
+                className="relative flex-shrink-0"
               >
                 <img src={krakkenLogo} alt="Krakken" className="w-14 h-14"
                   style={{ filter: 'drop-shadow(0 0 12px hsl(174 72% 46% / 0.3))' }} />
-                <div className="absolute inset-0 rounded-full pointer-events-none"
-                  style={{ boxShadow: '0 0 20px 4px hsl(174 72% 46% / 0.08)' }} />
               </motion.div>
 
               <div>
-                <motion.p
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="text-[10px] font-display uppercase tracking-[0.4em] text-muted-foreground/60 mb-1"
-                >
-                  05.03.2026
-                </motion.p>
                 <motion.h1
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-                  className="text-2xl lg:text-3xl font-display font-black leading-[0.95] tracking-tight"
+                  className="text-xl lg:text-2xl font-display font-black leading-tight tracking-tight"
                 >
-                  <span className="kraken-title">La traque commence</span>
+                  <span className="kraken-title">Tableau de bord</span>
                 </motion.h1>
+                <motion.p
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.2 }}
+                  className="text-[11px] font-display text-muted-foreground/50 mt-0.5"
+                >
+                  Analyse des profondeurs de <span style={{ color: 'hsl(162 68% 52%)' }} className="font-bold">Cdiscount</span>
+                </motion.p>
+                <motion.div
+                  initial={{ opacity: 0, y: 5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                  className="flex items-center gap-2 mt-2"
+                >
+                  {[
+                    { label: `${products.length} produits`, hue: '174 72% 46%' },
+                    { label: `${catStats.length} catégories`, hue: '262 52% 58%' },
+                    { label: `${new Set(products.map(p => p.brand)).size} marques`, hue: '188 78% 52%' },
+                  ].map((tag) => (
+                    <span key={tag.label} className="text-[10px] font-display font-bold px-2.5 py-1 rounded-full"
+                      style={{
+                        color: `hsl(${tag.hue})`,
+                        background: `hsl(${tag.hue} / 0.1)`,
+                        border: `1px solid hsl(${tag.hue} / 0.2)`,
+                      }}>
+                      {tag.label}
+                    </span>
+                  ))}
+                </motion.div>
               </div>
             </div>
 
-            {/* Live indicator */}
+            {/* Right: cumulative stats panel */}
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.5 }}
-              className="flex items-center gap-2 mt-2"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
+              className="hidden md:flex items-stretch gap-px rounded-xl overflow-hidden"
+              style={{ border: '1px solid hsl(225 20% 12%)' }}
             >
-              <span className="w-1.5 h-1.5 rounded-full" style={{
-                backgroundColor: 'hsl(162 68% 44%)',
-                boxShadow: '0 0 8px hsl(162 68% 44% / 0.6)',
-                animation: 'bioluminescence 2s ease-in-out infinite',
-              }} />
-              <span className="text-[10px] font-display text-muted-foreground/50">LIVE</span>
+              <div className="px-5 py-3 text-center" style={{ background: 'hsl(225 25% 7%)' }}>
+                <p className="text-[8px] font-display uppercase tracking-[0.2em] text-muted-foreground/35 mb-1">Traqués</p>
+                <p className="text-xl font-display font-black tabular-nums" style={{
+                  color: 'hsl(174 72% 56%)',
+                  textShadow: '0 0 16px hsl(174 72% 46% / 0.3)',
+                }}>
+                  {products.reduce((s, p) => s + p.recurrences, 0).toLocaleString("fr-FR")}
+                </p>
+              </div>
+              <div className="px-5 py-3 text-center flex items-center gap-2" style={{ background: 'hsl(225 25% 7%)' }}>
+                <div>
+                  <p className="text-[8px] font-display uppercase tracking-[0.2em] text-muted-foreground/35 mb-1">En surface</p>
+                  <p className="text-xl font-display font-black tabular-nums text-foreground/80">
+                    {products.length.toLocaleString("fr-FR")}
+                  </p>
+                </div>
+                <span className="w-2 h-2 rounded-full flex-shrink-0" style={{
+                  backgroundColor: 'hsl(162 68% 44%)',
+                  boxShadow: '0 0 8px hsl(162 68% 44% / 0.6)',
+                  animation: 'bioluminescence 2s ease-in-out infinite',
+                }} />
+              </div>
             </motion.div>
           </div>
         </div>
