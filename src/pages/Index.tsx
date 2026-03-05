@@ -69,9 +69,9 @@ const Index = () => {
                 transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
                 className="text-[clamp(2.5rem,5vw,4.5rem)] font-display font-black leading-[0.9] tracking-tight"
               >
-                <span className="text-foreground">Vos</span>
+                <span className="text-foreground">Chassez</span>
                 <br />
-                <span className="kraken-title">profondeurs</span>
+                <span className="kraken-title">en eaux profondes</span>
               </motion.h1>
             </div>
 
