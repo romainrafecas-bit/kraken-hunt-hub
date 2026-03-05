@@ -160,93 +160,87 @@ const Index = () => {
           <div className="tentacle-line" />
         </div>
 
-        {/* ═══ CATEGORIES — circular orbit layout ═══ */}
+        {/* ═══ CATEGORIES — stacked horizontal bars ═══ */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4 }}
           className="px-6 lg:px-10 relative z-10"
         >
-          <div className="flex items-start gap-8 lg:gap-16">
-            {/* Left: title + hovered detail */}
-            <div className="w-48 flex-shrink-0">
-              <p className="text-[9px] font-mono uppercase tracking-[0.3em] text-muted-foreground/40 mb-3">
-                Catégories
-              </p>
-              <AnimatePresence mode="wait">
-                {hoveredCat ? (
-                  <motion.div
-                    key={hoveredCat}
-                    initial={{ opacity: 0, y: 5 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -5 }}
-                    transition={{ duration: 0.15 }}
-                  >
-                    <p className="text-lg font-display font-black text-foreground">
-                      {catIcons[hoveredCat]} {hoveredCat}
-                    </p>
-                    <p className="text-sm font-mono mt-1" style={{ color: 'hsl(174 72% 56%)' }}>
-                      {catStats.find(c => c.name === hoveredCat)?.count} produits
-                    </p>
-                    <p className="text-[11px] text-muted-foreground font-mono">
-                      {catStats.find(c => c.name === hoveredCat)?.sales.toLocaleString("fr-FR")} ventes
-                    </p>
-                  </motion.div>
-                ) : (
-                  <motion.div
-                    key="default"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                  >
-                    <p className="text-2xl font-display font-black text-foreground">{catStats.length}</p>
-                    <p className="text-[11px] text-muted-foreground">zones de chasse actives</p>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
+          <p className="text-[9px] font-mono uppercase tracking-[0.3em] text-muted-foreground/40 mb-6">
+            Répartition par zone
+          </p>
 
-            {/* Right: horizontal category pills */}
-            <div className="flex-1 flex flex-wrap gap-2">
-              {catStats.map((cat, i) => {
-                const pct = Math.round((cat.sales / catTotal) * 100);
-                const hue = catHues[i % catHues.length];
-                const icon = catIcons[cat.name] || "📦";
-                const isHovered = hoveredCat === cat.name;
+          <div className="space-y-[3px]">
+            {catStats.map((cat, i) => {
+              const pct = Math.round((cat.sales / catTotal) * 100);
+              const hue = catHues[i % catHues.length];
+              const icon = catIcons[cat.name] || "📦";
+              const isHovered = hoveredCat === cat.name;
 
-                return (
-                  <motion.div
-                    key={cat.name}
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.5 + i * 0.05, ease: [0.16, 1, 0.3, 1] }}
-                    onMouseEnter={() => setHoveredCat(cat.name)}
-                    onMouseLeave={() => setHoveredCat(null)}
-                    className="cursor-pointer relative"
-                  >
+              return (
+                <motion.div
+                  key={cat.name}
+                  initial={{ opacity: 0, x: -30 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.45 + i * 0.04, ease: [0.16, 1, 0.3, 1] }}
+                  onMouseEnter={() => setHoveredCat(cat.name)}
+                  onMouseLeave={() => setHoveredCat(null)}
+                  className="flex items-center gap-3 cursor-pointer group"
+                >
+                  {/* Label */}
+                  <div className="w-32 flex-shrink-0 flex items-center gap-2 overflow-hidden">
+                    <span className="text-xs">{icon}</span>
+                    <span className="text-[11px] font-medium truncate transition-colors duration-200" style={{
+                      color: isHovered ? `hsl(${hue})` : 'hsl(210 10% 45%)',
+                    }}>{cat.name}</span>
+                  </div>
+
+                  {/* Bar */}
+                  <div className="flex-1 h-7 rounded-sm overflow-hidden relative" style={{
+                    background: 'hsl(225 20% 7%)',
+                  }}>
                     <motion.div
-                      className="flex items-center gap-2 px-4 py-2.5 rounded-2xl transition-all duration-300"
+                      initial={{ width: 0 }}
+                      animate={{ width: `${pct}%` }}
+                      transition={{ delay: 0.5 + i * 0.04, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+                      className="h-full rounded-sm relative overflow-hidden"
                       style={{
-                        background: isHovered ? `hsl(${hue} / 0.15)` : 'hsl(225 20% 8% / 0.6)',
-                        border: `1px solid ${isHovered ? `hsl(${hue} / 0.4)` : 'hsl(225 20% 12% / 0.4)'}`,
-                        boxShadow: isHovered ? `0 0 30px -8px hsl(${hue} / 0.3)` : 'none',
+                        background: `linear-gradient(90deg, hsl(${hue} / 0.6), hsl(${hue} / 0.25))`,
+                        boxShadow: isHovered ? `0 0 20px -4px hsl(${hue} / 0.4)` : 'none',
+                        transition: 'box-shadow 0.3s',
                       }}
-                      whileHover={{ scale: 1.05 }}
                     >
-                      <span className="text-sm">{icon}</span>
-                      <span className="text-[11px] font-semibold" style={{
-                        color: isHovered ? `hsl(${hue})` : 'hsl(210 10% 55%)',
-                        transition: 'color 0.2s',
-                      }}>{cat.name}</span>
-                      <span className="text-[10px] font-mono font-black ml-1" style={{
-                        color: `hsl(${hue})`,
-                        textShadow: isHovered ? `0 0 8px hsl(${hue} / 0.5)` : 'none',
-                      }}>{pct}%</span>
+                      {/* Shimmer on hover */}
+                      {isHovered && (
+                        <motion.div
+                          className="absolute inset-0"
+                          initial={{ x: '-100%' }}
+                          animate={{ x: '200%' }}
+                          transition={{ duration: 1, ease: "easeInOut" }}
+                          style={{
+                            background: `linear-gradient(90deg, transparent, hsl(${hue} / 0.3), transparent)`,
+                            width: '50%',
+                          }}
+                        />
+                      )}
                     </motion.div>
-                  </motion.div>
-                );
-              })}
-            </div>
+                  </div>
+
+                  {/* Values */}
+                  <div className="w-20 flex-shrink-0 flex items-center justify-end gap-3">
+                    <span className="text-[11px] font-mono font-black tabular-nums" style={{
+                      color: `hsl(${hue})`,
+                      textShadow: isHovered ? `0 0 10px hsl(${hue} / 0.5)` : 'none',
+                      transition: 'text-shadow 0.3s',
+                    }}>{pct}%</span>
+                    <span className="text-[9px] font-mono text-muted-foreground/40 tabular-nums w-6 text-right">
+                      {cat.count}
+                    </span>
+                  </div>
+                </motion.div>
+              );
+            })}
           </div>
         </motion.div>
 
