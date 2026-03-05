@@ -51,12 +51,16 @@ export default {
           foreground: "hsl(var(--card-foreground))",
         },
         coral: "hsl(var(--coral))",
+        cyan: {
+          DEFAULT: "hsl(var(--cyan))",
+          dim: "hsl(var(--cyan-dim))",
+        },
         ocean: {
           DEFAULT: "hsl(var(--ocean))",
           deep: "hsl(var(--ocean-deep))",
           light: "hsl(var(--ocean-light))",
         },
-        sand: "hsl(var(--sand))",
+        amber: "hsl(var(--amber))",
         "kraken-eye": "hsl(var(--kraken-eye))",
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",

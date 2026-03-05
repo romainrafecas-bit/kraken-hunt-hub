@@ -67,7 +67,7 @@ const ProductAnalysis = () => {
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: 0.15 }}
-      className="glass-panel overflow-hidden"
+      className="glass-panel-glow overflow-hidden"
     >
       {/* Header */}
       <div className="p-5 border-b border-border/40">
