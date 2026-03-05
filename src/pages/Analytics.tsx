@@ -40,14 +40,14 @@ const radarData = categoryData.slice(0, 6).map(c => ({
 }));
 
 const COLORS = [
-  "hsl(199, 89%, 48%)",
-  "hsl(16, 80%, 60%)",
-  "hsl(195, 60%, 55%)",
-  "hsl(35, 90%, 60%)",
-  "hsl(160, 50%, 45%)",
-  "hsl(280, 50%, 55%)",
-  "hsl(340, 60%, 55%)",
-  "hsl(120, 40%, 50%)",
+  "hsl(185, 80%, 42%)",
+  "hsl(185, 60%, 55%)",
+  "hsl(195, 70%, 48%)",
+  "hsl(12, 75%, 55%)",
+  "hsl(38, 90%, 55%)",
+  "hsl(160, 60%, 42%)",
+  "hsl(280, 45%, 50%)",
+  "hsl(190, 65%, 58%)",
 ];
 
 const topProducts = [...products].sort((a, b) => b.score - a.score).slice(0, 5);
@@ -130,14 +130,14 @@ const Analytics = () => {
               <AreaChart data={trendData}>
                 <defs>
                   <linearGradient id="salesGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="hsl(199, 89%, 48%)" stopOpacity={0.25} />
-                    <stop offset="95%" stopColor="hsl(199, 89%, 48%)" stopOpacity={0} />
+                    <stop offset="5%" stopColor="hsl(185, 80%, 42%)" stopOpacity={0.3} />
+                    <stop offset="95%" stopColor="hsl(185, 80%, 42%)" stopOpacity={0} />
                   </linearGradient>
                 </defs>
-                <XAxis dataKey="jour" tick={{ fontSize: 12, fill: "hsl(215, 12%, 50%)" }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fontSize: 11, fill: "hsl(215, 12%, 50%)" }} axisLine={false} tickLine={false} />
+                <XAxis dataKey="jour" tick={{ fontSize: 12, fill: "hsl(215, 15%, 42%)" }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 11, fill: "hsl(215, 15%, 42%)" }} axisLine={false} tickLine={false} />
                 <Tooltip content={<CustomTooltip />} />
-                <Area type="monotone" dataKey="ventes" stroke="hsl(199, 89%, 48%)" fill="url(#salesGrad)" strokeWidth={2.5} />
+                <Area type="monotone" dataKey="ventes" stroke="hsl(185, 80%, 42%)" fill="url(#salesGrad)" strokeWidth={2.5} style={{ filter: 'drop-shadow(0 0 4px hsl(185 80% 42% / 0.4))' }} />
               </AreaChart>
             </ResponsiveContainer>
           </motion.div>
@@ -206,11 +206,11 @@ const Analytics = () => {
             </h3>
             <ResponsiveContainer width="100%" height={250}>
               <RadarChart data={radarData}>
-                <PolarGrid stroke="hsl(220, 18%, 20%)" />
-                <PolarAngleAxis dataKey="category" tick={{ fontSize: 10, fill: "hsl(215, 12%, 50%)" }} />
-                <PolarRadiusAxis tick={{ fontSize: 9, fill: "hsl(215, 12%, 50%)" }} axisLine={false} />
-                <Radar name="Score" dataKey="score" stroke="hsl(199, 89%, 48%)" fill="hsl(199, 89%, 48%)" fillOpacity={0.12} strokeWidth={2} />
-                <Radar name="Volume" dataKey="volume" stroke="hsl(16, 80%, 60%)" fill="hsl(16, 80%, 60%)" fillOpacity={0.08} strokeWidth={2} />
+                <PolarGrid stroke="hsl(222, 25%, 14%)" />
+                <PolarAngleAxis dataKey="category" tick={{ fontSize: 10, fill: "hsl(215, 15%, 42%)" }} />
+                <PolarRadiusAxis tick={{ fontSize: 9, fill: "hsl(215, 15%, 42%)" }} axisLine={false} />
+                <Radar name="Score" dataKey="score" stroke="hsl(185, 80%, 42%)" fill="hsl(185, 80%, 42%)" fillOpacity={0.12} strokeWidth={2} />
+                <Radar name="Volume" dataKey="volume" stroke="hsl(185, 60%, 55%)" fill="hsl(185, 60%, 55%)" fillOpacity={0.08} strokeWidth={2} />
               </RadarChart>
             </ResponsiveContainer>
           </motion.div>
