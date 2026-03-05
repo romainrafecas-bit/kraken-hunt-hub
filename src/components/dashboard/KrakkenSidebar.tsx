@@ -1,6 +1,7 @@
 import { LayoutDashboard, Package, BarChart3, Settings, Filter, Waves } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { NavLink } from "react-router-dom";
+import krakkenLogo from "@/assets/krakken-logo.png";
 
 const navItems = [
   { icon: LayoutDashboard, label: "Dashboard", to: "/" },
@@ -15,22 +16,12 @@ const KrakkenSidebar = () => {
     <aside className="w-16 xl:w-56 h-screen bg-sidebar backdrop-blur-xl border-r border-sidebar-border flex flex-col fixed left-0 top-0 z-50">
       {/* Logo */}
       <div className="p-3 xl:p-4 flex items-center gap-3 border-b border-sidebar-border h-16">
-        <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 relative" style={{
-          background: 'linear-gradient(135deg, hsl(174 90% 45% / 0.2), hsl(199 85% 50% / 0.1))',
-          border: '1px solid hsl(174 90% 45% / 0.3)',
-          boxShadow: '0 0 15px -3px hsl(174 90% 45% / 0.3)'
+        <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 overflow-hidden" style={{
+          background: 'linear-gradient(135deg, hsl(222 45% 8%), hsl(222 35% 6%))',
+          border: '1px solid hsl(185 80% 42% / 0.2)',
+          boxShadow: '0 0 12px -2px hsl(185 80% 42% / 0.2)'
         }}>
-          <svg viewBox="0 0 24 24" className="w-6 h-6" fill="none">
-            <path d="M12 2C8 2 4 6 4 10c0 2 1 4 2 5.5C7 17 8.5 19 10 20.5c.7.7 1.3 1 2 1.5.7-.5 1.3-.8 2-1.5 1.5-1.5 3-3.5 4-5C19 14 20 12 20 10c0-4-4-8-8-8z" 
-              fill="hsl(174, 90%, 45%)" fillOpacity="0.15" stroke="hsl(174, 90%, 45%)" strokeWidth="1.5"/>
-            <circle cx="9" cy="9" r="1.5" fill="hsl(174, 90%, 50%)"/>
-            <circle cx="15" cy="9" r="1.5" fill="hsl(174, 90%, 50%)"/>
-            <path d="M7 14c0 0 2-2 5-2s5 2 5 2" stroke="hsl(174, 90%, 45%)" strokeWidth="1.5" strokeLinecap="round" fill="none"/>
-            <path d="M4 12c-1 1-2 3-1.5 5" stroke="hsl(174, 90%, 45%)" strokeWidth="1" strokeLinecap="round" opacity="0.5"/>
-            <path d="M20 12c1 1 2 3 1.5 5" stroke="hsl(174, 90%, 45%)" strokeWidth="1" strokeLinecap="round" opacity="0.5"/>
-            <path d="M5 15c-1.5 0.5-2.5 2-2 4" stroke="hsl(174, 90%, 45%)" strokeWidth="1" strokeLinecap="round" opacity="0.4"/>
-            <path d="M19 15c1.5 0.5 2.5 2 2 4" stroke="hsl(174, 90%, 45%)" strokeWidth="1" strokeLinecap="round" opacity="0.4"/>
-          </svg>
+          <img src={krakkenLogo} alt="Krakken" className="w-9 h-9 object-contain" />
         </div>
         <div className="hidden xl:block">
           <h1 className="font-display text-base font-extrabold text-primary tracking-wide glow-text-subtle">KRAKKEN</h1>
@@ -58,11 +49,11 @@ const KrakkenSidebar = () => {
               <>
                 {isActive && (
                   <>
-                    <div className="absolute inset-0 rounded-xl bg-primary/10 border border-primary/20" style={{
-                      boxShadow: '0 0 12px -4px hsl(174 90% 45% / 0.2)'
+                    <div className="absolute inset-0 rounded-xl bg-primary/8 border border-primary/15" style={{
+                      boxShadow: '0 0 12px -4px hsl(185 80% 42% / 0.15)'
                     }} />
                     <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-primary rounded-r-full" style={{
-                      boxShadow: '0 0 8px hsl(174 90% 45% / 0.5)'
+                      boxShadow: '0 0 8px hsl(185 80% 42% / 0.5)'
                     }} />
                   </>
                 )}

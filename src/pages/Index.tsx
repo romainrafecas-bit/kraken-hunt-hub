@@ -80,20 +80,20 @@ const Index = () => {
             <AreaChart data={chartData}>
               <defs>
                 <linearGradient id="scanGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="hsl(174, 90%, 45%)" stopOpacity={0.3} />
-                  <stop offset="95%" stopColor="hsl(174, 90%, 45%)" stopOpacity={0} />
+                  <stop offset="5%" stopColor="hsl(185, 80%, 42%)" stopOpacity={0.3} />
+                  <stop offset="95%" stopColor="hsl(185, 80%, 42%)" stopOpacity={0} />
                 </linearGradient>
               </defs>
-              <XAxis dataKey="date" tick={{ fontSize: 11, fill: "hsl(215, 12%, 45%)" }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 11, fill: "hsl(215, 12%, 45%)" }} axisLine={false} tickLine={false} />
+              <XAxis dataKey="date" tick={{ fontSize: 11, fill: "hsl(215, 15%, 42%)" }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fontSize: 11, fill: "hsl(215, 15%, 42%)" }} axisLine={false} tickLine={false} />
               <Tooltip content={<CustomTooltip />} />
               <Area
                 type="monotone"
                 dataKey="scans"
-                stroke="hsl(174, 90%, 45%)"
+                stroke="hsl(185, 80%, 42%)"
                 fill="url(#scanGrad)"
                 strokeWidth={2.5}
-                style={{ filter: 'drop-shadow(0 0 4px hsl(174 90% 45% / 0.4))' }}
+                style={{ filter: 'drop-shadow(0 0 4px hsl(185 80% 42% / 0.4))' }}
               />
             </AreaChart>
           </ResponsiveContainer>
