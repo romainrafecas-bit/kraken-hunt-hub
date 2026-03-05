@@ -17,24 +17,24 @@ const CategoryBreakdown = () => {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 12 }}
+      initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, delay: 0.4 }}
-      className="glass-panel rounded-md p-4"
+      transition={{ duration: 0.4, delay: 0.35 }}
+      className="glass-panel p-5"
     >
-      <h3 className="font-display text-xs font-bold tracking-[0.2em] text-foreground mb-4">CATÉGORIES</h3>
-      <div className="space-y-2.5">
+      <h3 className="font-display text-sm font-bold text-foreground mb-4">📦 Catégories</h3>
+      <div className="space-y-3">
         {sorted.map((cat, i) => {
           const pct = Math.round((cat.sales / total) * 100);
           return (
             <div key={cat.name} className="flex items-center gap-3 group">
-              <div className="w-20 text-xs font-mono text-secondary-foreground truncate group-hover:text-foreground transition-colors">{cat.name}</div>
-              <div className="flex-1 h-1 rounded-full bg-muted overflow-hidden">
+              <div className="w-20 text-xs text-secondary-foreground truncate group-hover:text-foreground transition-colors font-medium">{cat.name}</div>
+              <div className="flex-1 h-1.5 rounded-full bg-muted/60 overflow-hidden">
                 <motion.div
                   initial={{ width: 0 }}
                   animate={{ width: `${pct}%` }}
-                  transition={{ duration: 0.8, delay: 0.5 + i * 0.05 }}
-                  className="h-full rounded-full bg-primary/60"
+                  transition={{ duration: 0.7, delay: 0.4 + i * 0.04 }}
+                  className="h-full rounded-full bg-coral/70"
                 />
               </div>
               <span className="text-xs font-mono text-muted-foreground w-8 text-right">{pct}%</span>

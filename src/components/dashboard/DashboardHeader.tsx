@@ -6,43 +6,42 @@ const DashboardHeader = () => {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={{ duration: 0.8 }}
-      className="relative rounded-md overflow-hidden h-36 glass-panel"
+      transition={{ duration: 0.6 }}
+      className="relative rounded-2xl overflow-hidden h-36 glass-panel"
     >
-      <img src={abyssBg} alt="" className="absolute inset-0 w-full h-full object-cover opacity-25" />
-      <div className="absolute inset-0 bg-gradient-to-r from-background via-background/90 to-background/60" />
-      
-      {/* Scan line effect */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="w-full h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent animate-scan-line" />
-      </div>
+      <img src={abyssBg} alt="" className="absolute inset-0 w-full h-full object-cover opacity-20" />
+      <div className="absolute inset-0 bg-gradient-to-r from-card via-card/90 to-card/50" />
 
       <div className="relative z-10 h-full flex items-center justify-between px-6">
         <div>
-          <div className="flex items-center gap-3 mb-2">
-            <h2 className="font-display text-lg font-bold tracking-[0.25em] text-foreground glow-text">KRAKKEN</h2>
-            <span className="cryptic-mono text-primary/60 px-2 py-0.5 border border-primary/10 rounded" style={{ fontSize: '0.5rem' }}>v2.4.1</span>
+          <div className="flex items-center gap-3 mb-1.5">
+            <h2 className="font-display text-2xl font-extrabold text-foreground">
+              🐙 Krakken
+            </h2>
+            <span className="text-[0.65rem] font-medium text-primary px-2 py-0.5 bg-primary/10 rounded-full border border-primary/15">
+              v2.4
+            </span>
           </div>
-          <p className="text-sm text-secondary-foreground font-mono">
-            Analyse des profondeurs <span className="text-primary">Cdiscount</span> terminée
+          <p className="text-sm text-secondary-foreground">
+            Analyse des meilleures ventes <span className="text-primary font-semibold">Cdiscount</span> terminée
           </p>
-          <p className="cryptic-mono text-muted-foreground mt-2" style={{ fontSize: '0.55rem' }}>
-            54,892 PRODUITS ANALYSÉS · 12 CATÉGORIES · 847 MARQUES
+          <p className="text-xs text-muted-foreground mt-1.5">
+            54 892 produits · 12 catégories · 847 marques
           </p>
         </div>
 
-        <div className="hidden md:flex items-center gap-4">
+        <div className="hidden md:flex items-center gap-5">
           <div className="text-right">
-            <p className="cryptic-mono text-muted-foreground" style={{ fontSize: '0.5rem' }}>STATUT</p>
-            <div className="flex items-center gap-2 mt-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse-glow glow-dot" />
-              <span className="text-xs font-mono text-accent">ANALYSE COMPLÈTE</span>
+            <p className="text-[0.65rem] text-muted-foreground mb-1">Statut</p>
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse-glow" />
+              <span className="text-xs font-semibold text-emerald-400">Complet</span>
             </div>
           </div>
-          <div className="w-px h-10 bg-border/30" />
+          <div className="w-px h-10 bg-border/40" />
           <div className="text-right">
-            <p className="cryptic-mono text-muted-foreground" style={{ fontSize: '0.5rem' }}>PROFONDEUR</p>
-            <p className="font-display text-sm font-bold text-primary glow-text-subtle mt-1">NIVEAU 9</p>
+            <p className="text-[0.65rem] text-muted-foreground mb-1">Profondeur</p>
+            <p className="font-display text-sm font-bold text-primary">Niveau 9</p>
           </div>
         </div>
       </div>

@@ -12,8 +12,8 @@ export default {
     },
     extend: {
       fontFamily: {
-        display: ["Outfit", "sans-serif"],
-        body: ["Space Grotesk", "sans-serif"],
+        display: ["Nunito", "sans-serif"],
+        body: ["DM Sans", "sans-serif"],
         mono: ["JetBrains Mono", "monospace"],
       },
       colors: {
@@ -50,12 +50,13 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        coral: "hsl(var(--coral))",
         ocean: {
-          glow: "hsl(var(--cyan-glow))",
-          deep: "hsl(var(--deep-abyss))",
+          DEFAULT: "hsl(var(--ocean))",
+          deep: "hsl(var(--ocean-deep))",
+          light: "hsl(var(--ocean-light))",
         },
-        bioluminescent: "hsl(var(--bioluminescent))",
-        tentacle: "hsl(var(--tentacle))",
+        sand: "hsl(var(--sand))",
         "kraken-eye": "hsl(var(--kraken-eye))",
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
@@ -83,19 +84,15 @@ export default {
           to: { height: "0" },
         },
         "pulse-glow": {
-          "0%, 100%": { opacity: "0.3" },
+          "0%, 100%": { opacity: "0.4" },
           "50%": { opacity: "1" },
-        },
-        "scan-line": {
-          "0%": { transform: "translateX(-100%)" },
-          "100%": { transform: "translateX(100%)" },
         },
         "float": {
           "0%, 100%": { transform: "translateY(0)" },
-          "50%": { transform: "translateY(-4px)" },
+          "50%": { transform: "translateY(-3px)" },
         },
         "fade-in": {
-          "0%": { opacity: "0", transform: "translateY(8px)" },
+          "0%": { opacity: "0", transform: "translateY(6px)" },
           "100%": { opacity: "1", transform: "translateY(0)" },
         },
       },
@@ -103,7 +100,6 @@ export default {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "pulse-glow": "pulse-glow 3s ease-in-out infinite",
-        "scan-line": "scan-line 2s ease-in-out infinite",
         "float": "float 5s ease-in-out infinite",
         "fade-in": "fade-in 0.4s ease-out forwards",
       },

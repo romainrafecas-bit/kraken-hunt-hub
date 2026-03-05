@@ -2,7 +2,7 @@ import KrakkenSidebar from "@/components/dashboard/KrakkenSidebar";
 import { motion } from "framer-motion";
 import { BarChart3, TrendingUp, ShoppingCart, Star, ArrowUp, ArrowDown } from "lucide-react";
 import { products, categories } from "@/data/products";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, AreaChart, Area } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, AreaChart, Area } from "recharts";
 
 const categoryData = categories.filter(c => c !== "Tous").map(cat => {
   const catProducts = products.filter(p => p.category === cat);
@@ -12,7 +12,6 @@ const categoryData = categories.filter(c => c !== "Tous").map(cat => {
     ventes: catProducts.reduce((s, p) => s + p.sales, 0),
     produits: catProducts.length,
     avgScore: catProducts.length ? Math.round(catProducts.reduce((s, p) => s + p.score, 0) / catProducts.length) : 0,
-    avgPrice: catProducts.length ? Math.round(catProducts.reduce((s, p) => s + p.price, 0) / catProducts.length) : 0,
   };
 }).sort((a, b) => b.ventes - a.ventes);
 
@@ -25,13 +24,13 @@ const priceRanges = [
 ];
 
 const trendData = [
-  { jour: "Lun", ventes: 8200, score: 82 },
-  { jour: "Mar", ventes: 9100, score: 84 },
-  { jour: "Mer", ventes: 7800, score: 79 },
-  { jour: "Jeu", ventes: 10500, score: 88 },
-  { jour: "Ven", ventes: 12300, score: 91 },
-  { jour: "Sam", ventes: 15800, score: 94 },
-  { jour: "Dim", ventes: 11200, score: 86 },
+  { jour: "Lun", ventes: 8200 },
+  { jour: "Mar", ventes: 9100 },
+  { jour: "Mer", ventes: 7800 },
+  { jour: "Jeu", ventes: 10500 },
+  { jour: "Ven", ventes: 12300 },
+  { jour: "Sam", ventes: 15800 },
+  { jour: "Dim", ventes: 11200 },
 ];
 
 const radarData = categoryData.slice(0, 6).map(c => ({
@@ -41,14 +40,14 @@ const radarData = categoryData.slice(0, 6).map(c => ({
 }));
 
 const COLORS = [
-  "hsl(180, 100%, 40%)",
-  "hsl(160, 100%, 35%)",
-  "hsl(200, 60%, 40%)",
-  "hsl(45, 100%, 50%)",
-  "hsl(280, 60%, 50%)",
-  "hsl(0, 60%, 45%)",
-  "hsl(120, 50%, 40%)",
-  "hsl(30, 80%, 50%)",
+  "hsl(199, 89%, 48%)",
+  "hsl(16, 80%, 60%)",
+  "hsl(195, 60%, 55%)",
+  "hsl(35, 90%, 60%)",
+  "hsl(160, 50%, 45%)",
+  "hsl(280, 50%, 55%)",
+  "hsl(340, 60%, 55%)",
+  "hsl(120, 40%, 50%)",
 ];
 
 const topProducts = [...products].sort((a, b) => b.score - a.score).slice(0, 5);
@@ -59,11 +58,11 @@ const avgDiscount = Math.round(products.reduce((s, p) => s + (1 - p.price / p.or
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (!active || !payload) return null;
   return (
-    <div className="bg-card/95 backdrop-blur-xl border border-border/40 rounded-md px-3 py-2 shadow-lg">
-      <p className="text-xs font-medium text-foreground mb-1">{label}</p>
+    <div className="bg-card/95 backdrop-blur-xl border border-border/50 rounded-xl px-3 py-2 shadow-xl">
+      <p className="text-xs font-semibold text-foreground mb-1">{label}</p>
       {payload.map((p: any, i: number) => (
         <p key={i} className="text-xs text-muted-foreground">
-          {p.name}: <span className="text-primary font-mono">{p.value?.toLocaleString()}</span>
+          {p.name}: <span className="text-primary font-mono font-semibold">{p.value?.toLocaleString()}</span>
         </p>
       ))}
     </div>
@@ -80,35 +79,35 @@ const Analytics = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5 }}
-          className="glass-panel rounded-md p-5"
+          className="glass-panel p-5"
         >
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-md bg-primary/10 flex items-center justify-center">
+              <div className="w-9 h-9 rounded-xl bg-primary/12 flex items-center justify-center">
                 <BarChart3 className="w-4 h-4 text-primary" />
               </div>
               <div>
-                <h1 className="font-display text-xl font-bold tracking-wide text-foreground">Analytics</h1>
+                <h1 className="font-display text-xl font-extrabold text-foreground">Analytics</h1>
                 <p className="text-sm text-muted-foreground">Vue d'ensemble des performances de marché</p>
               </div>
             </div>
             <div className="hidden md:flex items-center gap-6">
               <div className="text-center">
-                <div className="flex items-center gap-1 text-accent">
+                <div className="flex items-center gap-1 text-emerald-400">
                   <ArrowUp className="w-3 h-3" />
-                  <span className="text-sm font-mono font-bold">{upTrending}</span>
+                  <span className="text-sm font-bold">{upTrending}</span>
                 </div>
                 <p className="text-xs text-muted-foreground">En hausse</p>
               </div>
               <div className="text-center">
                 <div className="flex items-center gap-1 text-destructive">
                   <ArrowDown className="w-3 h-3" />
-                  <span className="text-sm font-mono font-bold">{downTrending}</span>
+                  <span className="text-sm font-bold">{downTrending}</span>
                 </div>
                 <p className="text-xs text-muted-foreground">En baisse</p>
               </div>
               <div className="text-center">
-                <span className="text-sm font-mono font-bold text-primary">-{avgDiscount}%</span>
+                <span className="text-sm font-bold text-coral">-{avgDiscount}%</span>
                 <p className="text-xs text-muted-foreground">Réduction moy.</p>
               </div>
             </div>
@@ -117,14 +116,13 @@ const Analytics = () => {
 
         {/* Charts grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-          {/* Sales trend */}
           <motion.div
-            initial={{ opacity: 0, y: 12 }}
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="glass-panel rounded-md p-5"
+            className="glass-panel p-5"
           >
-            <h3 className="font-display text-sm font-semibold tracking-wide text-foreground mb-4 flex items-center gap-2">
+            <h3 className="font-display text-sm font-bold text-foreground mb-4 flex items-center gap-2">
               <TrendingUp className="w-4 h-4 text-primary" />
               Tendance des ventes
             </h3>
@@ -132,56 +130,54 @@ const Analytics = () => {
               <AreaChart data={trendData}>
                 <defs>
                   <linearGradient id="salesGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="hsl(180, 100%, 40%)" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="hsl(180, 100%, 40%)" stopOpacity={0} />
+                    <stop offset="5%" stopColor="hsl(199, 89%, 48%)" stopOpacity={0.25} />
+                    <stop offset="95%" stopColor="hsl(199, 89%, 48%)" stopOpacity={0} />
                   </linearGradient>
                 </defs>
-                <XAxis dataKey="jour" tick={{ fontSize: 11, fill: "hsl(210, 15%, 35%)" }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fontSize: 11, fill: "hsl(210, 15%, 35%)" }} axisLine={false} tickLine={false} />
+                <XAxis dataKey="jour" tick={{ fontSize: 12, fill: "hsl(215, 12%, 50%)" }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 11, fill: "hsl(215, 12%, 50%)" }} axisLine={false} tickLine={false} />
                 <Tooltip content={<CustomTooltip />} />
-                <Area type="monotone" dataKey="ventes" stroke="hsl(180, 100%, 40%)" fill="url(#salesGrad)" strokeWidth={2} />
+                <Area type="monotone" dataKey="ventes" stroke="hsl(199, 89%, 48%)" fill="url(#salesGrad)" strokeWidth={2.5} />
               </AreaChart>
             </ResponsiveContainer>
           </motion.div>
 
-          {/* Category bar chart */}
           <motion.div
-            initial={{ opacity: 0, y: 12 }}
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.15 }}
-            className="glass-panel rounded-md p-5"
+            className="glass-panel p-5"
           >
-            <h3 className="font-display text-sm font-semibold tracking-wide text-foreground mb-4 flex items-center gap-2">
-              <ShoppingCart className="w-4 h-4 text-primary" />
+            <h3 className="font-display text-sm font-bold text-foreground mb-4 flex items-center gap-2">
+              <ShoppingCart className="w-4 h-4 text-coral" />
               Ventes par catégorie
             </h3>
             <ResponsiveContainer width="100%" height={220}>
               <BarChart data={categoryData.slice(0, 8)}>
-                <XAxis dataKey="name" tick={{ fontSize: 10, fill: "hsl(210, 15%, 35%)" }} axisLine={false} tickLine={false} angle={-20} textAnchor="end" height={50} />
-                <YAxis tick={{ fontSize: 11, fill: "hsl(210, 15%, 35%)" }} axisLine={false} tickLine={false} />
+                <XAxis dataKey="name" tick={{ fontSize: 10, fill: "hsl(215, 12%, 50%)" }} axisLine={false} tickLine={false} angle={-20} textAnchor="end" height={50} />
+                <YAxis tick={{ fontSize: 11, fill: "hsl(215, 12%, 50%)" }} axisLine={false} tickLine={false} />
                 <Tooltip content={<CustomTooltip />} />
-                <Bar dataKey="ventes" radius={[4, 4, 0, 0]}>
+                <Bar dataKey="ventes" radius={[6, 6, 0, 0]}>
                   {categoryData.slice(0, 8).map((_, i) => (
-                    <Cell key={i} fill={COLORS[i % COLORS.length]} fillOpacity={0.7} />
+                    <Cell key={i} fill={COLORS[i % COLORS.length]} fillOpacity={0.75} />
                   ))}
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
           </motion.div>
 
-          {/* Price distribution */}
           <motion.div
-            initial={{ opacity: 0, y: 12 }}
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="glass-panel rounded-md p-5"
+            className="glass-panel p-5"
           >
-            <h3 className="font-display text-sm font-semibold tracking-wide text-foreground mb-4">
+            <h3 className="font-display text-sm font-bold text-foreground mb-4">
               Distribution des prix
             </h3>
             <ResponsiveContainer width="100%" height={220}>
               <PieChart>
-                <Pie data={priceRanges} dataKey="count" nameKey="range" cx="50%" cy="50%" outerRadius={80} innerRadius={40} strokeWidth={0}>
+                <Pie data={priceRanges} dataKey="count" nameKey="range" cx="50%" cy="50%" outerRadius={80} innerRadius={45} strokeWidth={0}>
                   {priceRanges.map((_, i) => (
                     <Cell key={i} fill={COLORS[i % COLORS.length]} fillOpacity={0.8} />
                   ))}
@@ -192,61 +188,60 @@ const Analytics = () => {
             <div className="flex flex-wrap gap-3 justify-center mt-2">
               {priceRanges.map((r, i) => (
                 <div key={r.range} className="flex items-center gap-1.5">
-                  <div className="w-2 h-2 rounded-full" style={{ backgroundColor: COLORS[i % COLORS.length] }} />
+                  <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: COLORS[i % COLORS.length] }} />
                   <span className="text-xs text-muted-foreground">{r.range} ({r.count})</span>
                 </div>
               ))}
             </div>
           </motion.div>
 
-          {/* Radar chart */}
           <motion.div
-            initial={{ opacity: 0, y: 12 }}
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.25 }}
-            className="glass-panel rounded-md p-5"
+            className="glass-panel p-5"
           >
-            <h3 className="font-display text-sm font-semibold tracking-wide text-foreground mb-4">
+            <h3 className="font-display text-sm font-bold text-foreground mb-4">
               Score par catégorie
             </h3>
             <ResponsiveContainer width="100%" height={250}>
               <RadarChart data={radarData}>
-                <PolarGrid stroke="hsl(220, 25%, 10%)" />
-                <PolarAngleAxis dataKey="category" tick={{ fontSize: 10, fill: "hsl(210, 15%, 35%)" }} />
-                <PolarRadiusAxis tick={{ fontSize: 9, fill: "hsl(210, 15%, 35%)" }} axisLine={false} />
-                <Radar name="Score" dataKey="score" stroke="hsl(180, 100%, 40%)" fill="hsl(180, 100%, 40%)" fillOpacity={0.15} strokeWidth={2} />
-                <Radar name="Volume" dataKey="volume" stroke="hsl(160, 100%, 35%)" fill="hsl(160, 100%, 35%)" fillOpacity={0.1} strokeWidth={2} />
+                <PolarGrid stroke="hsl(220, 18%, 20%)" />
+                <PolarAngleAxis dataKey="category" tick={{ fontSize: 10, fill: "hsl(215, 12%, 50%)" }} />
+                <PolarRadiusAxis tick={{ fontSize: 9, fill: "hsl(215, 12%, 50%)" }} axisLine={false} />
+                <Radar name="Score" dataKey="score" stroke="hsl(199, 89%, 48%)" fill="hsl(199, 89%, 48%)" fillOpacity={0.12} strokeWidth={2} />
+                <Radar name="Volume" dataKey="volume" stroke="hsl(16, 80%, 60%)" fill="hsl(16, 80%, 60%)" fillOpacity={0.08} strokeWidth={2} />
               </RadarChart>
             </ResponsiveContainer>
           </motion.div>
         </div>
 
-        {/* Top 5 products */}
+        {/* Top 5 */}
         <motion.div
-          initial={{ opacity: 0, y: 12 }}
+          initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="glass-panel rounded-md p-5"
+          className="glass-panel p-5"
         >
-          <h3 className="font-display text-sm font-semibold tracking-wide text-foreground mb-4 flex items-center gap-2">
+          <h3 className="font-display text-sm font-bold text-foreground mb-4 flex items-center gap-2">
             <Star className="w-4 h-4 text-kraken-eye" />
             Top 5 produits par score
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
             {topProducts.map((p, i) => (
-              <div key={p.id} className="bg-secondary/30 border border-border/20 rounded-md p-4 hover:border-primary/20 transition-all group">
+              <div key={p.id} className="bg-secondary/40 border border-border/25 rounded-xl p-4 hover:border-primary/25 transition-all group">
                 <div className="flex items-center gap-2 mb-3">
-                  <span className="font-display text-lg font-bold text-primary/60">#{i + 1}</span>
-                  <div className="w-8 h-1 rounded-full bg-muted overflow-hidden flex-1">
-                    <div className="h-full rounded-full bg-gradient-to-r from-primary to-accent" style={{ width: `${p.score}%` }} />
+                  <span className="font-display text-lg font-extrabold text-primary/50">#{i + 1}</span>
+                  <div className="w-8 h-1.5 rounded-full bg-muted/50 overflow-hidden flex-1">
+                    <div className="h-full rounded-full bg-gradient-to-r from-primary to-ocean-light" style={{ width: `${p.score}%` }} />
                   </div>
-                  <span className="font-mono text-xs font-bold text-primary">{p.score}</span>
+                  <span className="text-xs font-bold text-primary">{p.score}</span>
                 </div>
-                <p className="text-sm text-foreground/90 font-medium group-hover:text-primary transition-colors leading-tight">{p.name}</p>
+                <p className="text-sm text-foreground/90 font-semibold group-hover:text-primary transition-colors leading-tight">{p.name}</p>
                 <p className="text-xs text-muted-foreground mt-1">{p.brand}</p>
                 <div className="flex justify-between items-center mt-3">
                   <span className="font-mono text-sm font-bold text-foreground">{p.price}€</span>
-                  <span className="text-xs text-muted-foreground">{p.sales.toLocaleString()} ventes</span>
+                  <span className="text-[11px] text-muted-foreground">{p.sales.toLocaleString()} ventes</span>
                 </div>
               </div>
             ))}
