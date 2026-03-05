@@ -84,7 +84,7 @@ const Index = () => {
           <div className="flex items-center justify-between mb-4 relative z-10">
             <h3 className="font-display text-sm font-bold text-foreground flex items-center gap-2">
               <span style={{ filter: 'drop-shadow(0 0 4px hsl(174 72% 46% / 0.4))' }}>🐙</span>
-              Progression des traquages
+              Progression de la traque
             </h3>
             <span className="bio-badge bio-violet text-[10px]">15 jours</span>
           </div>
