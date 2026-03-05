@@ -1,6 +1,6 @@
 import KrakkenSidebar from "@/components/dashboard/KrakkenSidebar";
 import { motion } from "framer-motion";
-import { BarChart3, TrendingUp, ShoppingCart, Star, ArrowUp, ArrowDown } from "lucide-react";
+import { BarChart3, TrendingUp, ShoppingCart, Star } from "lucide-react";
 import { products, categories } from "@/data/products";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, AreaChart, Area } from "recharts";
 
@@ -9,7 +9,7 @@ const categoryData = categories.filter(c => c !== "Tous").map(cat => {
   return {
     name: cat.length > 10 ? cat.slice(0, 10) + "…" : cat,
     fullName: cat,
-    ventes: catProducts.reduce((s, p) => s + p.sales, 0),
+    ventes: catProducts.reduce((s, p) => s + p.recurrences, 0),
     produits: catProducts.length,
     avgScore: catProducts.length ? Math.round(catProducts.reduce((s, p) => s + p.score, 0) / catProducts.length) : 0,
   };
@@ -51,8 +51,7 @@ const COLORS = [
 ];
 
 const topProducts = [...products].sort((a, b) => b.score - a.score).slice(0, 5);
-const upTrending = products.filter(p => p.trend === "up").length;
-const downTrending = products.filter(p => p.trend === "down").length;
+const avgSellers = Math.round(products.reduce((s, p) => s + p.sellers, 0) / products.length);
 const avgDiscount = Math.round(products.reduce((s, p) => s + (1 - p.price / p.originalPrice) * 100, 0) / products.length);
 
 const CustomTooltip = ({ active, payload, label }: any) => {
@@ -93,21 +92,15 @@ const Analytics = () => {
             </div>
             <div className="hidden md:flex items-center gap-6">
               <div className="text-center">
-                <div className="flex items-center gap-1 text-emerald-400">
-                  <ArrowUp className="w-3 h-3" />
-                  <span className="text-sm font-bold">{upTrending}</span>
-                </div>
-                <p className="text-xs text-muted-foreground">En hausse</p>
+                <span className="text-sm font-bold text-primary">{products.length}</span>
+                <p className="text-xs text-muted-foreground">Produits</p>
               </div>
               <div className="text-center">
-                <div className="flex items-center gap-1 text-destructive">
-                  <ArrowDown className="w-3 h-3" />
-                  <span className="text-sm font-bold">{downTrending}</span>
-                </div>
-                <p className="text-xs text-muted-foreground">En baisse</p>
+                <span className="text-sm font-bold text-accent">{avgSellers}</span>
+                <p className="text-xs text-muted-foreground">Vendeurs moy.</p>
               </div>
               <div className="text-center">
-                <span className="text-sm font-bold text-accent">-{avgDiscount}%</span>
+                <span className="text-sm font-bold text-emerald-400">-{avgDiscount}%</span>
                 <p className="text-xs text-muted-foreground">Réduction moy.</p>
               </div>
             </div>
@@ -241,7 +234,7 @@ const Analytics = () => {
                 <p className="text-xs text-muted-foreground mt-1">{p.brand}</p>
                 <div className="flex justify-between items-center mt-3">
                   <span className="font-mono text-sm font-bold text-foreground">{p.price}€</span>
-                  <span className="text-[11px] text-muted-foreground">{p.sales.toLocaleString()} ventes</span>
+                  <span className="text-[11px] text-muted-foreground">{p.recurrences.toLocaleString()} récurrences</span>
                 </div>
               </div>
             ))}

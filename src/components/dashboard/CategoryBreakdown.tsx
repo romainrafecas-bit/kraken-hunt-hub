@@ -15,7 +15,7 @@ const catColors = [
 const CategoryBreakdown = () => {
   const catStats = products.reduce((acc, p) => {
     if (!acc[p.category]) acc[p.category] = { sales: 0, count: 0 };
-    acc[p.category].sales += p.sales;
+    acc[p.category].sales += p.recurrences;
     acc[p.category].count += 1;
     return acc;
   }, {} as Record<string, { sales: number; count: number }>);

@@ -1,23 +1,23 @@
 import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
-import { ArrowUpDown, ArrowUp, ArrowDown, TrendingUp, TrendingDown, Minus, ChevronLeft, ChevronRight, Search } from "lucide-react";
+import { ArrowUpDown, ArrowUp, ArrowDown, ChevronLeft, ChevronRight, Search, Users, CalendarDays } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Product, products as allProducts, categories, brands } from "@/data/products";
 
-type SortKey = "score" | "price" | "sales" | "rating" | "name" | "brand";
+type SortKey = "score" | "price" | "recurrences" | "rating" | "name" | "brand" | "sellers";
 type SortDir = "asc" | "desc";
 
 const ITEMS_PER_PAGE = 12;
 
-const TrendIcon = ({ trend }: { trend: Product["trend"] }) => {
-  if (trend === "up") return <TrendingUp className="w-3.5 h-3.5 text-emerald-400" />;
-  if (trend === "down") return <TrendingDown className="w-3.5 h-3.5 text-destructive" />;
-  return <Minus className="w-3.5 h-3.5 text-muted-foreground" />;
-};
+const months = [
+  "Janvier", "Février", "Mars", "Avril", "Mai", "Juin",
+  "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"
+];
 
 const ProductAnalysis = () => {
   const [selectedCategory, setSelectedCategory] = useState("Tous");
   const [selectedBrand, setSelectedBrand] = useState("Toutes");
+  const [selectedMonth, setSelectedMonth] = useState(1); // February (0-indexed)
   const [sortKey, setSortKey] = useState<SortKey>("score");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [page, setPage] = useState(0);
@@ -46,9 +46,9 @@ const ProductAnalysis = () => {
     setPage(0);
   };
 
-  const SortHeader = ({ label, sortKeyName }: { label: string; sortKeyName: SortKey }) => (
+  const SortHeader = ({ label, sortKeyName, className: headerClass }: { label: string; sortKeyName: SortKey; className?: string }) => (
     <th
-      className="text-left px-4 py-3 cursor-pointer group/sort select-none"
+      className={cn("text-left px-4 py-3 cursor-pointer group/sort select-none", headerClass)}
       onClick={() => toggleSort(sortKeyName)}
     >
       <div className="flex items-center gap-1.5">
@@ -82,16 +82,33 @@ const ProductAnalysis = () => {
             <p className="text-xs text-muted-foreground mt-1">Dernière analyse complète — 28 fév. 2026</p>
           </div>
 
-          {/* Search */}
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
-            <input
-              type="text"
-              placeholder="Rechercher un produit..."
-              value={searchQuery}
-              onChange={e => { setSearchQuery(e.target.value); setPage(0); }}
-              className="bg-secondary/60 border border-border/40 rounded-xl pl-9 pr-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 w-full lg:w-64 transition-all"
-            />
+          <div className="flex items-center gap-3">
+            {/* Month selector */}
+            <div className="relative flex items-center gap-2">
+              <CalendarDays className="w-3.5 h-3.5 text-accent" />
+              <select
+                value={selectedMonth}
+                onChange={e => setSelectedMonth(Number(e.target.value))}
+                className="bg-secondary/60 border border-border/40 rounded-xl px-3 py-2 text-sm text-foreground focus:outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all appearance-none cursor-pointer pr-8"
+                style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2366b2b2' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 10px center' }}
+              >
+                {months.map((m, i) => (
+                  <option key={m} value={i} className="bg-card text-foreground">{m} 2026</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Search */}
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+              <input
+                type="text"
+                placeholder="Rechercher un produit..."
+                value={searchQuery}
+                onChange={e => { setSearchQuery(e.target.value); setPage(0); }}
+                className="bg-secondary/60 border border-border/40 rounded-xl pl-9 pr-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 w-full lg:w-56 transition-all"
+              />
+            </div>
           </div>
         </div>
 
@@ -124,7 +141,7 @@ const ProductAnalysis = () => {
                 className={cn(
                   "px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200",
                   selectedBrand === brand
-                    ? "bg-coral/15 text-coral border border-coral/25"
+                    ? "bg-accent/15 text-accent border border-accent/25"
                     : "bg-secondary/40 text-muted-foreground border border-transparent hover:text-foreground hover:bg-secondary/70"
                 )}
               >
@@ -146,26 +163,23 @@ const ProductAnalysis = () => {
               <th className="text-left px-4 py-3">
                 <span className="soft-label">#</span>
               </th>
+              <th className="text-left px-4 py-3">
+                <span className="soft-label">Image</span>
+              </th>
               <SortHeader label="Produit" sortKeyName="name" />
               <SortHeader label="Marque" sortKeyName="brand" />
               <th className="text-left px-4 py-3">
                 <span className="soft-label">Catégorie</span>
               </th>
               <SortHeader label="Prix" sortKeyName="price" />
-              <th className="text-left px-4 py-3">
-                <span className="soft-label">Réduc.</span>
-              </th>
-              <SortHeader label="Ventes" sortKeyName="sales" />
+              <SortHeader label="Récurrences" sortKeyName="recurrences" />
               <SortHeader label="Note" sortKeyName="rating" />
-              <th className="text-left px-4 py-3">
-                <span className="soft-label">Trend</span>
-              </th>
+              <SortHeader label="Vendeurs" sortKeyName="sellers" />
               <SortHeader label="Score" sortKeyName="score" />
             </tr>
           </thead>
           <tbody>
             {paged.map((product, i) => {
-              const discount = Math.round((1 - product.price / product.originalPrice) * 100);
               const globalRank = page * ITEMS_PER_PAGE + i + 1;
               return (
                 <motion.tr
@@ -184,6 +198,16 @@ const ProductAnalysis = () => {
                     </span>
                   </td>
                   <td className="px-4 py-3">
+                    <div className="w-10 h-10 rounded-lg overflow-hidden bg-secondary/60 border border-border/30 flex-shrink-0">
+                      <img
+                        src={product.image}
+                        alt={product.name}
+                        className="w-full h-full object-cover"
+                        loading="lazy"
+                      />
+                    </div>
+                  </td>
+                  <td className="px-4 py-3">
                     <span className="text-sm text-foreground/90 font-medium group-hover:text-primary transition-colors">{product.name}</span>
                   </td>
                   <td className="px-4 py-3">
@@ -200,17 +224,11 @@ const ProductAnalysis = () => {
                   </td>
                   <td className="px-4 py-3">
                     <span className={cn(
-                      "text-xs font-bold px-2.5 py-1 rounded-full",
-                      discount >= 40 ? "text-emerald-300 bg-emerald-500/15 border border-emerald-500/20" 
-                        : discount >= 25 ? "text-teal-300 bg-teal-500/12 border border-teal-500/15" 
-                        : discount >= 15 ? "text-cyan-300 bg-cyan-500/10 border border-cyan-500/15" 
-                        : "text-muted-foreground bg-secondary/40"
+                      "text-sm font-mono font-semibold",
+                      product.recurrences >= 8000 ? "text-emerald-400" : product.recurrences >= 4000 ? "text-accent" : "text-foreground/80"
                     )}>
-                      -{discount}%
+                      {product.recurrences.toLocaleString()}
                     </span>
-                  </td>
-                  <td className="px-4 py-3">
-                    <span className="text-sm font-mono text-foreground/80">{product.sales.toLocaleString()}</span>
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-1.5">
@@ -229,13 +247,13 @@ const ProductAnalysis = () => {
                     </div>
                   </td>
                   <td className="px-4 py-3">
-                    <div className="flex items-center gap-2">
-                      <TrendIcon trend={product.trend} />
+                    <div className="flex items-center gap-1.5">
+                      <Users className="w-3 h-3 text-accent/60" />
                       <span className={cn(
-                        "text-xs font-bold tracking-wider",
-                        product.trend === "up" ? "text-emerald-400" : product.trend === "down" ? "text-destructive" : "text-muted-foreground"
+                        "text-sm font-bold",
+                        product.sellers >= 25 ? "text-primary" : product.sellers >= 15 ? "text-accent" : "text-foreground/70"
                       )}>
-                        {product.velocity}
+                        {product.sellers}
                       </span>
                     </div>
                   </td>
@@ -245,9 +263,9 @@ const ProductAnalysis = () => {
                         <div
                           className={cn(
                             "h-full rounded-full",
-                            product.score >= 85 ? "bg-gradient-to-r from-emerald-500 to-emerald-300" 
-                              : product.score >= 70 ? "bg-gradient-to-r from-primary to-accent" 
-                              : product.score >= 50 ? "bg-gradient-to-r from-cyan-600 to-cyan-400" 
+                            product.score >= 85 ? "bg-gradient-to-r from-emerald-500 to-emerald-300"
+                              : product.score >= 70 ? "bg-gradient-to-r from-primary to-accent"
+                              : product.score >= 50 ? "bg-gradient-to-r from-cyan-600 to-cyan-400"
                               : "bg-gradient-to-r from-muted-foreground to-muted-foreground"
                           )}
                           style={{ width: `${product.score}%` }}

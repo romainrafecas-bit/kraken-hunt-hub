@@ -3,14 +3,14 @@ import { products } from "@/data/products";
 
 const TopBrands = () => {
   const brandStats = products.reduce((acc, p) => {
-    if (!acc[p.brand]) acc[p.brand] = { sales: 0, count: 0 };
-    acc[p.brand].sales += p.sales;
+    if (!acc[p.brand]) acc[p.brand] = { recurrences: 0, count: 0 };
+    acc[p.brand].recurrences += p.recurrences;
     acc[p.brand].count += 1;
     return acc;
-  }, {} as Record<string, { sales: number; count: number }>);
+  }, {} as Record<string, { recurrences: number; count: number }>);
 
   const sorted = Object.entries(brandStats)
-    .map(([name, data]) => ({ name, sales: data.sales }))
+    .map(([name, data]) => ({ name, sales: data.recurrences }))
     .sort((a, b) => b.sales - a.sales)
     .slice(0, 8);
 
