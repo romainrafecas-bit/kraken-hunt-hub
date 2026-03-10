@@ -35,8 +35,8 @@ const Landing = () => {
             <span className="kraken-title text-lg font-black tracking-wider">KRAKKEN</span>
           </div>
           <div className="flex items-center gap-8">
-            <a href="#features" className="text-[11px] text-foreground/40 hover:text-primary transition-colors hidden sm:block tracking-widest uppercase">Features</a>
-            <a href="#pricing" className="text-[11px] text-foreground/40 hover:text-primary transition-colors hidden sm:block tracking-widest uppercase">Accès</a>
+            <a href="#features" className="text-[11px] text-foreground/60 hover:text-primary transition-colors hidden sm:block tracking-widest uppercase">Features</a>
+            <a href="#pricing" className="text-[11px] text-foreground/60 hover:text-primary transition-colors hidden sm:block tracking-widest uppercase">Accès</a>
             <Link to="/" className="px-6 py-2.5 rounded-full text-[11px] font-bold tracking-widest uppercase transition-all duration-500 hover:scale-105 hover:shadow-[0_0_40px_-8px_hsl(174_72%_46%_/_0.6)]" style={{
               background: 'linear-gradient(135deg, hsl(174 72% 46%), hsl(188 78% 48%))',
               color: 'hsl(230 50% 3%)',
@@ -122,7 +122,7 @@ const Landing = () => {
             </Link>
             <div className="flex items-center gap-3">
               <div className="w-1.5 h-1.5 rounded-full bg-kraken-emerald animate-pulse-glow" />
-              <span className="text-[11px] text-foreground/30 tracking-wide">Premier mois offert · Puis 29,90€/mois</span>
+              <span className="text-[11px] text-foreground/50 tracking-wide">Premier mois offert · Puis 29,90€/mois</span>
             </div>
           </motion.div>
         </motion.div>
@@ -169,7 +169,7 @@ const Landing = () => {
                   textShadow: '0 0 60px hsl(174 72% 46% / 0.4)',
                   lineHeight: 1,
                 }}>{s.val}</span>
-                <span className="text-xs text-foreground/30 tracking-widest uppercase">{s.sub}</span>
+                <span className="text-xs text-foreground/50 tracking-widest uppercase">{s.sub}</span>
               </motion.div>
             ))}
           </div>
@@ -194,7 +194,7 @@ const Landing = () => {
             <h2 className="font-display font-black text-4xl md:text-6xl text-foreground leading-[1.05] max-w-3xl">
               Tu scrolles encore Cdiscount
               <br />
-              <span className="text-foreground/25">à la recherche du bon produit ?</span>
+              <span className="text-foreground/45">à la recherche du bon produit ?</span>
             </h2>
           </motion.div>
 
@@ -244,7 +244,7 @@ const Landing = () => {
                   }} />
                 </div>
                 <h4 className="font-display font-bold text-base text-foreground/90 mb-2">{item.title}</h4>
-                <p className="text-sm text-foreground/40 leading-relaxed">{item.desc}</p>
+                <p className="text-sm text-foreground/55 leading-relaxed">{item.desc}</p>
               </motion.div>
             ))}
           </div>
@@ -343,7 +343,7 @@ const Landing = () => {
                     }}>
                       {step.title}
                     </h3>
-                    <p className="text-sm text-foreground/45 leading-relaxed">{step.body}</p>
+                    <p className="text-sm text-foreground/60 leading-relaxed">{step.body}</p>
                   </div>
                 </motion.div>
               ))}
@@ -365,7 +365,7 @@ const Landing = () => {
           <h2 className="font-display font-black text-3xl md:text-5xl text-foreground mb-5">
             L'interface.
           </h2>
-          <p className="text-sm text-foreground/35 leading-relaxed">
+          <p className="text-sm text-foreground/55 leading-relaxed">
             Les produits. Les données. Les boutons pour sourcer.
             <br />Pas d'écrans inutiles.
           </p>
@@ -399,7 +399,7 @@ const Landing = () => {
                 <span className="w-2.5 h-2.5 rounded-full" style={{ background: 'hsl(162 50% 35% / 0.5)' }} />
               </div>
               <div className="flex-1 flex justify-center">
-                <div className="px-6 py-1.5 rounded-lg text-[9px] font-mono text-foreground/25" style={{
+                <div className="px-6 py-1.5 rounded-lg text-[9px] font-mono text-foreground/45" style={{
                   background: 'hsl(225 20% 6%)',
                   border: '1px solid hsl(225 20% 8%)',
                 }}>
@@ -460,7 +460,7 @@ const Landing = () => {
                         }}>RUPTURE</span>
                       )}
                     </div>
-                    <span className="text-[10px] text-foreground/30 font-mono">{p.brand}</span>
+                    <span className="text-[10px] text-foreground/50 font-mono">{p.brand}</span>
                   </div>
                   <span className="text-xs font-black font-mono text-foreground/70 hidden sm:block">{p.price}</span>
                   <span className="text-[10px] font-mono font-bold hidden sm:block text-primary/70">{p.sales}</span>
@@ -524,7 +524,7 @@ const Landing = () => {
               }} />
               <RefreshCw className="w-7 h-7 mb-6 text-primary" style={{ filter: 'drop-shadow(0 0 8px hsl(174 72% 46% / 0.4))' }} />
               <h3 className="font-display font-black text-xl md:text-2xl text-foreground mb-3">Mise à jour hebdomadaire</h3>
-              <p className="text-sm text-foreground/40 leading-relaxed max-w-md">
+              <p className="text-sm text-foreground/55 leading-relaxed max-w-md">
                 De nouveaux produits gagnants chaque semaine. La base évolue avec le marché français en temps réel.
               </p>
             </motion.div>
@@ -546,7 +546,7 @@ const Landing = () => {
               }} />
               <ExternalLink className="w-7 h-7 mb-6" style={{ color: 'hsl(38 92% 56%)', filter: 'drop-shadow(0 0 8px hsl(38 92% 56% / 0.4))' }} />
               <h3 className="font-display font-black text-xl md:text-2xl text-foreground mb-3">Sourcing en 1 clic</h3>
-              <p className="text-sm text-foreground/40 leading-relaxed">
+              <p className="text-sm text-foreground/55 leading-relaxed">
                 AliExpress + Google Lens intégrés. Sans quitter l'interface.
               </p>
             </motion.div>
@@ -575,7 +575,7 @@ const Landing = () => {
                   filter: `drop-shadow(0 0 5px hsl(${f.color} / 0.4))`,
                 }} />
                 <h4 className="font-display font-bold text-sm text-foreground/85 mb-1.5">{f.title}</h4>
-                <p className="text-xs text-foreground/35 leading-relaxed">{f.desc}</p>
+                <p className="text-xs text-foreground/55 leading-relaxed">{f.desc}</p>
               </motion.div>
             ))}
           </div>
@@ -618,7 +618,7 @@ const Landing = () => {
                   filter: `drop-shadow(0 0 8px hsl(${s.color} / 0.4))`,
                 }} />
                 <span className="font-display font-black text-3xl md:text-4xl text-foreground block mb-2">{s.stat}</span>
-                <span className="text-[10px] text-foreground/30 tracking-widest uppercase">{s.label}</span>
+                <span className="text-[10px] text-foreground/50 tracking-widest uppercase">{s.label}</span>
               </motion.div>
             ))}
           </motion.div>
@@ -640,7 +640,7 @@ const Landing = () => {
             className="text-center mb-16"
           >
             <h2 className="font-display font-black text-4xl md:text-5xl text-foreground mb-4">
-              Un plan. <span className="text-foreground/30">Accès total.</span>
+              Un plan. <span className="text-foreground/50">Accès total.</span>
             </h2>
           </motion.div>
 
@@ -681,7 +681,7 @@ const Landing = () => {
               </motion.div>
               <div className="flex items-baseline justify-center gap-2">
                 <span className="text-6xl md:text-7xl font-display font-black text-foreground">29,90€</span>
-                <span className="text-lg text-foreground/30">/mois</span>
+                <span className="text-lg text-foreground/50">/mois</span>
               </div>
             </div>
 
@@ -709,7 +709,7 @@ const Landing = () => {
             }}>
               Commencer maintenant
             </Link>
-            <p className="text-[10px] text-foreground/20 text-center mt-4 tracking-wide">Sans engagement · Annulation à tout moment</p>
+            <p className="text-[10px] text-foreground/40 text-center mt-4 tracking-wide">Sans engagement · Annulation à tout moment</p>
           </motion.div>
         </div>
       </section>
@@ -807,7 +807,7 @@ const Landing = () => {
               n'attendent pas.
             </motion.span>
           </h2>
-          <p className="text-sm text-foreground/30 mb-12 max-w-md mx-auto">
+          <p className="text-sm text-foreground/50 mb-12 max-w-md mx-auto">
             Pendant que tu cherches, d'autres vendent.
           </p>
           <Link to="/" className="group inline-flex items-center gap-3 px-14 py-5 rounded-full text-sm font-bold tracking-wider transition-all duration-500 hover:scale-105 hover:shadow-[0_0_60px_-10px_hsl(174_72%_46%_/_0.6)]" style={{
@@ -829,11 +829,11 @@ const Landing = () => {
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <img src={krakkenLogo} alt="" className="w-5 h-5 object-contain" style={{ opacity: 0.25, filter: 'drop-shadow(0 0 4px hsl(174 72% 46% / 0.3))' }} />
-            <span className="text-[11px] text-foreground/20">© 2026 Krakken</span>
+            <span className="text-[11px] text-foreground/40">© 2026 Krakken</span>
           </div>
           <div className="flex gap-6">
-            <a href="#" className="text-[10px] text-foreground/15 hover:text-foreground/40 transition-colors">Mentions légales</a>
-            <a href="#" className="text-[10px] text-foreground/15 hover:text-foreground/40 transition-colors">Contact</a>
+            <a href="#" className="text-[10px] text-foreground/35 hover:text-foreground/60 transition-colors">Mentions légales</a>
+            <a href="#" className="text-[10px] text-foreground/35 hover:text-foreground/60 transition-colors">Contact</a>
           </div>
         </div>
       </footer>

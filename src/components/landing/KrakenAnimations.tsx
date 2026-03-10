@@ -119,7 +119,7 @@ const DeepKraken = () => {
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
         className="absolute w-[140%] h-[140%] -left-[20%] -top-[15%]"
-        style={{ opacity: 0.12 }}
+        style={{ opacity: 0.35 }}
       >
         {/* Kraken body — massive dome */}
         <motion.ellipse
@@ -311,8 +311,8 @@ const DeepKraken = () => {
 
         <defs>
           <radialGradient id="krakenBodyGrad" cx="0.5" cy="0.4">
-            <stop offset="0%" stopColor="hsl(174 72% 46% / 0.3)" />
-            <stop offset="60%" stopColor="hsl(228 42% 8% / 0.6)" />
+            <stop offset="0%" stopColor="hsl(174 72% 46% / 0.5)" />
+            <stop offset="50%" stopColor="hsl(228 42% 10% / 0.7)" />
             <stop offset="100%" stopColor="hsl(228 42% 3% / 0)" />
           </radialGradient>
         </defs>
@@ -322,26 +322,26 @@ const DeepKraken = () => {
       <motion.div
         className="absolute rounded-full"
         style={{
-          width: 120, height: 120,
-          left: 'calc(38% - 60px)', top: 'calc(28% - 60px)',
-          background: 'radial-gradient(circle, hsl(174 72% 46% / 0.15) 0%, transparent 70%)',
+          width: 180, height: 180,
+          left: 'calc(38% - 90px)', top: 'calc(28% - 90px)',
+          background: 'radial-gradient(circle, hsl(174 72% 46% / 0.25) 0%, transparent 70%)',
         }}
         animate={{
-          scale: [1, 1.5, 1],
-          opacity: [0.3, 0.7, 0.3],
+          scale: [1, 1.6, 1],
+          opacity: [0.4, 0.9, 0.4],
         }}
         transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
       />
       <motion.div
         className="absolute rounded-full"
         style={{
-          width: 120, height: 120,
-          left: 'calc(48% - 60px)', top: 'calc(28% - 60px)',
-          background: 'radial-gradient(circle, hsl(174 72% 46% / 0.15) 0%, transparent 70%)',
+          width: 180, height: 180,
+          left: 'calc(48% - 90px)', top: 'calc(28% - 90px)',
+          background: 'radial-gradient(circle, hsl(174 72% 46% / 0.25) 0%, transparent 70%)',
         }}
         animate={{
-          scale: [1, 1.5, 1],
-          opacity: [0.3, 0.7, 0.3],
+          scale: [1, 1.6, 1],
+          opacity: [0.4, 0.9, 0.4],
         }}
         transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 0.3 }}
       />
