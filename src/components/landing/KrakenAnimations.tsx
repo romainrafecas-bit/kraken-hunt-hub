@@ -119,7 +119,7 @@ const DeepKraken = () => {
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
         className="absolute w-[140%] h-[140%] -left-[20%] -top-[15%]"
-        style={{ opacity: 0.12 }}
+        style={{ opacity: 0.35 }}
       >
         {/* Kraken body — massive dome */}
         <motion.ellipse
