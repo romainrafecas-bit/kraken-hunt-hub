@@ -1,5 +1,6 @@
-import { motion, useScroll, useTransform, useMotionValue, useSpring, animate } from "framer-motion";
-import { useRef, useEffect, useState } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
+import { useRef } from "react";
+import krakenBg from "@/assets/kraken-bg.jpg";
 
 interface TentacleProps {
   side: "left" | "right";
@@ -97,7 +98,7 @@ const Tentacle = ({ side, top, color = "174 72% 46%", delay = 0, size = 300 }: T
   );
 };
 
-// === DEEP SEA KRAKEN — menacing silhouette ===
+// === DEEP SEA KRAKEN — Real image with animations ===
 const DeepKraken = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
@@ -105,299 +106,79 @@ const DeepKraken = () => {
     offset: ["start start", "end start"],
   });
 
-  const bodyY = useTransform(scrollYProgress, [0, 1], [0, 80]);
-  const bodyRotate = useTransform(scrollYProgress, [0, 1], [0, -3]);
+  const y = useTransform(scrollYProgress, [0, 1], [0, 120]);
+  const scale = useTransform(scrollYProgress, [0, 1], [1, 1.15]);
 
   return (
     <motion.div
       ref={containerRef}
       className="absolute inset-0 pointer-events-none overflow-hidden"
-      style={{ y: bodyY, rotate: bodyRotate }}
     >
-      <svg
-        viewBox="0 0 1200 900"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-        className="absolute w-[180%] h-[180%] -left-[40%] -top-[25%]"
-        style={{ opacity: 0.55 }}
+      {/* Main kraken image — floating animation */}
+      <motion.div
+        className="absolute inset-0"
+        style={{ y, scale }}
       >
-        {/* Kraken body — massive dome */}
-        <motion.ellipse
-          cx="600" cy="300" rx="280" ry="230"
-          fill="url(#krakenBodyGrad)"
+        <motion.img
+          src={krakenBg}
+          alt=""
+          className="absolute w-[130%] h-[130%] -left-[15%] -top-[10%] object-cover"
+          style={{ opacity: 0.55 }}
           animate={{
-            ry: [230, 242, 222, 236, 230],
-            rx: [280, 272, 288, 276, 280],
-            cy: [300, 293, 308, 296, 300],
+            y: [0, -15, 0, 10, 0],
+            x: [0, 5, 0, -5, 0],
+            scale: [1, 1.02, 1, 0.99, 1],
           }}
-          transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
-        />
-        {/* Body inner texture */}
-        <motion.ellipse
-          cx="600" cy="290" rx="180" ry="140"
-          fill="url(#krakenInnerGrad)"
-          animate={{
-            ry: [140, 150, 135, 145, 140],
-            rx: [180, 174, 186, 178, 180],
+          transition={{
+            duration: 18,
+            repeat: Infinity,
+            ease: "easeInOut",
           }}
-          transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
         />
+      </motion.div>
 
-        {/* Eye left — larger */}
-        <motion.ellipse
-          cx="520" cy="285" rx="28" ry="35"
-          fill="hsl(174 72% 46% / 0.8)"
-          style={{ filter: 'blur(2px)' }}
-          animate={{
-            opacity: [0.5, 1, 0.5],
-            ry: [35, 28, 35],
-          }}
-          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.ellipse
-          cx="520" cy="285" rx="12" ry="22"
-          fill="hsl(174 72% 85% / 1)"
-          animate={{
-            opacity: [0.7, 1, 0.7],
-            ry: [22, 16, 22],
-          }}
-          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <ellipse cx="520" cy="280" rx="4" ry="6" fill="hsl(180 90% 95% / 0.9)" />
-
-        {/* Eye right — larger */}
-        <motion.ellipse
-          cx="680" cy="285" rx="28" ry="35"
-          fill="hsl(174 72% 46% / 0.8)"
-          style={{ filter: 'blur(2px)' }}
-          animate={{
-            opacity: [0.5, 1, 0.5],
-            ry: [35, 28, 35],
-          }}
-          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 0.3 }}
-        />
-        <motion.ellipse
-          cx="680" cy="285" rx="12" ry="22"
-          fill="hsl(174 72% 85% / 1)"
-          animate={{
-            opacity: [0.7, 1, 0.7],
-            ry: [22, 16, 22],
-          }}
-          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 0.3 }}
-        />
-        <ellipse cx="680" cy="280" rx="4" ry="6" fill="hsl(180 90% 95% / 0.9)" />
-
-        {/* Tentacle 1 — left major sweep — THICK with fill */}
-        <motion.path
-          stroke="hsl(174 72% 46% / 0.4)"
-          strokeWidth="22"
-          strokeLinecap="round"
-          fill="hsl(174 72% 46% / 0.06)"
-          animate={{
-            d: [
-              "M440,500 Q300,580 140,670 Q40,730 -30,830 Q-60,890 -10,900",
-              "M440,500 Q270,600 100,700 Q0,760 -60,860 Q-90,920 -40,920",
-              "M440,500 Q330,560 180,640 Q80,700 20,800 Q-10,860 30,880",
-              "M440,500 Q300,580 140,670 Q40,730 -30,830 Q-60,890 -10,900",
-            ],
-          }}
-          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-        />
-
-        {/* Tentacle 2 — right major sweep */}
-        <motion.path
-          stroke="hsl(262 52% 58% / 0.35)"
-          strokeWidth="20"
-          strokeLinecap="round"
-          fill="hsl(262 52% 58% / 0.05)"
-          animate={{
-            d: [
-              "M760,500 Q900,580 1060,670 Q1160,730 1230,830 Q1260,890 1210,900",
-              "M760,500 Q930,600 1100,700 Q1200,760 1260,860 Q1290,920 1240,920",
-              "M760,500 Q870,560 1020,640 Q1120,700 1180,800 Q1210,860 1170,880",
-              "M760,500 Q900,580 1060,670 Q1160,730 1230,830 Q1260,890 1210,900",
-            ],
-          }}
-          transition={{ duration: 11, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-        />
-
-        {/* Tentacle 3 — center-left descending */}
-        <motion.path
-          stroke="hsl(188 78% 52% / 0.3)"
-          strokeWidth="16"
-          strokeLinecap="round"
-          fill="hsl(188 78% 52% / 0.04)"
-          animate={{
-            d: [
-              "M520,510 Q460,640 380,780 Q340,860 310,920",
-              "M520,510 Q440,660 350,800 Q310,880 270,940",
-              "M520,510 Q480,620 410,750 Q370,830 350,900",
-              "M520,510 Q460,640 380,780 Q340,860 310,920",
-            ],
-          }}
-          transition={{ duration: 9, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
-        />
-
-        {/* Tentacle 4 — center-right descending */}
-        <motion.path
-          stroke="hsl(174 72% 46% / 0.3)"
-          strokeWidth="16"
-          strokeLinecap="round"
-          fill="hsl(174 72% 46% / 0.04)"
-          animate={{
-            d: [
-              "M680,510 Q740,640 820,780 Q860,860 890,920",
-              "M680,510 Q760,660 850,800 Q890,880 930,940",
-              "M680,510 Q720,620 790,750 Q830,830 850,900",
-              "M680,510 Q740,640 820,780 Q860,860 890,920",
-            ],
-          }}
-          transition={{ duration: 9.5, repeat: Infinity, ease: "easeInOut", delay: 1.5 }}
-        />
-
-        {/* Tentacle 5 — far left reaching up and out */}
-        <motion.path
-          stroke="hsl(262 52% 58% / 0.25)"
-          strokeWidth="14"
-          strokeLinecap="round"
-          fill="hsl(262 52% 58% / 0.03)"
-          animate={{
-            d: [
-              "M400,460 Q250,480 80,540 Q-40,590 -120,700 Q-160,760 -100,790",
-              "M400,460 Q220,500 50,570 Q-60,620 -140,730 Q-180,800 -120,820",
-              "M400,460 Q280,470 120,520 Q0,570 -80,670 Q-120,730 -60,760",
-              "M400,460 Q250,480 80,540 Q-40,590 -120,700 Q-160,760 -100,790",
-            ],
-          }}
-          transition={{ duration: 13, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-        />
-
-        {/* Tentacle 6 — far right reaching up and out */}
-        <motion.path
-          stroke="hsl(188 78% 52% / 0.25)"
-          strokeWidth="14"
-          strokeLinecap="round"
-          fill="hsl(188 78% 52% / 0.03)"
-          animate={{
-            d: [
-              "M800,460 Q950,480 1120,540 Q1240,590 1320,700 Q1360,760 1300,790",
-              "M800,460 Q980,500 1150,570 Q1260,620 1340,730 Q1380,800 1320,820",
-              "M800,460 Q920,470 1080,520 Q1200,570 1280,670 Q1320,730 1260,760",
-              "M800,460 Q950,480 1120,540 Q1240,590 1320,700 Q1360,760 1300,790",
-            ],
-          }}
-          transition={{ duration: 12, repeat: Infinity, ease: "easeInOut", delay: 3 }}
-        />
-
-        {/* Tentacle 7 — center short left */}
-        <motion.path
-          stroke="hsl(174 72% 46% / 0.25)"
-          strokeWidth="14"
-          strokeLinecap="round"
-          fill="none"
-          animate={{
-            d: [
-              "M560,520 Q540,620 510,740 Q500,800 480,850",
-              "M560,520 Q530,630 490,760 Q480,820 450,870",
-              "M560,520 Q550,610 530,720 Q520,780 510,830",
-              "M560,520 Q540,620 510,740 Q500,800 480,850",
-            ],
-          }}
-          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut", delay: 0.8 }}
-        />
-
-        {/* Tentacle 8 — center short right */}
-        <motion.path
-          stroke="hsl(262 52% 58% / 0.25)"
-          strokeWidth="14"
-          strokeLinecap="round"
-          fill="none"
-          animate={{
-            d: [
-              "M640,520 Q660,620 690,740 Q700,800 720,850",
-              "M640,520 Q670,630 710,760 Q720,820 750,870",
-              "M640,520 Q650,610 670,720 Q680,780 690,830",
-              "M640,520 Q660,620 690,740 Q700,800 720,850",
-            ],
-          }}
-          transition={{ duration: 8.5, repeat: Infinity, ease: "easeInOut", delay: 1.2 }}
-        />
-
-        {/* Suction cups along major tentacles */}
-        {[0.3, 0.45, 0.6, 0.75].map((t, i) => (
-          <motion.circle
-            key={`sl-${i}`}
-            cx={440 - t * 400}
-            cy={500 + t * 350}
-            r={5 - i * 0.8}
-            fill="hsl(174 72% 46% / 0.5)"
-            animate={{ opacity: [0.2, 0.7, 0.2], r: [3, 5 - i * 0.5, 3] }}
-            transition={{ duration: 3 + i * 0.5, repeat: Infinity, ease: "easeInOut", delay: i * 0.4 }}
-          />
-        ))}
-        {[0.3, 0.45, 0.6, 0.75].map((t, i) => (
-          <motion.circle
-            key={`sr-${i}`}
-            cx={760 + t * 400}
-            cy={500 + t * 350}
-            r={5 - i * 0.8}
-            fill="hsl(262 52% 58% / 0.5)"
-            animate={{ opacity: [0.2, 0.7, 0.2], r: [3, 5 - i * 0.5, 3] }}
-            transition={{ duration: 3 + i * 0.5, repeat: Infinity, ease: "easeInOut", delay: 0.5 + i * 0.4 }}
-          />
-        ))}
-
-        <defs>
-          <radialGradient id="krakenBodyGrad" cx="0.5" cy="0.35">
-            <stop offset="0%" stopColor="hsl(174 72% 30% / 0.6)" />
-            <stop offset="40%" stopColor="hsl(228 42% 12% / 0.7)" />
-            <stop offset="100%" stopColor="hsl(228 42% 3% / 0)" />
-          </radialGradient>
-          <radialGradient id="krakenInnerGrad" cx="0.5" cy="0.4">
-            <stop offset="0%" stopColor="hsl(174 72% 20% / 0.3)" />
-            <stop offset="100%" stopColor="hsl(228 42% 5% / 0)" />
-          </radialGradient>
-        </defs>
-      </svg>
-
-      {/* Eye glow pulses — large and bright */}
+      {/* Pulsing eye glow overlay — left eye */}
       <motion.div
         className="absolute rounded-full"
         style={{
-          width: 250, height: 250,
-          left: 'calc(33% - 125px)', top: 'calc(22% - 125px)',
-          background: 'radial-gradient(circle, hsl(174 72% 50% / 0.35) 0%, hsl(174 72% 46% / 0.1) 40%, transparent 70%)',
+          width: 200, height: 200,
+          left: 'calc(40% - 100px)', top: 'calc(28% - 100px)',
+          background: 'radial-gradient(circle, hsl(174 80% 55% / 0.3) 0%, hsl(174 72% 46% / 0.08) 40%, transparent 70%)',
+          filter: 'blur(8px)',
         }}
         animate={{
-          scale: [1, 1.8, 1],
-          opacity: [0.5, 1, 0.5],
+          scale: [1, 1.5, 1],
+          opacity: [0.4, 0.9, 0.4],
         }}
         transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
       />
+
+      {/* Pulsing eye glow overlay — right eye */}
       <motion.div
         className="absolute rounded-full"
         style={{
-          width: 250, height: 250,
-          left: 'calc(47% - 125px)', top: 'calc(22% - 125px)',
-          background: 'radial-gradient(circle, hsl(174 72% 50% / 0.35) 0%, hsl(174 72% 46% / 0.1) 40%, transparent 70%)',
+          width: 200, height: 200,
+          left: 'calc(52% - 100px)', top: 'calc(28% - 100px)',
+          background: 'radial-gradient(circle, hsl(174 80% 55% / 0.3) 0%, hsl(174 72% 46% / 0.08) 40%, transparent 70%)',
+          filter: 'blur(8px)',
         }}
         animate={{
-          scale: [1, 1.8, 1],
-          opacity: [0.5, 1, 0.5],
+          scale: [1, 1.5, 1],
+          opacity: [0.4, 0.9, 0.4],
         }}
-        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 0.3 }}
+        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
       />
     </motion.div>
   );
 };
 
-// Floating particles — enhanced
+// Floating particles
 const Particles = () => {
-  const particles = Array.from({ length: 30 }, (_, i) => ({
+  const particles = Array.from({ length: 25 }, (_, i) => ({
     id: i,
     x: Math.random() * 100,
     y: Math.random() * 100,
-    size: 1 + Math.random() * 3.5,
+    size: 1 + Math.random() * 3,
     duration: 3 + Math.random() * 7,
     delay: Math.random() * 5,
     color: i % 4 === 0 ? "174 72% 46%" : i % 4 === 1 ? "262 52% 58%" : i % 4 === 2 ? "188 78% 52%" : "174 72% 60%",
