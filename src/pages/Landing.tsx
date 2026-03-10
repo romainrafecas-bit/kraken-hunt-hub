@@ -618,7 +618,7 @@ const Landing = () => {
                   filter: `drop-shadow(0 0 8px hsl(${s.color} / 0.4))`,
                 }} />
                 <span className="font-display font-black text-3xl md:text-4xl text-foreground block mb-2">{s.stat}</span>
-                <span className="text-[10px] text-foreground/30 tracking-widest uppercase">{s.label}</span>
+                <span className="text-[10px] text-foreground/50 tracking-widest uppercase">{s.label}</span>
               </motion.div>
             ))}
           </motion.div>
