@@ -122,8 +122,8 @@ const DeepKraken = () => {
         <motion.img
           src={krakenBg}
           alt=""
-          className="absolute w-[130%] h-[130%] -left-[15%] -top-[10%] object-cover"
-          style={{ opacity: 0.55 }}
+          className="absolute w-full h-full left-0 object-cover object-center"
+          style={{ opacity: 0.45, top: '5%' }}
           animate={{
             y: [0, -15, 0, 10, 0],
             x: [0, 5, 0, -5, 0],
