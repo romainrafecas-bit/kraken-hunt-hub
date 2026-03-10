@@ -118,202 +118,244 @@ const DeepKraken = () => {
         viewBox="0 0 1200 900"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
-        className="absolute w-[140%] h-[140%] -left-[20%] -top-[15%]"
-        style={{ opacity: 0.35 }}
+        className="absolute w-[180%] h-[180%] -left-[40%] -top-[25%]"
+        style={{ opacity: 0.55 }}
       >
         {/* Kraken body — massive dome */}
         <motion.ellipse
-          cx="600" cy="320" rx="220" ry="180"
+          cx="600" cy="300" rx="280" ry="230"
           fill="url(#krakenBodyGrad)"
           animate={{
-            ry: [180, 190, 175, 185, 180],
-            rx: [220, 215, 225, 218, 220],
-            cy: [320, 315, 325, 318, 320],
+            ry: [230, 242, 222, 236, 230],
+            rx: [280, 272, 288, 276, 280],
+            cy: [300, 293, 308, 296, 300],
           }}
-          transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
+          transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
+        />
+        {/* Body inner texture */}
+        <motion.ellipse
+          cx="600" cy="290" rx="180" ry="140"
+          fill="url(#krakenInnerGrad)"
+          animate={{
+            ry: [140, 150, 135, 145, 140],
+            rx: [180, 174, 186, 178, 180],
+          }}
+          transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
         />
 
-        {/* Eye left */}
+        {/* Eye left — larger */}
         <motion.ellipse
-          cx="540" cy="310" rx="18" ry="22"
-          fill="hsl(174 72% 46% / 0.7)"
-          style={{ filter: 'blur(1px)' }}
+          cx="520" cy="285" rx="28" ry="35"
+          fill="hsl(174 72% 46% / 0.8)"
+          style={{ filter: 'blur(2px)' }}
           animate={{
             opacity: [0.5, 1, 0.5],
-            ry: [22, 18, 22],
+            ry: [35, 28, 35],
           }}
           transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
         />
         <motion.ellipse
-          cx="540" cy="310" rx="8" ry="14"
-          fill="hsl(174 72% 80% / 0.9)"
+          cx="520" cy="285" rx="12" ry="22"
+          fill="hsl(174 72% 85% / 1)"
           animate={{
-            opacity: [0.6, 1, 0.6],
-            ry: [14, 10, 14],
+            opacity: [0.7, 1, 0.7],
+            ry: [22, 16, 22],
           }}
           transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
         />
+        <ellipse cx="520" cy="280" rx="4" ry="6" fill="hsl(180 90% 95% / 0.9)" />
 
-        {/* Eye right */}
+        {/* Eye right — larger */}
         <motion.ellipse
-          cx="660" cy="310" rx="18" ry="22"
-          fill="hsl(174 72% 46% / 0.7)"
-          style={{ filter: 'blur(1px)' }}
+          cx="680" cy="285" rx="28" ry="35"
+          fill="hsl(174 72% 46% / 0.8)"
+          style={{ filter: 'blur(2px)' }}
           animate={{
             opacity: [0.5, 1, 0.5],
-            ry: [22, 18, 22],
+            ry: [35, 28, 35],
           }}
           transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 0.3 }}
         />
         <motion.ellipse
-          cx="660" cy="310" rx="8" ry="14"
-          fill="hsl(174 72% 80% / 0.9)"
+          cx="680" cy="285" rx="12" ry="22"
+          fill="hsl(174 72% 85% / 1)"
           animate={{
-            opacity: [0.6, 1, 0.6],
-            ry: [14, 10, 14],
+            opacity: [0.7, 1, 0.7],
+            ry: [22, 16, 22],
           }}
           transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 0.3 }}
         />
+        <ellipse cx="680" cy="280" rx="4" ry="6" fill="hsl(180 90% 95% / 0.9)" />
 
-        {/* Tentacle 1 — left sweep */}
+        {/* Tentacle 1 — left major sweep — THICK with fill */}
         <motion.path
-          stroke="hsl(174 72% 46% / 0.3)"
-          strokeWidth="12"
+          stroke="hsl(174 72% 46% / 0.4)"
+          strokeWidth="22"
           strokeLinecap="round"
-          fill="none"
+          fill="hsl(174 72% 46% / 0.06)"
           animate={{
             d: [
-              "M480,480 Q350,550 200,620 Q120,660 80,750 Q60,800 100,820",
-              "M480,480 Q330,570 180,640 Q100,680 50,770 Q30,830 80,840",
-              "M480,480 Q370,540 220,600 Q140,640 110,730 Q90,790 120,800",
-              "M480,480 Q350,550 200,620 Q120,660 80,750 Q60,800 100,820",
+              "M440,500 Q300,580 140,670 Q40,730 -30,830 Q-60,890 -10,900",
+              "M440,500 Q270,600 100,700 Q0,760 -60,860 Q-90,920 -40,920",
+              "M440,500 Q330,560 180,640 Q80,700 20,800 Q-10,860 30,880",
+              "M440,500 Q300,580 140,670 Q40,730 -30,830 Q-60,890 -10,900",
             ],
           }}
           transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
         />
 
-        {/* Tentacle 2 — right sweep */}
+        {/* Tentacle 2 — right major sweep */}
         <motion.path
-          stroke="hsl(262 52% 58% / 0.25)"
-          strokeWidth="11"
+          stroke="hsl(262 52% 58% / 0.35)"
+          strokeWidth="20"
           strokeLinecap="round"
-          fill="none"
+          fill="hsl(262 52% 58% / 0.05)"
           animate={{
             d: [
-              "M720,480 Q850,550 1000,620 Q1080,660 1120,750 Q1140,800 1100,820",
-              "M720,480 Q870,570 1020,640 Q1100,680 1150,770 Q1170,830 1120,840",
-              "M720,480 Q830,540 980,600 Q1060,640 1090,730 Q1110,790 1080,800",
-              "M720,480 Q850,550 1000,620 Q1080,660 1120,750 Q1140,800 1100,820",
+              "M760,500 Q900,580 1060,670 Q1160,730 1230,830 Q1260,890 1210,900",
+              "M760,500 Q930,600 1100,700 Q1200,760 1260,860 Q1290,920 1240,920",
+              "M760,500 Q870,560 1020,640 Q1120,700 1180,800 Q1210,860 1170,880",
+              "M760,500 Q900,580 1060,670 Q1160,730 1230,830 Q1260,890 1210,900",
             ],
           }}
           transition={{ duration: 11, repeat: Infinity, ease: "easeInOut", delay: 1 }}
         />
 
-        {/* Tentacle 3 — center left */}
+        {/* Tentacle 3 — center-left descending */}
         <motion.path
-          stroke="hsl(188 78% 52% / 0.2)"
-          strokeWidth="9"
+          stroke="hsl(188 78% 52% / 0.3)"
+          strokeWidth="16"
           strokeLinecap="round"
-          fill="none"
+          fill="hsl(188 78% 52% / 0.04)"
           animate={{
             d: [
-              "M530,490 Q480,600 420,720 Q390,790 370,850 Q360,880 380,890",
-              "M530,490 Q460,610 400,740 Q370,810 340,870 Q330,900 360,900",
-              "M530,490 Q500,590 440,700 Q410,770 400,830 Q390,860 400,870",
-              "M530,490 Q480,600 420,720 Q390,790 370,850 Q360,880 380,890",
+              "M520,510 Q460,640 380,780 Q340,860 310,920",
+              "M520,510 Q440,660 350,800 Q310,880 270,940",
+              "M520,510 Q480,620 410,750 Q370,830 350,900",
+              "M520,510 Q460,640 380,780 Q340,860 310,920",
             ],
           }}
           transition={{ duration: 9, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
         />
 
-        {/* Tentacle 4 — center right */}
+        {/* Tentacle 4 — center-right descending */}
         <motion.path
-          stroke="hsl(174 72% 46% / 0.2)"
-          strokeWidth="9"
+          stroke="hsl(174 72% 46% / 0.3)"
+          strokeWidth="16"
           strokeLinecap="round"
-          fill="none"
+          fill="hsl(174 72% 46% / 0.04)"
           animate={{
             d: [
-              "M670,490 Q720,600 780,720 Q810,790 830,850 Q840,880 820,890",
-              "M670,490 Q740,610 800,740 Q830,810 860,870 Q870,900 840,900",
-              "M670,490 Q700,590 760,700 Q790,770 800,830 Q810,860 800,870",
-              "M670,490 Q720,600 780,720 Q810,790 830,850 Q840,880 820,890",
+              "M680,510 Q740,640 820,780 Q860,860 890,920",
+              "M680,510 Q760,660 850,800 Q890,880 930,940",
+              "M680,510 Q720,620 790,750 Q830,830 850,900",
+              "M680,510 Q740,640 820,780 Q860,860 890,920",
             ],
           }}
           transition={{ duration: 9.5, repeat: Infinity, ease: "easeInOut", delay: 1.5 }}
         />
 
-        {/* Tentacle 5 — far left reaching */}
+        {/* Tentacle 5 — far left reaching up and out */}
         <motion.path
-          stroke="hsl(262 52% 58% / 0.15)"
-          strokeWidth="7"
+          stroke="hsl(262 52% 58% / 0.25)"
+          strokeWidth="14"
           strokeLinecap="round"
-          fill="none"
+          fill="hsl(262 52% 58% / 0.03)"
           animate={{
             d: [
-              "M440,470 Q300,500 150,560 Q50,610 -20,700 Q-40,740 0,760",
-              "M440,470 Q280,520 130,580 Q30,630 -40,720 Q-60,760 -20,780",
-              "M440,470 Q320,490 170,540 Q70,590 0,680 Q-20,720 20,740",
-              "M440,470 Q300,500 150,560 Q50,610 -20,700 Q-40,740 0,760",
+              "M400,460 Q250,480 80,540 Q-40,590 -120,700 Q-160,760 -100,790",
+              "M400,460 Q220,500 50,570 Q-60,620 -140,730 Q-180,800 -120,820",
+              "M400,460 Q280,470 120,520 Q0,570 -80,670 Q-120,730 -60,760",
+              "M400,460 Q250,480 80,540 Q-40,590 -120,700 Q-160,760 -100,790",
             ],
           }}
           transition={{ duration: 13, repeat: Infinity, ease: "easeInOut", delay: 2 }}
         />
 
-        {/* Tentacle 6 — far right reaching */}
+        {/* Tentacle 6 — far right reaching up and out */}
         <motion.path
-          stroke="hsl(188 78% 52% / 0.15)"
-          strokeWidth="7"
+          stroke="hsl(188 78% 52% / 0.25)"
+          strokeWidth="14"
           strokeLinecap="round"
-          fill="none"
+          fill="hsl(188 78% 52% / 0.03)"
           animate={{
             d: [
-              "M760,470 Q900,500 1050,560 Q1150,610 1220,700 Q1240,740 1200,760",
-              "M760,470 Q920,520 1070,580 Q1170,630 1240,720 Q1260,760 1220,780",
-              "M760,470 Q880,490 1030,540 Q1130,590 1200,680 Q1220,720 1180,740",
-              "M760,470 Q900,500 1050,560 Q1150,610 1220,700 Q1240,740 1200,760",
+              "M800,460 Q950,480 1120,540 Q1240,590 1320,700 Q1360,760 1300,790",
+              "M800,460 Q980,500 1150,570 Q1260,620 1340,730 Q1380,800 1320,820",
+              "M800,460 Q920,470 1080,520 Q1200,570 1280,670 Q1320,730 1260,760",
+              "M800,460 Q950,480 1120,540 Q1240,590 1320,700 Q1360,760 1300,790",
             ],
           }}
           transition={{ duration: 12, repeat: Infinity, ease: "easeInOut", delay: 3 }}
         />
 
-        {/* Central short tentacles */}
+        {/* Tentacle 7 — center short left */}
         <motion.path
-          stroke="hsl(174 72% 46% / 0.18)"
-          strokeWidth="10"
+          stroke="hsl(174 72% 46% / 0.25)"
+          strokeWidth="14"
           strokeLinecap="round"
           fill="none"
           animate={{
             d: [
-              "M580,500 Q570,580 550,680 Q540,730 530,770",
-              "M580,500 Q560,590 540,700 Q530,750 510,790",
-              "M580,500 Q575,570 560,660 Q550,710 545,750",
-              "M580,500 Q570,580 550,680 Q540,730 530,770",
+              "M560,520 Q540,620 510,740 Q500,800 480,850",
+              "M560,520 Q530,630 490,760 Q480,820 450,870",
+              "M560,520 Q550,610 530,720 Q520,780 510,830",
+              "M560,520 Q540,620 510,740 Q500,800 480,850",
             ],
           }}
           transition={{ duration: 8, repeat: Infinity, ease: "easeInOut", delay: 0.8 }}
         />
+
+        {/* Tentacle 8 — center short right */}
         <motion.path
-          stroke="hsl(262 52% 58% / 0.18)"
-          strokeWidth="10"
+          stroke="hsl(262 52% 58% / 0.25)"
+          strokeWidth="14"
           strokeLinecap="round"
           fill="none"
           animate={{
             d: [
-              "M620,500 Q630,580 650,680 Q660,730 670,770",
-              "M620,500 Q640,590 660,700 Q670,750 690,790",
-              "M620,500 Q625,570 640,660 Q650,710 655,750",
-              "M620,500 Q630,580 650,680 Q660,730 670,770",
+              "M640,520 Q660,620 690,740 Q700,800 720,850",
+              "M640,520 Q670,630 710,760 Q720,820 750,870",
+              "M640,520 Q650,610 670,720 Q680,780 690,830",
+              "M640,520 Q660,620 690,740 Q700,800 720,850",
             ],
           }}
           transition={{ duration: 8.5, repeat: Infinity, ease: "easeInOut", delay: 1.2 }}
         />
 
+        {/* Suction cups along major tentacles */}
+        {[0.3, 0.45, 0.6, 0.75].map((t, i) => (
+          <motion.circle
+            key={`sl-${i}`}
+            cx={440 - t * 400}
+            cy={500 + t * 350}
+            r={5 - i * 0.8}
+            fill="hsl(174 72% 46% / 0.5)"
+            animate={{ opacity: [0.2, 0.7, 0.2], r: [3, 5 - i * 0.5, 3] }}
+            transition={{ duration: 3 + i * 0.5, repeat: Infinity, ease: "easeInOut", delay: i * 0.4 }}
+          />
+        ))}
+        {[0.3, 0.45, 0.6, 0.75].map((t, i) => (
+          <motion.circle
+            key={`sr-${i}`}
+            cx={760 + t * 400}
+            cy={500 + t * 350}
+            r={5 - i * 0.8}
+            fill="hsl(262 52% 58% / 0.5)"
+            animate={{ opacity: [0.2, 0.7, 0.2], r: [3, 5 - i * 0.5, 3] }}
+            transition={{ duration: 3 + i * 0.5, repeat: Infinity, ease: "easeInOut", delay: 0.5 + i * 0.4 }}
+          />
+        ))}
+
         <defs>
-          <radialGradient id="krakenBodyGrad" cx="0.5" cy="0.4">
-            <stop offset="0%" stopColor="hsl(174 72% 46% / 0.5)" />
-            <stop offset="50%" stopColor="hsl(228 42% 10% / 0.7)" />
+          <radialGradient id="krakenBodyGrad" cx="0.5" cy="0.35">
+            <stop offset="0%" stopColor="hsl(174 72% 30% / 0.6)" />
+            <stop offset="40%" stopColor="hsl(228 42% 12% / 0.7)" />
             <stop offset="100%" stopColor="hsl(228 42% 3% / 0)" />
+          </radialGradient>
+          <radialGradient id="krakenInnerGrad" cx="0.5" cy="0.4">
+            <stop offset="0%" stopColor="hsl(174 72% 20% / 0.3)" />
+            <stop offset="100%" stopColor="hsl(228 42% 5% / 0)" />
           </radialGradient>
         </defs>
       </svg>
