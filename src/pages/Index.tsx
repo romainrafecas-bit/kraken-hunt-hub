@@ -188,15 +188,33 @@ const Index = () => {
               <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-auto">
                 <defs>
                   <linearGradient id="areaFill" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="hsl(174 72% 50%)" stopOpacity="0.2" />
+                    <stop offset="0%" stopColor="hsl(174 72% 50%)" stopOpacity="0.25" />
+                    <stop offset="50%" stopColor="hsl(188 78% 52%)" stopOpacity="0.08" />
                     <stop offset="100%" stopColor="hsl(228 42% 5%)" stopOpacity="0" />
                   </linearGradient>
                   <linearGradient id="lineStroke" x1="0" y1="0" x2="1" y2="0">
-                    <stop offset="0%" stopColor="hsl(174 72% 50%)" />
-                    <stop offset="60%" stopColor="hsl(188 78% 58%)" />
-                    <stop offset="100%" stopColor="hsl(262 52% 62%)" />
+                    <stop offset="0%" stopColor="hsl(162 68% 50%)" />
+                    <stop offset="40%" stopColor="hsl(174 72% 55%)" />
+                    <stop offset="70%" stopColor="hsl(188 78% 58%)" />
+                    <stop offset="100%" stopColor="hsl(262 52% 65%)" />
                   </linearGradient>
+                  <filter id="lineGlow">
+                    <feGaussianBlur stdDeviation="3" result="blur" />
+                    <feMerge>
+                      <feMergeNode in="blur" />
+                      <feMergeNode in="SourceGraphic" />
+                    </feMerge>
+                  </filter>
                 </defs>
+
+                {/* Horizontal grid lines */}
+                {[0.25, 0.5, 0.75].map((frac) => {
+                  const y = padY + chartH - frac * chartH;
+                  return (
+                    <line key={frac} x1={padX} y1={y} x2={W - padX} y2={y}
+                      stroke="hsl(225 18% 14%)" strokeWidth="0.5" strokeDasharray="4 4" />
+                  );
+                })}
 
                 {/* Area fill */}
                 <motion.path
@@ -207,7 +225,22 @@ const Index = () => {
                   transition={{ delay: 0.5, duration: 0.8 }}
                 />
 
-                {/* Smooth line */}
+                {/* Glow line (behind) */}
+                <motion.path
+                  d={path}
+                  fill="none"
+                  stroke="hsl(174 72% 50%)"
+                  strokeWidth="6"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  opacity="0.15"
+                  filter="url(#lineGlow)"
+                  initial={{ pathLength: 0 }}
+                  animate={{ pathLength: 1 }}
+                  transition={{ delay: 0.3, duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+                />
+
+                {/* Main line */}
                 <motion.path
                   d={path}
                   fill="none"
@@ -226,14 +259,14 @@ const Index = () => {
                   return (
                     <g key={i}>
                       <motion.circle
-                        cx={pt.x} cy={pt.y} r={isToday ? 5 : 3.5}
-                        fill={isToday ? "hsl(174 72% 55%)" : "hsl(225 25% 8%)"}
-                        stroke={isToday ? "hsl(174 72% 40%)" : "hsl(188 60% 40%)"}
-                        strokeWidth={isToday ? 2 : 1.5}
+                        cx={pt.x} cy={pt.y} r={isToday ? 5.5 : 3.5}
+                        fill={isToday ? "hsl(174 72% 55%)" : "hsl(225 25% 10%)"}
+                        stroke={isToday ? "hsl(174 72% 40%)" : "hsl(188 60% 45%)"}
+                        strokeWidth={isToday ? 2.5 : 1.5}
                         initial={{ scale: 0 }}
                         animate={{ scale: 1 }}
                         transition={{ delay: 0.5 + i * 0.07, type: "spring", stiffness: 300 }}
-                        style={{ filter: isToday ? 'drop-shadow(0 0 6px hsl(174 72% 50% / 0.5))' : 'none' }}
+                        style={{ filter: isToday ? 'drop-shadow(0 0 8px hsl(174 72% 50% / 0.6))' : 'none' }}
                       />
                       {isToday && (
                         <circle cx={pt.x} cy={pt.y} r="10" fill="none"
@@ -244,12 +277,12 @@ const Index = () => {
                       )}
                       <text x={pt.x} y={pt.y - 10} textAnchor="middle"
                         className="text-[10px] font-display font-bold"
-                        fill={isToday ? "hsl(174 72% 60%)" : "hsl(210 10% 38%)"}>
+                        fill={isToday ? "hsl(174 72% 60%)" : "hsl(210 10% 50%)"}>
                         {dailyData[i].v}
                       </text>
                       <text x={pt.x} y={H - 4} textAnchor="middle"
-                        className="text-[9px] font-display"
-                        fill={isToday ? "hsl(174 72% 50%)" : "hsl(210 10% 25%)"}>
+                        className="text-[9px] font-display font-semibold"
+                        fill={isToday ? "hsl(174 72% 55%)" : "hsl(210 10% 42%)"}>
                         {dailyData[i].day}
                       </text>
                     </g>
