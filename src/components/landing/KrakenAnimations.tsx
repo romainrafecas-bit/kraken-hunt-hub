@@ -360,30 +360,30 @@ const DeepKraken = () => {
         </defs>
       </svg>
 
-      {/* Eye glow pulses */}
+      {/* Eye glow pulses — large and bright */}
       <motion.div
         className="absolute rounded-full"
         style={{
-          width: 180, height: 180,
-          left: 'calc(38% - 90px)', top: 'calc(28% - 90px)',
-          background: 'radial-gradient(circle, hsl(174 72% 46% / 0.25) 0%, transparent 70%)',
+          width: 250, height: 250,
+          left: 'calc(33% - 125px)', top: 'calc(22% - 125px)',
+          background: 'radial-gradient(circle, hsl(174 72% 50% / 0.35) 0%, hsl(174 72% 46% / 0.1) 40%, transparent 70%)',
         }}
         animate={{
-          scale: [1, 1.6, 1],
-          opacity: [0.4, 0.9, 0.4],
+          scale: [1, 1.8, 1],
+          opacity: [0.5, 1, 0.5],
         }}
         transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
       />
       <motion.div
         className="absolute rounded-full"
         style={{
-          width: 180, height: 180,
-          left: 'calc(48% - 90px)', top: 'calc(28% - 90px)',
-          background: 'radial-gradient(circle, hsl(174 72% 46% / 0.25) 0%, transparent 70%)',
+          width: 250, height: 250,
+          left: 'calc(47% - 125px)', top: 'calc(22% - 125px)',
+          background: 'radial-gradient(circle, hsl(174 72% 50% / 0.35) 0%, hsl(174 72% 46% / 0.1) 40%, transparent 70%)',
         }}
         animate={{
-          scale: [1, 1.6, 1],
-          opacity: [0.4, 0.9, 0.4],
+          scale: [1, 1.8, 1],
+          opacity: [0.5, 1, 0.5],
         }}
         transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 0.3 }}
       />
