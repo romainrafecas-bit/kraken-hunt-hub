@@ -236,7 +236,7 @@ const Index = () => {
           transition={{ delay: 0.4 }}
           className="px-6 lg:px-10 relative z-10"
         >
-          <p className="text-[10px] font-display uppercase tracking-[0.25em] text-muted-foreground/70 font-bold mb-8">
+          <p className="text-[10px] font-display uppercase tracking-[0.25em] text-foreground/55 font-bold mb-8">
             Répartition par zone
           </p>
 
