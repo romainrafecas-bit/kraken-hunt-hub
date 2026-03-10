@@ -1,7 +1,8 @@
 import KrakkenSidebar from "@/components/dashboard/KrakkenSidebar";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { products } from "@/data/products";
-import { useState, useMemo, useRef } from "react";
+import { useState } from "react";
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import krakkenLogo from "@/assets/krakken-logo.png";
 
 /* ── data ── */
@@ -159,132 +160,67 @@ const Index = () => {
             </div>
           </div>
 
-          {/* Smooth area curve */}
-          {(() => {
-            const W = 700, H = 160, padX = 40, padY = 20;
-            const plotW = W - padX * 2, plotH = H - padY * 2;
-            const stepX = plotW / (dailyData.length - 1);
-
-            const points = dailyData.map((d, i) => ({
-              x: padX + i * stepX,
-              y: padY + plotH - (d.v / maxDaily) * plotH,
-            }));
-
-            // Build smooth cubic bezier path
-            const buildPath = () => {
-              let path = `M ${points[0].x} ${points[0].y}`;
-              for (let i = 0; i < points.length - 1; i++) {
-                const p0 = points[Math.max(0, i - 1)];
-                const p1 = points[i];
-                const p2 = points[i + 1];
-                const p3 = points[Math.min(points.length - 1, i + 2)];
-                const tension = 0.3;
-                const cp1x = p1.x + (p2.x - p0.x) * tension;
-                const cp1y = p1.y + (p2.y - p0.y) * tension;
-                const cp2x = p2.x - (p3.x - p1.x) * tension;
-                const cp2y = p2.y - (p3.y - p1.y) * tension;
-                path += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${p2.x} ${p2.y}`;
-              }
-              return path;
-            };
-
-            const curvePath = buildPath();
-            const areaPath = `${curvePath} L ${points[points.length - 1].x} ${H} L ${points[0].x} ${H} Z`;
-
-            return (
-              <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-44" preserveAspectRatio="none">
+          {/* Smooth area curve with Recharts */}
+          <div className="w-full h-52 mt-2">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={dailyData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <defs>
-                  <linearGradient id="curveGrad" x1="0" y1="0" x2="1" y2="0">
-                    <stop offset="0%" stopColor="hsl(188 78% 52%)" />
-                    <stop offset="50%" stopColor="hsl(174 72% 56%)" />
-                    <stop offset="100%" stopColor="hsl(162 68% 52%)" />
+                  <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="hsl(174, 72%, 46%)" stopOpacity={0.35} />
+                    <stop offset="100%" stopColor="hsl(174, 72%, 46%)" stopOpacity={0} />
                   </linearGradient>
-                  <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="hsl(174 72% 46% / 0.25)" />
-                    <stop offset="100%" stopColor="hsl(174 72% 46% / 0)" />
+                  <linearGradient id="strokeGrad" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0%" stopColor="hsl(188, 78%, 52%)" />
+                    <stop offset="50%" stopColor="hsl(174, 72%, 56%)" />
+                    <stop offset="100%" stopColor="hsl(162, 68%, 52%)" />
                   </linearGradient>
-                  <filter id="glow">
-                    <feGaussianBlur stdDeviation="3" result="blur" />
-                    <feMerge>
-                      <feMergeNode in="blur" />
-                      <feMergeNode in="SourceGraphic" />
-                    </feMerge>
-                  </filter>
                 </defs>
-
-                {/* Horizontal grid lines */}
-                {[0.25, 0.5, 0.75].map((pct) => (
-                  <line key={pct}
-                    x1={padX} x2={W - padX}
-                    y1={padY + plotH * (1 - pct)} y2={padY + plotH * (1 - pct)}
-                    stroke="hsl(225 20% 16%)" strokeWidth="0.5" />
-                ))}
-
-                {/* Area fill */}
-                <motion.path
-                  d={areaPath}
-                  fill="url(#areaGrad)"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.5, duration: 1 }}
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(225, 20%, 14%)" vertical={false} />
+                <XAxis
+                  dataKey="day"
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fill: 'hsl(210, 14%, 65%)', fontSize: 11, fontWeight: 600, fontFamily: 'DM Sans' }}
                 />
-
-                {/* Curve line */}
-                <motion.path
-                  d={curvePath}
-                  fill="none"
-                  stroke="url(#curveGrad)"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  filter="url(#glow)"
-                  initial={{ pathLength: 0 }}
-                  animate={{ pathLength: 1 }}
-                  transition={{ delay: 0.3, duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+                <YAxis
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fill: 'hsl(210, 14%, 55%)', fontSize: 10, fontFamily: 'DM Sans' }}
+                  domain={[0, 'auto']}
                 />
-
-                {/* Data points + labels */}
-                {points.map((pt, i) => {
-                  const isLast = i === dailyData.length - 1;
-                  return (
-                    <g key={i}>
-                      {/* Vertical dashed line for last point */}
-                      {isLast && (
-                        <line x1={pt.x} x2={pt.x} y1={pt.y} y2={H - 4}
-                          stroke="hsl(174 72% 46% / 0.2)" strokeWidth="0.5" strokeDasharray="3 3" />
-                      )}
-                      {/* Dot */}
-                      <motion.circle
-                        cx={pt.x} cy={pt.y} r={isLast ? 5 : 3.5}
-                        fill={isLast ? 'hsl(174 72% 56%)' : 'hsl(188 78% 50%)'}
-                        stroke={isLast ? 'hsl(174 72% 70%)' : 'hsl(225 25% 10%)'}
-                        strokeWidth={isLast ? 2 : 1.5}
-                        style={{ filter: isLast ? 'drop-shadow(0 0 6px hsl(174 72% 46% / 0.6))' : 'none' }}
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        transition={{ delay: 0.6 + i * 0.08, type: 'spring', stiffness: 300 }}
-                      />
-                      {/* Value */}
-                      <text x={pt.x} y={pt.y - 12} textAnchor="middle"
-                        className="text-[11px] font-display font-black"
-                        fill={isLast ? 'hsl(174 72% 65%)' : 'hsl(195 20% 70%)'}
-                        style={{ textShadow: isLast ? '0 0 10px hsl(174 72% 46% / 0.5)' : 'none' } as any}
-                      >
-                        {dailyData[i].v}
-                      </text>
-                      {/* Day label */}
-                      <text x={pt.x} y={H - 2} textAnchor="middle"
-                        className="text-[10px] font-display font-semibold"
-                        fill={isLast ? 'hsl(174 72% 60%)' : 'hsl(210 14% 60%)'}
-                      >
-                        {dailyData[i].day}
-                      </text>
-                    </g>
-                  );
-                })}
-              </svg>
-            );
-          })()}
+                <Tooltip
+                  contentStyle={{
+                    background: 'hsl(225, 32%, 8%)',
+                    border: '1px solid hsl(174, 72%, 46%, 0.2)',
+                    borderRadius: '12px',
+                    boxShadow: '0 8px 32px hsl(228, 50%, 2%, 0.6)',
+                    color: 'hsl(185, 20%, 88%)',
+                    fontSize: 12,
+                    fontFamily: 'DM Sans',
+                  }}
+                  labelStyle={{ color: 'hsl(174, 72%, 56%)', fontWeight: 700 }}
+                  cursor={{ stroke: 'hsl(174, 72%, 46%, 0.2)', strokeWidth: 1 }}
+                />
+                <Area
+                  type="monotone"
+                  dataKey="v"
+                  stroke="hsl(174, 72%, 56%)"
+                  strokeWidth={2.5}
+                  fill="url(#chartGrad)"
+                  dot={{ r: 4, fill: 'hsl(174, 72%, 56%)', stroke: 'hsl(225, 25%, 10%)', strokeWidth: 2 }}
+                  activeDot={{
+                    r: 6,
+                    fill: 'hsl(174, 72%, 60%)',
+                    stroke: 'hsl(174, 72%, 70%)',
+                    strokeWidth: 2,
+                    style: { filter: 'drop-shadow(0 0 6px hsl(174, 72%, 46%, 0.6))' } as any,
+                  }}
+                  animationDuration={1200}
+                  animationEasing="ease-out"
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
         </motion.div>
 
         {/* ═══ DIVIDER ═══ */}
