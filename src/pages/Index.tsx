@@ -417,7 +417,7 @@ const Index = () => {
                     <p className="text-sm font-display font-black tabular-nums" style={{ color: `hsl(${scoreColor})` }}>
                       {p.recurrences.toLocaleString("fr-FR")}
                     </p>
-                    <p className="text-[9px] font-display text-muted-foreground/50">récurrences</p>
+                    <p className="text-[9px] font-display text-foreground/45">récurrences</p>
                   </div>
 
                   {/* Score pill */}
