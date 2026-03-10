@@ -365,7 +365,7 @@ const Landing = () => {
           <h2 className="font-display font-black text-3xl md:text-5xl text-foreground mb-5">
             L'interface.
           </h2>
-          <p className="text-sm text-foreground/35 leading-relaxed">
+          <p className="text-sm text-foreground/55 leading-relaxed">
             Les produits. Les données. Les boutons pour sourcer.
             <br />Pas d'écrans inutiles.
           </p>
