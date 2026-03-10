@@ -343,7 +343,7 @@ const Landing = () => {
                     }}>
                       {step.title}
                     </h3>
-                    <p className="text-sm text-foreground/45 leading-relaxed">{step.body}</p>
+                    <p className="text-sm text-foreground/60 leading-relaxed">{step.body}</p>
                   </div>
                 </motion.div>
               ))}
