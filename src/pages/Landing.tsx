@@ -709,7 +709,7 @@ const Landing = () => {
             }}>
               Commencer maintenant
             </Link>
-            <p className="text-[10px] text-foreground/20 text-center mt-4 tracking-wide">Sans engagement · Annulation à tout moment</p>
+            <p className="text-[10px] text-foreground/40 text-center mt-4 tracking-wide">Sans engagement · Annulation à tout moment</p>
           </motion.div>
         </div>
       </section>
