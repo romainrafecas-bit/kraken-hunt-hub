@@ -75,7 +75,7 @@ const Index = () => {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.2 }}
-                  className="text-[11px] font-display text-muted-foreground/50 mt-0.5"
+                  className="text-[11px] font-display text-muted-foreground mt-0.5"
                 >
                   Analyse des profondeurs de <span style={{ color: 'hsl(162 68% 52%)' }} className="font-bold">Cdiscount</span>
                 </motion.p>
@@ -112,7 +112,7 @@ const Index = () => {
               style={{ border: '1px solid hsl(225 20% 12%)' }}
             >
               <div className="px-5 py-3 text-center" style={{ background: 'hsl(225 25% 7%)' }}>
-                <p className="text-[8px] font-display uppercase tracking-[0.2em] text-muted-foreground/35 mb-1">Traqués</p>
+                <p className="text-[8px] font-display uppercase tracking-[0.2em] text-muted-foreground/60 mb-1">Traqués</p>
                 <p className="text-xl font-display font-black tabular-nums" style={{
                   color: 'hsl(174 72% 56%)',
                   textShadow: '0 0 16px hsl(174 72% 46% / 0.3)',
@@ -159,138 +159,69 @@ const Index = () => {
             </div>
           </div>
 
-          {/* SVG smooth curve */}
-          {(() => {
-            const W = 700, H = 140, padX = 30, padY = 24;
-            const chartW = W - padX * 2;
-            const chartH = H - padY * 2;
-            const pts = dailyData.map((d, i) => ({
-              x: padX + (i / (dailyData.length - 1)) * chartW,
-              y: padY + chartH - (d.v / maxDaily) * chartH,
-            }));
+          {/* Bar chart */}
+          <div className="flex items-end gap-3 h-40">
+            {dailyData.map((d, i) => {
+              const isToday = i === dailyData.length - 1;
+              const heightPct = (d.v / maxDaily) * 100;
+              const barHue = isToday ? '174 72% 50%' : '188 78% 45%';
 
-            // Catmull-Rom → cubic bezier smooth path
-            let path = `M ${pts[0].x} ${pts[0].y}`;
-            for (let i = 0; i < pts.length - 1; i++) {
-              const p0 = pts[Math.max(0, i - 1)];
-              const p1 = pts[i];
-              const p2 = pts[i + 1];
-              const p3 = pts[Math.min(pts.length - 1, i + 2)];
-              const cp1x = p1.x + (p2.x - p0.x) / 5;
-              const cp1y = p1.y + (p2.y - p0.y) / 5;
-              const cp2x = p2.x - (p3.x - p1.x) / 5;
-              const cp2y = p2.y - (p3.y - p1.y) / 5;
-              path += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${p2.x} ${p2.y}`;
-            }
-            const areaPath = path + ` L ${pts[pts.length - 1].x} ${H} L ${pts[0].x} ${H} Z`;
+              return (
+                <div key={i} className="flex-1 flex flex-col items-center gap-2">
+                  {/* Value label */}
+                  <motion.span
+                    initial={{ opacity: 0, y: 5 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.4 + i * 0.06 }}
+                    className="text-xs font-display font-black tabular-nums"
+                    style={{
+                      color: isToday ? 'hsl(174 72% 60%)' : 'hsl(195 14% 65%)',
+                      textShadow: isToday ? '0 0 12px hsl(174 72% 46% / 0.5)' : 'none',
+                    }}
+                  >
+                    {d.v}
+                  </motion.span>
 
-            return (
-              <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-auto">
-                <defs>
-                  <linearGradient id="areaFill" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="hsl(174 72% 50%)" stopOpacity="0.25" />
-                    <stop offset="50%" stopColor="hsl(188 78% 52%)" stopOpacity="0.08" />
-                    <stop offset="100%" stopColor="hsl(228 42% 5%)" stopOpacity="0" />
-                  </linearGradient>
-                  <linearGradient id="lineStroke" x1="0" y1="0" x2="1" y2="0">
-                    <stop offset="0%" stopColor="hsl(162 68% 50%)" />
-                    <stop offset="40%" stopColor="hsl(174 72% 55%)" />
-                    <stop offset="70%" stopColor="hsl(188 78% 58%)" />
-                    <stop offset="100%" stopColor="hsl(262 52% 65%)" />
-                  </linearGradient>
-                  <filter id="lineGlow">
-                    <feGaussianBlur stdDeviation="3" result="blur" />
-                    <feMerge>
-                      <feMergeNode in="blur" />
-                      <feMergeNode in="SourceGraphic" />
-                    </feMerge>
-                  </filter>
-                </defs>
+                  {/* Bar */}
+                  <div className="w-full flex justify-center" style={{ height: '100px' }}>
+                    <motion.div
+                      initial={{ height: 0 }}
+                      animate={{ height: `${heightPct}%` }}
+                      transition={{ delay: 0.3 + i * 0.06, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+                      className="w-full max-w-[40px] rounded-t-lg relative overflow-hidden"
+                      style={{
+                        background: isToday
+                          ? 'linear-gradient(180deg, hsl(174 72% 55%), hsl(188 78% 40%))'
+                          : 'linear-gradient(180deg, hsl(225 22% 18%), hsl(225 22% 12%))',
+                        boxShadow: isToday
+                          ? '0 0 20px hsl(174 72% 46% / 0.3), inset 0 1px 0 hsl(174 72% 70% / 0.3)'
+                          : 'inset 0 1px 0 hsl(225 22% 22%)',
+                        border: isToday ? '1px solid hsl(174 72% 46% / 0.4)' : '1px solid hsl(225 20% 16%)',
+                      }}
+                    >
+                      {/* Inner shine */}
+                      <div className="absolute inset-0 opacity-30" style={{
+                        background: 'linear-gradient(180deg, hsl(0 0% 100% / 0.1), transparent 50%)',
+                      }} />
+                    </motion.div>
+                  </div>
 
-                {/* Horizontal grid lines */}
-                {[0.25, 0.5, 0.75].map((frac) => {
-                  const y = padY + chartH - frac * chartH;
-                  return (
-                    <line key={frac} x1={padX} y1={y} x2={W - padX} y2={y}
-                      stroke="hsl(225 18% 14%)" strokeWidth="0.5" strokeDasharray="4 4" />
-                  );
-                })}
-
-                {/* Area fill */}
-                <motion.path
-                  d={areaPath}
-                  fill="url(#areaFill)"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.5, duration: 0.8 }}
-                />
-
-                {/* Glow line (behind) */}
-                <motion.path
-                  d={path}
-                  fill="none"
-                  stroke="hsl(174 72% 50%)"
-                  strokeWidth="6"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  opacity="0.15"
-                  filter="url(#lineGlow)"
-                  initial={{ pathLength: 0 }}
-                  animate={{ pathLength: 1 }}
-                  transition={{ delay: 0.3, duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
-                />
-
-                {/* Main line */}
-                <motion.path
-                  d={path}
-                  fill="none"
-                  stroke="url(#lineStroke)"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  initial={{ pathLength: 0 }}
-                  animate={{ pathLength: 1 }}
-                  transition={{ delay: 0.3, duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
-                />
-
-                {/* Dots + labels */}
-                {pts.map((pt, i) => {
-                  const isToday = i === dailyData.length - 1;
-                  return (
-                    <g key={i}>
-                      <motion.circle
-                        cx={pt.x} cy={pt.y} r={isToday ? 5.5 : 3.5}
-                        fill={isToday ? "hsl(174 72% 55%)" : "hsl(225 25% 10%)"}
-                        stroke={isToday ? "hsl(174 72% 40%)" : "hsl(188 60% 45%)"}
-                        strokeWidth={isToday ? 2.5 : 1.5}
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        transition={{ delay: 0.5 + i * 0.07, type: "spring", stiffness: 300 }}
-                        style={{ filter: isToday ? 'drop-shadow(0 0 8px hsl(174 72% 50% / 0.6))' : 'none' }}
-                      />
-                      {isToday && (
-                        <circle cx={pt.x} cy={pt.y} r="10" fill="none"
-                          stroke="hsl(174 72% 50%)" strokeWidth="0.8" opacity="0.3">
-                          <animate attributeName="r" values="8;16;8" dur="2.5s" repeatCount="indefinite" />
-                          <animate attributeName="opacity" values="0.3;0;0.3" dur="2.5s" repeatCount="indefinite" />
-                        </circle>
-                      )}
-                      <text x={pt.x} y={pt.y - 10} textAnchor="middle"
-                        className="text-[10px] font-display font-bold"
-                        fill={isToday ? "hsl(174 72% 60%)" : "hsl(210 10% 50%)"}>
-                        {dailyData[i].v}
-                      </text>
-                      <text x={pt.x} y={H - 4} textAnchor="middle"
-                        className="text-[9px] font-display font-semibold"
-                        fill={isToday ? "hsl(174 72% 55%)" : "hsl(210 10% 42%)"}>
-                        {dailyData[i].day}
-                      </text>
-                    </g>
-                  );
-                })}
-              </svg>
-            );
-          })()}
+                  {/* Day label */}
+                  <motion.span
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.5 + i * 0.04 }}
+                    className="text-[10px] font-display font-semibold"
+                    style={{
+                      color: isToday ? 'hsl(174 72% 55%)' : 'hsl(195 14% 55%)',
+                    }}
+                  >
+                    {d.day}
+                  </motion.span>
+                </div>
+              );
+            })}
+          </div>
         </motion.div>
 
         {/* ═══ DIVIDER ═══ */}
@@ -446,7 +377,7 @@ const Index = () => {
                   {/* Rank */}
                   <span className="text-lg font-display font-black w-7 text-center tabular-nums flex-shrink-0"
                     style={{
-                      color: i === 0 ? 'hsl(38 92% 56%)' : i < 3 ? `hsl(${scoreColor})` : 'hsl(210 10% 22%)',
+                      color: i === 0 ? 'hsl(38 92% 56%)' : i < 3 ? `hsl(${scoreColor})` : 'hsl(210 10% 38%)',
                       textShadow: i === 0 ? '0 0 14px hsl(38 92% 56% / 0.4)' : 'none',
                     }}>
                     {i + 1}
@@ -461,7 +392,7 @@ const Index = () => {
 
                   {/* Info */}
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-display font-bold text-foreground/85 group-hover:text-foreground transition-colors truncate">
+                    <p className="text-sm font-display font-bold text-foreground group-hover:text-foreground transition-colors truncate">
                       {p.name}
                     </p>
                     <p className="text-[10px] font-display text-muted-foreground/60 mt-0.5">
@@ -472,7 +403,7 @@ const Index = () => {
                   {/* Price + discount */}
                   <div className="text-right flex-shrink-0">
                     <p className="text-sm font-display font-black text-foreground tabular-nums">
-                      {p.price}<span className="text-[10px] text-muted-foreground/50">€</span>
+                      {p.price}<span className="text-[10px] text-muted-foreground">€</span>
                     </p>
                     {discount > 0 && (
                       <span className="text-[10px] font-display font-bold" style={{ color: 'hsl(162 68% 50%)' }}>
