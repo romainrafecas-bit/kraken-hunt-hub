@@ -112,7 +112,7 @@ const Index = () => {
               style={{ border: '1px solid hsl(225 20% 12%)' }}
             >
               <div className="px-5 py-3 text-center" style={{ background: 'hsl(225 25% 7%)' }}>
-                <p className="text-[8px] font-display uppercase tracking-[0.2em] text-muted-foreground/35 mb-1">Traqués</p>
+                <p className="text-[8px] font-display uppercase tracking-[0.2em] text-muted-foreground/60 mb-1">Traqués</p>
                 <p className="text-xl font-display font-black tabular-nums" style={{
                   color: 'hsl(174 72% 56%)',
                   textShadow: '0 0 16px hsl(174 72% 46% / 0.3)',
