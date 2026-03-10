@@ -460,7 +460,7 @@ const Landing = () => {
                         }}>RUPTURE</span>
                       )}
                     </div>
-                    <span className="text-[10px] text-foreground/30 font-mono">{p.brand}</span>
+                    <span className="text-[10px] text-foreground/50 font-mono">{p.brand}</span>
                   </div>
                   <span className="text-xs font-black font-mono text-foreground/70 hidden sm:block">{p.price}</span>
                   <span className="text-[10px] font-mono font-bold hidden sm:block text-primary/70">{p.sales}</span>
