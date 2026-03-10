@@ -440,7 +440,7 @@ const Index = () => {
                   {/* Rank */}
                   <span className="text-lg font-display font-black w-7 text-center tabular-nums flex-shrink-0"
                     style={{
-                      color: i === 0 ? 'hsl(38 92% 56%)' : i < 3 ? `hsl(${scoreColor})` : 'hsl(210 10% 38%)',
+                      color: i === 0 ? 'hsl(38 92% 56%)' : i < 3 ? `hsl(${scoreColor})` : 'hsl(210 14% 50%)',
                       textShadow: i === 0 ? '0 0 14px hsl(38 92% 56% / 0.4)' : 'none',
                     }}>
                     {i + 1}
