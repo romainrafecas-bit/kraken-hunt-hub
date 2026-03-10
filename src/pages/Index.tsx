@@ -317,7 +317,7 @@ const Index = () => {
                       }}
                     />
                     <span className="text-[11px] font-display font-semibold truncate flex-1 transition-colors duration-200"
-                      style={{ color: isHovered ? `hsl(${hue})` : 'hsl(210 10% 65%)' }}>
+                      style={{ color: isHovered ? `hsl(${hue})` : 'hsl(210 14% 75%)' }}>
                       {cat.name}
                     </span>
                     <span className="text-[11px] font-display font-black tabular-nums"
