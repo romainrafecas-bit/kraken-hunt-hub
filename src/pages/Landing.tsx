@@ -524,7 +524,7 @@ const Landing = () => {
               }} />
               <RefreshCw className="w-7 h-7 mb-6 text-primary" style={{ filter: 'drop-shadow(0 0 8px hsl(174 72% 46% / 0.4))' }} />
               <h3 className="font-display font-black text-xl md:text-2xl text-foreground mb-3">Mise à jour hebdomadaire</h3>
-              <p className="text-sm text-foreground/40 leading-relaxed max-w-md">
+              <p className="text-sm text-foreground/55 leading-relaxed max-w-md">
                 De nouveaux produits gagnants chaque semaine. La base évolue avec le marché français en temps réel.
               </p>
             </motion.div>
