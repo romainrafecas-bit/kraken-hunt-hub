@@ -169,7 +169,7 @@ const Landing = () => {
                   textShadow: '0 0 60px hsl(174 72% 46% / 0.4)',
                   lineHeight: 1,
                 }}>{s.val}</span>
-                <span className="text-xs text-foreground/30 tracking-widest uppercase">{s.sub}</span>
+                <span className="text-xs text-foreground/50 tracking-widest uppercase">{s.sub}</span>
               </motion.div>
             ))}
           </div>
