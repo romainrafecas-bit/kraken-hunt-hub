@@ -37,12 +37,12 @@ const Landing = () => {
           <div className="flex items-center gap-8">
             <a href="#features" className="text-[11px] text-foreground/60 hover:text-primary transition-colors hidden sm:block tracking-widest uppercase">Features</a>
             <a href="#pricing" className="text-[11px] text-foreground/60 hover:text-primary transition-colors hidden sm:block tracking-widest uppercase">Accès</a>
-            <Link to="/" className="px-6 py-2.5 rounded-full text-[11px] font-bold tracking-widest uppercase transition-all duration-500 hover:scale-105 hover:shadow-[0_0_40px_-8px_hsl(174_72%_46%_/_0.6)]" style={{
+            <Link to="/" className="px-7 py-3 rounded-full text-xs font-bold tracking-widest uppercase transition-all duration-500 hover:scale-105 hover:shadow-[0_0_40px_-8px_hsl(174_72%_46%_/_0.6)]" style={{
               background: 'linear-gradient(135deg, hsl(174 72% 46%), hsl(188 78% 48%))',
               color: 'hsl(230 50% 3%)',
               boxShadow: '0 0 30px -6px hsl(174 72% 46% / 0.5)',
             }}>
-              Entrer
+              Commencer
             </Link>
           </div>
         </div>
@@ -116,7 +116,7 @@ const Landing = () => {
               boxShadow: '0 0 80px -12px hsl(174 72% 46% / 0.5), inset 0 1px 0 hsl(180 80% 70% / 0.3)',
             }}>
               <span className="relative z-10 flex items-center gap-3">
-                Accéder à la base
+                Commencer la traque
                 <ChevronRight className="w-4 h-4 group-hover:translate-x-2 transition-transform duration-300" />
               </span>
             </Link>
