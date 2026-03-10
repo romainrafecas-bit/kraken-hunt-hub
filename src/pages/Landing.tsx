@@ -681,7 +681,7 @@ const Landing = () => {
               </motion.div>
               <div className="flex items-baseline justify-center gap-2">
                 <span className="text-6xl md:text-7xl font-display font-black text-foreground">29,90€</span>
-                <span className="text-lg text-foreground/30">/mois</span>
+                <span className="text-lg text-foreground/50">/mois</span>
               </div>
             </div>
 
