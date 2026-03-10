@@ -807,7 +807,7 @@ const Landing = () => {
               n'attendent pas.
             </motion.span>
           </h2>
-          <p className="text-sm text-foreground/30 mb-12 max-w-md mx-auto">
+          <p className="text-sm text-foreground/50 mb-12 max-w-md mx-auto">
             Pendant que tu cherches, d'autres vendent.
           </p>
           <Link to="/" className="group inline-flex items-center gap-3 px-14 py-5 rounded-full text-sm font-bold tracking-wider transition-all duration-500 hover:scale-105 hover:shadow-[0_0_60px_-10px_hsl(174_72%_46%_/_0.6)]" style={{
