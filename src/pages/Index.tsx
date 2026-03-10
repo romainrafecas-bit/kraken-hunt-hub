@@ -159,69 +159,132 @@ const Index = () => {
             </div>
           </div>
 
-          {/* Bar chart */}
-          <div className="flex items-end gap-3 h-40">
-            {dailyData.map((d, i) => {
-              const isToday = i === dailyData.length - 1;
-              const heightPct = (d.v / maxDaily) * 100;
-              const barHue = isToday ? '174 72% 50%' : '188 78% 45%';
+          {/* Smooth area curve */}
+          {(() => {
+            const W = 700, H = 160, padX = 40, padY = 20;
+            const plotW = W - padX * 2, plotH = H - padY * 2;
+            const stepX = plotW / (dailyData.length - 1);
 
-              return (
-                <div key={i} className="flex-1 flex flex-col items-center gap-2">
-                  {/* Value label */}
-                  <motion.span
-                    initial={{ opacity: 0, y: 5 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.4 + i * 0.06 }}
-                    className="text-xs font-display font-black tabular-nums"
-                    style={{
-                      color: isToday ? 'hsl(174 72% 60%)' : 'hsl(195 14% 65%)',
-                      textShadow: isToday ? '0 0 12px hsl(174 72% 46% / 0.5)' : 'none',
-                    }}
-                  >
-                    {d.v}
-                  </motion.span>
+            const points = dailyData.map((d, i) => ({
+              x: padX + i * stepX,
+              y: padY + plotH - (d.v / maxDaily) * plotH,
+            }));
 
-                  {/* Bar */}
-                  <div className="w-full flex justify-center" style={{ height: '100px' }}>
-                    <motion.div
-                      initial={{ height: 0 }}
-                      animate={{ height: `${heightPct}%` }}
-                      transition={{ delay: 0.3 + i * 0.06, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-                      className="w-full max-w-[40px] rounded-t-lg relative overflow-hidden"
-                      style={{
-                        background: isToday
-                          ? 'linear-gradient(180deg, hsl(174 72% 55%), hsl(188 78% 40%))'
-                          : 'linear-gradient(180deg, hsl(225 22% 18%), hsl(225 22% 12%))',
-                        boxShadow: isToday
-                          ? '0 0 20px hsl(174 72% 46% / 0.3), inset 0 1px 0 hsl(174 72% 70% / 0.3)'
-                          : 'inset 0 1px 0 hsl(225 22% 22%)',
-                        border: isToday ? '1px solid hsl(174 72% 46% / 0.4)' : '1px solid hsl(225 20% 16%)',
-                      }}
-                    >
-                      {/* Inner shine */}
-                      <div className="absolute inset-0 opacity-30" style={{
-                        background: 'linear-gradient(180deg, hsl(0 0% 100% / 0.1), transparent 50%)',
-                      }} />
-                    </motion.div>
-                  </div>
+            // Build smooth cubic bezier path
+            const buildPath = () => {
+              let path = `M ${points[0].x} ${points[0].y}`;
+              for (let i = 0; i < points.length - 1; i++) {
+                const p0 = points[Math.max(0, i - 1)];
+                const p1 = points[i];
+                const p2 = points[i + 1];
+                const p3 = points[Math.min(points.length - 1, i + 2)];
+                const tension = 0.3;
+                const cp1x = p1.x + (p2.x - p0.x) * tension;
+                const cp1y = p1.y + (p2.y - p0.y) * tension;
+                const cp2x = p2.x - (p3.x - p1.x) * tension;
+                const cp2y = p2.y - (p3.y - p1.y) * tension;
+                path += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${p2.x} ${p2.y}`;
+              }
+              return path;
+            };
 
-                  {/* Day label */}
-                  <motion.span
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.5 + i * 0.04 }}
-                    className="text-[10px] font-display font-semibold"
-                    style={{
-                      color: isToday ? 'hsl(174 72% 55%)' : 'hsl(195 14% 55%)',
-                    }}
-                  >
-                    {d.day}
-                  </motion.span>
-                </div>
-              );
-            })}
-          </div>
+            const curvePath = buildPath();
+            const areaPath = `${curvePath} L ${points[points.length - 1].x} ${H} L ${points[0].x} ${H} Z`;
+
+            return (
+              <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-44" preserveAspectRatio="none">
+                <defs>
+                  <linearGradient id="curveGrad" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0%" stopColor="hsl(188 78% 52%)" />
+                    <stop offset="50%" stopColor="hsl(174 72% 56%)" />
+                    <stop offset="100%" stopColor="hsl(162 68% 52%)" />
+                  </linearGradient>
+                  <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="hsl(174 72% 46% / 0.25)" />
+                    <stop offset="100%" stopColor="hsl(174 72% 46% / 0)" />
+                  </linearGradient>
+                  <filter id="glow">
+                    <feGaussianBlur stdDeviation="3" result="blur" />
+                    <feMerge>
+                      <feMergeNode in="blur" />
+                      <feMergeNode in="SourceGraphic" />
+                    </feMerge>
+                  </filter>
+                </defs>
+
+                {/* Horizontal grid lines */}
+                {[0.25, 0.5, 0.75].map((pct) => (
+                  <line key={pct}
+                    x1={padX} x2={W - padX}
+                    y1={padY + plotH * (1 - pct)} y2={padY + plotH * (1 - pct)}
+                    stroke="hsl(225 20% 16%)" strokeWidth="0.5" />
+                ))}
+
+                {/* Area fill */}
+                <motion.path
+                  d={areaPath}
+                  fill="url(#areaGrad)"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.5, duration: 1 }}
+                />
+
+                {/* Curve line */}
+                <motion.path
+                  d={curvePath}
+                  fill="none"
+                  stroke="url(#curveGrad)"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  filter="url(#glow)"
+                  initial={{ pathLength: 0 }}
+                  animate={{ pathLength: 1 }}
+                  transition={{ delay: 0.3, duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+                />
+
+                {/* Data points + labels */}
+                {points.map((pt, i) => {
+                  const isLast = i === dailyData.length - 1;
+                  return (
+                    <g key={i}>
+                      {/* Vertical dashed line for last point */}
+                      {isLast && (
+                        <line x1={pt.x} x2={pt.x} y1={pt.y} y2={H - 4}
+                          stroke="hsl(174 72% 46% / 0.2)" strokeWidth="0.5" strokeDasharray="3 3" />
+                      )}
+                      {/* Dot */}
+                      <motion.circle
+                        cx={pt.x} cy={pt.y} r={isLast ? 5 : 3.5}
+                        fill={isLast ? 'hsl(174 72% 56%)' : 'hsl(188 78% 50%)'}
+                        stroke={isLast ? 'hsl(174 72% 70%)' : 'hsl(225 25% 10%)'}
+                        strokeWidth={isLast ? 2 : 1.5}
+                        style={{ filter: isLast ? 'drop-shadow(0 0 6px hsl(174 72% 46% / 0.6))' : 'none' }}
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ delay: 0.6 + i * 0.08, type: 'spring', stiffness: 300 }}
+                      />
+                      {/* Value */}
+                      <text x={pt.x} y={pt.y - 12} textAnchor="middle"
+                        className="text-[11px] font-display font-black"
+                        fill={isLast ? 'hsl(174 72% 65%)' : 'hsl(195 20% 70%)'}
+                        style={{ textShadow: isLast ? '0 0 10px hsl(174 72% 46% / 0.5)' : 'none' } as any}
+                      >
+                        {dailyData[i].v}
+                      </text>
+                      {/* Day label */}
+                      <text x={pt.x} y={H - 2} textAnchor="middle"
+                        className="text-[10px] font-display font-semibold"
+                        fill={isLast ? 'hsl(174 72% 60%)' : 'hsl(210 14% 60%)'}
+                      >
+                        {dailyData[i].day}
+                      </text>
+                    </g>
+                  );
+                })}
+              </svg>
+            );
+          })()}
         </motion.div>
 
         {/* ═══ DIVIDER ═══ */}
