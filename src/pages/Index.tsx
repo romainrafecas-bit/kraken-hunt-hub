@@ -1,7 +1,8 @@
 import KrakkenSidebar from "@/components/dashboard/KrakkenSidebar";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { products } from "@/data/products";
-import { useState, useMemo, useRef } from "react";
+import { useState } from "react";
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import krakkenLogo from "@/assets/krakken-logo.png";
 
 /* ── data ── */
