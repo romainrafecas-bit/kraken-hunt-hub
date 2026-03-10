@@ -244,7 +244,7 @@ const Landing = () => {
                   }} />
                 </div>
                 <h4 className="font-display font-bold text-base text-foreground/90 mb-2">{item.title}</h4>
-                <p className="text-sm text-foreground/40 leading-relaxed">{item.desc}</p>
+                <p className="text-sm text-foreground/55 leading-relaxed">{item.desc}</p>
               </motion.div>
             ))}
           </div>
