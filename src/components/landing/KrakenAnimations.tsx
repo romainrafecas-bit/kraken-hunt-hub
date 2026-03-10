@@ -335,13 +335,13 @@ const DeepKraken = () => {
       <motion.div
         className="absolute rounded-full"
         style={{
-          width: 120, height: 120,
-          left: 'calc(48% - 60px)', top: 'calc(28% - 60px)',
-          background: 'radial-gradient(circle, hsl(174 72% 46% / 0.15) 0%, transparent 70%)',
+          width: 180, height: 180,
+          left: 'calc(48% - 90px)', top: 'calc(28% - 90px)',
+          background: 'radial-gradient(circle, hsl(174 72% 46% / 0.25) 0%, transparent 70%)',
         }}
         animate={{
-          scale: [1, 1.5, 1],
-          opacity: [0.3, 0.7, 0.3],
+          scale: [1, 1.6, 1],
+          opacity: [0.4, 0.9, 0.4],
         }}
         transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 0.3 }}
       />
