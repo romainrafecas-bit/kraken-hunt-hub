@@ -50,20 +50,19 @@ const Landing = () => {
 
       {/* ═══ HERO — Abyssal with Kraken ═══ */}
       <section ref={heroRef} className="relative h-[120vh] flex items-center justify-center overflow-hidden">
-        <motion.div className="absolute inset-0" style={{ scale: heroScale }}>
-          <DeepKraken />
-        </motion.div>
+        <DeepKraken />
         
         <Particles />
-        <InkClouds />
 
-        {/* Deep vignette */}
-        <div className="absolute inset-0" style={{
+        {/* Bottom fade to page background — smooth */}
+        <div className="absolute bottom-0 left-0 right-0 h-[40%] pointer-events-none" style={{
+          background: 'linear-gradient(to top, hsl(230 50% 3%) 0%, hsl(230 50% 3% / 0.8) 30%, transparent 100%)',
+        }} />
+        {/* Side vignettes */}
+        <div className="absolute inset-0 pointer-events-none" style={{
           background: `
-            radial-gradient(ellipse at 50% 30%, hsl(174 72% 46% / 0.04) 0%, transparent 50%),
-            radial-gradient(ellipse at 50% 100%, hsl(230 50% 3%) 0%, transparent 50%),
-            radial-gradient(ellipse at 0% 50%, hsl(230 50% 3% / 0.8) 0%, transparent 50%),
-            radial-gradient(ellipse at 100% 50%, hsl(230 50% 3% / 0.8) 0%, transparent 50%)
+            radial-gradient(ellipse at 0% 50%, hsl(230 50% 3% / 0.6) 0%, transparent 40%),
+            radial-gradient(ellipse at 100% 50%, hsl(230 50% 3% / 0.6) 0%, transparent 40%)
           `,
         }} />
 
@@ -110,15 +109,13 @@ const Landing = () => {
             transition={{ duration: 0.6, delay: 1 }}
             className="flex flex-col items-center gap-6"
           >
-            <Link to="/" className="group relative inline-flex items-center gap-3 px-12 py-4.5 rounded-full text-sm font-bold tracking-wider transition-all duration-500 hover:scale-105 overflow-hidden" style={{
-              background: 'linear-gradient(135deg, hsl(174 72% 46%), hsl(188 78% 48%))',
+            <Link to="/" className="group inline-flex items-center gap-2.5 px-10 py-4 rounded-lg text-sm font-bold tracking-wide transition-all duration-300 hover:brightness-110" style={{
+              background: 'hsl(174 72% 46%)',
               color: 'hsl(230 50% 3%)',
-              boxShadow: '0 0 80px -12px hsl(174 72% 46% / 0.5), inset 0 1px 0 hsl(180 80% 70% / 0.3)',
+              boxShadow: '0 0 40px -8px hsl(174 72% 46% / 0.4)',
             }}>
-              <span className="relative z-10 flex items-center gap-3">
-                Commencer la traque
-                <ChevronRight className="w-4 h-4 group-hover:translate-x-2 transition-transform duration-300" />
-              </span>
+              Voir les produits
+              <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>
             <div className="flex items-center gap-3">
               <div className="w-1.5 h-1.5 rounded-full bg-kraken-emerald animate-pulse-glow" />
