@@ -50,20 +50,19 @@ const Landing = () => {
 
       {/* ═══ HERO — Abyssal with Kraken ═══ */}
       <section ref={heroRef} className="relative h-[120vh] flex items-center justify-center overflow-hidden">
-        <motion.div className="absolute inset-0" style={{ scale: heroScale }}>
-          <DeepKraken />
-        </motion.div>
+        <DeepKraken />
         
         <Particles />
-        <InkClouds />
 
-        {/* Deep vignette */}
-        <div className="absolute inset-0" style={{
+        {/* Bottom fade to page background — smooth */}
+        <div className="absolute bottom-0 left-0 right-0 h-[40%] pointer-events-none" style={{
+          background: 'linear-gradient(to top, hsl(230 50% 3%) 0%, hsl(230 50% 3% / 0.8) 30%, transparent 100%)',
+        }} />
+        {/* Side vignettes */}
+        <div className="absolute inset-0 pointer-events-none" style={{
           background: `
-            radial-gradient(ellipse at 50% 30%, hsl(174 72% 46% / 0.04) 0%, transparent 50%),
-            radial-gradient(ellipse at 50% 100%, hsl(230 50% 3%) 0%, transparent 50%),
-            radial-gradient(ellipse at 0% 50%, hsl(230 50% 3% / 0.8) 0%, transparent 50%),
-            radial-gradient(ellipse at 100% 50%, hsl(230 50% 3% / 0.8) 0%, transparent 50%)
+            radial-gradient(ellipse at 0% 50%, hsl(230 50% 3% / 0.6) 0%, transparent 40%),
+            radial-gradient(ellipse at 100% 50%, hsl(230 50% 3% / 0.6) 0%, transparent 40%)
           `,
         }} />
 
