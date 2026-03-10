@@ -829,11 +829,11 @@ const Landing = () => {
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <img src={krakkenLogo} alt="" className="w-5 h-5 object-contain" style={{ opacity: 0.25, filter: 'drop-shadow(0 0 4px hsl(174 72% 46% / 0.3))' }} />
-            <span className="text-[11px] text-foreground/20">© 2026 Krakken</span>
+            <span className="text-[11px] text-foreground/40">© 2026 Krakken</span>
           </div>
           <div className="flex gap-6">
-            <a href="#" className="text-[10px] text-foreground/15 hover:text-foreground/40 transition-colors">Mentions légales</a>
-            <a href="#" className="text-[10px] text-foreground/15 hover:text-foreground/40 transition-colors">Contact</a>
+            <a href="#" className="text-[10px] text-foreground/35 hover:text-foreground/60 transition-colors">Mentions légales</a>
+            <a href="#" className="text-[10px] text-foreground/35 hover:text-foreground/60 transition-colors">Contact</a>
           </div>
         </div>
       </footer>
