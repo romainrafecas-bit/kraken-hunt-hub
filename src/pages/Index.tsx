@@ -403,7 +403,7 @@ const Index = () => {
                   {/* Price + discount */}
                   <div className="text-right flex-shrink-0">
                     <p className="text-sm font-display font-black text-foreground tabular-nums">
-                      {p.price}<span className="text-[10px] text-muted-foreground">€</span>
+                      {p.price}<span className="text-[10px] text-foreground/50">€</span>
                     </p>
                     {discount > 0 && (
                       <span className="text-[10px] font-display font-bold" style={{ color: 'hsl(162 68% 50%)' }}>
