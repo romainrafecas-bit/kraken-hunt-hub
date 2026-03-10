@@ -575,7 +575,7 @@ const Landing = () => {
                   filter: `drop-shadow(0 0 5px hsl(${f.color} / 0.4))`,
                 }} />
                 <h4 className="font-display font-bold text-sm text-foreground/85 mb-1.5">{f.title}</h4>
-                <p className="text-xs text-foreground/35 leading-relaxed">{f.desc}</p>
+                <p className="text-xs text-foreground/55 leading-relaxed">{f.desc}</p>
               </motion.div>
             ))}
           </div>
