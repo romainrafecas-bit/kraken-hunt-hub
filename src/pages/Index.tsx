@@ -464,7 +464,7 @@ const Index = () => {
                     <p className="text-sm font-display font-bold text-foreground/85 group-hover:text-foreground transition-colors truncate">
                       {p.name}
                     </p>
-                    <p className="text-[10px] font-display text-muted-foreground/40 mt-0.5">
+                    <p className="text-[10px] font-display text-muted-foreground/60 mt-0.5">
                       {p.brand} · {p.category}
                     </p>
                   </div>
