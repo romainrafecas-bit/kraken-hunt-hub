@@ -116,7 +116,7 @@ const Landing = () => {
               boxShadow: '0 0 80px -12px hsl(174 72% 46% / 0.5), inset 0 1px 0 hsl(180 80% 70% / 0.3)',
             }}>
               <span className="relative z-10 flex items-center gap-3">
-                Accéder à la base
+                Commencer la traque
                 <ChevronRight className="w-4 h-4 group-hover:translate-x-2 transition-transform duration-300" />
               </span>
             </Link>
