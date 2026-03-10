@@ -546,7 +546,7 @@ const Landing = () => {
               }} />
               <ExternalLink className="w-7 h-7 mb-6" style={{ color: 'hsl(38 92% 56%)', filter: 'drop-shadow(0 0 8px hsl(38 92% 56% / 0.4))' }} />
               <h3 className="font-display font-black text-xl md:text-2xl text-foreground mb-3">Sourcing en 1 clic</h3>
-              <p className="text-sm text-foreground/40 leading-relaxed">
+              <p className="text-sm text-foreground/55 leading-relaxed">
                 AliExpress + Google Lens intégrés. Sans quitter l'interface.
               </p>
             </motion.div>
