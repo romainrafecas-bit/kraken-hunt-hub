@@ -311,8 +311,8 @@ const DeepKraken = () => {
 
         <defs>
           <radialGradient id="krakenBodyGrad" cx="0.5" cy="0.4">
-            <stop offset="0%" stopColor="hsl(174 72% 46% / 0.3)" />
-            <stop offset="60%" stopColor="hsl(228 42% 8% / 0.6)" />
+            <stop offset="0%" stopColor="hsl(174 72% 46% / 0.5)" />
+            <stop offset="50%" stopColor="hsl(228 42% 10% / 0.7)" />
             <stop offset="100%" stopColor="hsl(228 42% 3% / 0)" />
           </radialGradient>
         </defs>
