@@ -399,7 +399,7 @@ const Landing = () => {
                 <span className="w-2.5 h-2.5 rounded-full" style={{ background: 'hsl(162 50% 35% / 0.5)' }} />
               </div>
               <div className="flex-1 flex justify-center">
-                <div className="px-6 py-1.5 rounded-lg text-[9px] font-mono text-foreground/25" style={{
+                <div className="px-6 py-1.5 rounded-lg text-[9px] font-mono text-foreground/45" style={{
                   background: 'hsl(225 20% 6%)',
                   border: '1px solid hsl(225 20% 8%)',
                 }}>
