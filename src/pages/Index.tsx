@@ -392,7 +392,7 @@ const Index = () => {
 
                   {/* Info */}
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-display font-bold text-foreground/85 group-hover:text-foreground transition-colors truncate">
+                    <p className="text-sm font-display font-bold text-foreground group-hover:text-foreground transition-colors truncate">
                       {p.name}
                     </p>
                     <p className="text-[10px] font-display text-muted-foreground/60 mt-0.5">
