@@ -155,7 +155,7 @@ const Index = () => {
               <span className="text-[10px] font-display font-bold" style={{ color: 'hsl(162 68% 52%)' }}>
                 +{Math.round(((dailyData[6].v - dailyData[0].v) / dailyData[0].v) * 100)}%
               </span>
-              <span className="text-[9px] font-display text-muted-foreground/40">vs lun.</span>
+              <span className="text-[9px] font-display text-muted-foreground/60">vs lun.</span>
             </div>
           </div>
 
