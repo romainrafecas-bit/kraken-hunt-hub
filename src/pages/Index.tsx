@@ -138,7 +138,7 @@ const Index = () => {
         >
           <div className="flex items-end justify-between mb-6">
             <div>
-              <p className="text-[9px] font-display uppercase tracking-[0.3em] text-muted-foreground/70 mb-1">
+              <p className="text-[9px] font-display uppercase tracking-[0.3em] text-foreground/60 mb-1">
                 Ce mois-ci
               </p>
               <div className="flex items-baseline gap-3">
