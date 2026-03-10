@@ -148,7 +148,7 @@ const Index = () => {
                 }}>
                   {dailyData.reduce((s, d) => s + d.v, 0)}
                 </p>
-                <p className="text-[10px] font-display text-muted-foreground/70">produits scannés</p>
+                <p className="text-[10px] font-display text-foreground/55">produits scannés</p>
               </div>
             </div>
             <div className="flex items-center gap-1.5">
