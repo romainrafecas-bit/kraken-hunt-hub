@@ -415,7 +415,7 @@ const Index = () => {
           transition={{ delay: 0.6 }}
           className="px-6 lg:px-10 pb-16 relative z-10"
         >
-          <p className="text-[9px] font-display uppercase tracking-[0.3em] text-muted-foreground/40 mb-8">
+          <p className="text-[10px] font-display uppercase tracking-[0.25em] text-muted-foreground/70 font-bold mb-8">
             Meilleures prises
           </p>
 
