@@ -355,7 +355,7 @@ const Index = () => {
                 <span className="text-2xl font-display font-black text-foreground">
                   {catStats.length}
                 </span>
-                <span className="text-[9px] font-display text-muted-foreground/40 uppercase tracking-wider">
+                <span className="text-[9px] font-display text-muted-foreground/60 uppercase tracking-wider">
                   zones
                 </span>
               </div>
