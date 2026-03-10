@@ -194,7 +194,7 @@ const Landing = () => {
             <h2 className="font-display font-black text-4xl md:text-6xl text-foreground leading-[1.05] max-w-3xl">
               Tu scrolles encore Cdiscount
               <br />
-              <span className="text-foreground/25">à la recherche du bon produit ?</span>
+              <span className="text-foreground/45">à la recherche du bon produit ?</span>
             </h2>
           </motion.div>
 
