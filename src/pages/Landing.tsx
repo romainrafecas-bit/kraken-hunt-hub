@@ -640,7 +640,7 @@ const Landing = () => {
             className="text-center mb-16"
           >
             <h2 className="font-display font-black text-4xl md:text-5xl text-foreground mb-4">
-              Un plan. <span className="text-foreground/30">Accès total.</span>
+              Un plan. <span className="text-foreground/50">Accès total.</span>
             </h2>
           </motion.div>
 
