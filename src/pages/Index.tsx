@@ -75,7 +75,7 @@ const Index = () => {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.2 }}
-                  className="text-[11px] font-display text-muted-foreground mt-0.5"
+                  className="text-[11px] font-display text-foreground/60 mt-0.5"
                 >
                   Analyse des profondeurs de <span style={{ color: 'hsl(162 68% 52%)' }} className="font-bold">Cdiscount</span>
                 </motion.p>
