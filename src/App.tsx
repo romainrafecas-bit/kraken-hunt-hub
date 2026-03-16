@@ -7,6 +7,8 @@ import Index from "./pages/Index";
 import Produits from "./pages/Produits";
 import Analytics from "./pages/Analytics";
 import Landing from "./pages/Landing";
+import Profil from "./pages/Profil";
+import Favoris from "./pages/Favoris";
 import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 
