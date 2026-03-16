@@ -7,6 +7,8 @@ import Index from "./pages/Index";
 import Produits from "./pages/Produits";
 import Analytics from "./pages/Analytics";
 import Landing from "./pages/Landing";
+import Profil from "./pages/Profil";
+import Favoris from "./pages/Favoris";
 import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 
@@ -21,6 +23,8 @@ const App = () => (
           <Route path="/landing" element={<Landing />} />
           <Route path="/produits" element={<Produits />} />
           <Route path="/analytics" element={<Analytics />} />
+          <Route path="/profil" element={<Profil />} />
+          <Route path="/favoris" element={<Favoris />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
