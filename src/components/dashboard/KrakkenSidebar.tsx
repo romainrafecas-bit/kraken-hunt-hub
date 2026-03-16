@@ -1,4 +1,4 @@
-import { LayoutDashboard, Package, BarChart3, Settings, Filter, Anchor } from "lucide-react";
+import { LayoutDashboard, Package, BarChart3, Settings, Filter, Anchor, User, Heart } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { NavLink } from "react-router-dom";
 import krakkenLogo from "@/assets/krakken-logo.png";
