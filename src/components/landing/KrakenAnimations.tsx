@@ -20,13 +20,13 @@ const Tentacle = ({ side, top, color = "174 72% 46%", delay = 0, size = 300 }: T
   const x = useTransform(
     scrollYProgress,
     [0, 0.5, 1],
-    side === "left" ? [-size * 0.6, 0, -size * 0.3] : [size * 0.6, 0, size * 0.3]
+    side === "left" ? [-size * 0.8, -size * 0.1, -size * 0.5] : [size * 0.8, size * 0.1, size * 0.5]
   );
-  const opacity = useTransform(scrollYProgress, [0, 0.3, 0.7, 1], [0, 0.6, 0.6, 0]);
+  const opacity = useTransform(scrollYProgress, [0, 0.3, 0.7, 1], [0, 0.5, 0.5, 0]);
   const rotate = useTransform(
     scrollYProgress,
     [0, 0.5, 1],
-    side === "left" ? [-15, 5, -10] : [15, -5, 10]
+    side === "left" ? [-20, 3, -12] : [20, -3, 12]
   );
 
   return (
@@ -40,56 +40,74 @@ const Tentacle = ({ side, top, color = "174 72% 46%", delay = 0, size = 300 }: T
         opacity,
         rotate,
         width: size,
-        height: size * 1.8,
+        height: size * 2,
         transformOrigin: side === "left" ? "left center" : "right center",
       }}
     >
       <svg
-        viewBox="0 0 200 360"
+        viewBox="0 0 120 400"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
         className="w-full h-full"
         style={{
           transform: side === "right" ? "scaleX(-1)" : undefined,
-          filter: `drop-shadow(0 0 20px hsl(${color} / 0.3))`,
+          filter: `drop-shadow(0 0 30px hsl(${color} / 0.15))`,
         }}
       >
+        {/* Main tentacle body — organic curve */}
         <motion.path
-          d="M0,180 Q60,80 40,20 Q35,0 50,10 Q65,20 55,50 Q80,100 70,180 Q60,260 80,320 Q85,340 70,335 Q55,330 65,300 Q50,240 0,180Z"
-          fill={`hsl(${color} / 0.08)`}
-          stroke={`hsl(${color} / 0.2)`}
-          strokeWidth="1"
+          d="M0,200 C15,160 35,100 28,50 C26,35 32,25 38,35 C44,45 40,65 35,90 C30,130 50,170 45,200 C40,235 55,280 50,320 C48,340 42,355 35,345 C28,335 35,310 40,285 C45,255 25,230 0,200Z"
+          fill={`hsl(${color} / 0.05)`}
+          stroke={`hsl(${color} / 0.12)`}
+          strokeWidth="0.5"
           animate={{
             d: [
-              "M0,180 Q60,80 40,20 Q35,0 50,10 Q65,20 55,50 Q80,100 70,180 Q60,260 80,320 Q85,340 70,335 Q55,330 65,300 Q50,240 0,180Z",
-              "M0,180 Q70,90 45,25 Q38,5 53,15 Q68,25 52,55 Q75,110 65,180 Q55,250 75,315 Q80,335 65,330 Q50,325 60,295 Q45,235 0,180Z",
-              "M0,180 Q55,75 38,18 Q32,-2 48,8 Q62,18 58,48 Q85,95 75,180 Q65,265 85,325 Q90,345 75,338 Q60,332 70,305 Q55,245 0,180Z",
-              "M0,180 Q60,80 40,20 Q35,0 50,10 Q65,20 55,50 Q80,100 70,180 Q60,260 80,320 Q85,340 70,335 Q55,330 65,300 Q50,240 0,180Z",
+              "M0,200 C15,160 35,100 28,50 C26,35 32,25 38,35 C44,45 40,65 35,90 C30,130 50,170 45,200 C40,235 55,280 50,320 C48,340 42,355 35,345 C28,335 35,310 40,285 C45,255 25,230 0,200Z",
+              "M0,200 C20,155 40,95 32,45 C30,28 36,20 42,30 C48,42 42,68 38,95 C33,135 52,175 48,205 C43,240 58,285 52,325 C50,345 44,358 37,348 C30,338 38,315 42,290 C47,258 28,232 0,200Z",
+              "M0,200 C12,165 32,105 25,55 C23,38 29,28 35,38 C41,48 37,62 33,88 C28,128 48,168 42,198 C38,232 52,275 48,315 C46,335 40,350 33,340 C26,330 33,308 38,282 C43,252 22,228 0,200Z",
+              "M0,200 C15,160 35,100 28,50 C26,35 32,25 38,35 C44,45 40,65 35,90 C30,130 50,170 45,200 C40,235 55,280 50,320 C48,340 42,355 35,345 C28,335 35,310 40,285 C45,255 25,230 0,200Z",
             ],
           }}
           transition={{
-            duration: 8 + delay * 2,
+            duration: 12 + delay * 2,
             repeat: Infinity,
             ease: "easeInOut",
             delay,
           }}
         />
-        {[0.2, 0.35, 0.5, 0.65, 0.8].map((t, i) => (
+        {/* Inner highlight stroke */}
+        <motion.path
+          d="M5,200 C18,165 33,110 27,60 C25,45 30,38 35,48 C40,58 38,75 34,100 C30,140 45,175 42,200 C39,230 50,270 47,305"
+          fill="none"
+          stroke={`hsl(${color} / 0.08)`}
+          strokeWidth="0.8"
+          strokeLinecap="round"
+          animate={{
+            strokeOpacity: [0.05, 0.12, 0.05],
+          }}
+          transition={{
+            duration: 6,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: delay + 1,
+          }}
+        />
+        {/* Suction cups — small subtle dots along the tentacle */}
+        {[0.25, 0.4, 0.55, 0.7, 0.85].map((t, i) => (
           <motion.circle
             key={i}
-            cx={40 + Math.sin(t * 4) * 15}
-            cy={t * 340 + 10}
-            r={3 - i * 0.3}
-            fill={`hsl(${color} / 0.4)`}
+            cx={30 + Math.sin(t * 3) * 8}
+            cy={t * 350 + 25}
+            r={1.5 - i * 0.15}
+            fill={`hsl(${color} / 0.2)`}
             animate={{
-              opacity: [0.2, 0.8, 0.2],
-              r: [2 - i * 0.2, 3.5 - i * 0.3, 2 - i * 0.2],
+              opacity: [0.1, 0.4, 0.1],
             }}
             transition={{
-              duration: 3 + i * 0.5,
+              duration: 4 + i * 0.8,
               repeat: Infinity,
               ease: "easeInOut",
-              delay: delay + i * 0.3,
+              delay: delay + i * 0.5,
             }}
           />
         ))}
@@ -114,7 +132,6 @@ const DeepKraken = () => {
       ref={containerRef}
       className="absolute inset-0 pointer-events-none overflow-hidden"
     >
-      {/* Main kraken image — floating animation */}
       <motion.div
         className="absolute inset-0"
         style={{ y, scale }}

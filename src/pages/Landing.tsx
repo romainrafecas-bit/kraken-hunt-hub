@@ -1,15 +1,60 @@
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useScroll, useTransform, useInView } from "framer-motion";
 import { Link } from "react-router-dom";
-import { useRef } from "react";
+import { useRef, useEffect, useState } from "react";
 import { 
   ChevronRight, ArrowDown, Search, Package, ShoppingCart,
   ExternalLink, AlertTriangle, Filter, FileSpreadsheet, 
-  LayoutGrid, RefreshCw, Eye, Zap, CheckCircle2, Shield,
+  LayoutGrid, RefreshCw, CheckCircle2,
   Crosshair, TrendingDown, Users
 } from "lucide-react";
 import krakkenLogo from "@/assets/krakken-logo.png";
 import { Tentacle, DeepKraken, Particles, InkClouds } from "@/components/landing/KrakenAnimations";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+
+// Animated counter hook
+const useCountUp = (end: number, duration = 2000, startOnView = true) => {
+  const [count, setCount] = useState(0);
+  const ref = useRef<HTMLSpanElement>(null);
+  const inView = useInView(ref as React.RefObject<Element>, { once: true });
+  
+  useEffect(() => {
+    if (!startOnView || !inView) return;
+    let start = 0;
+    const increment = end / (duration / 16);
+    const timer = setInterval(() => {
+      start += increment;
+      if (start >= end) {
+        setCount(end);
+        clearInterval(timer);
+      } else {
+        setCount(Math.floor(start));
+      }
+    }, 16);
+    return () => clearInterval(timer);
+  }, [end, duration, inView, startOnView]);
+  
+  return { count, ref };
+};
+
+// Glowing icon wrapper
+const GlowIcon = ({ icon: Icon, color, size = 20 }: { icon: React.ElementType; color: string; size?: number }) => (
+  <motion.div
+    className="relative"
+    whileHover={{ scale: 1.15 }}
+    transition={{ type: "spring", stiffness: 400 }}
+  >
+    <Icon style={{
+      width: size, height: size,
+      color: `hsl(${color})`,
+      filter: `drop-shadow(0 0 10px hsl(${color} / 0.5))`,
+    }} />
+    <div className="absolute inset-0 rounded-full" style={{
+      background: `radial-gradient(circle, hsl(${color} / 0.15) 0%, transparent 70%)`,
+      filter: 'blur(6px)',
+      transform: 'scale(2.5)',
+    }} />
+  </motion.div>
+);
 
 const Landing = () => {
   const heroRef = useRef<HTMLDivElement>(null);
@@ -17,6 +62,9 @@ const Landing = () => {
   const heroOpacity = useTransform(scrollYProgress, [0, 0.7], [1, 0]);
   const textY = useTransform(scrollYProgress, [0, 1], [0, -100]);
   const heroScale = useTransform(scrollYProgress, [0, 1], [1, 1.1]);
+
+  const stat1 = useCountUp(100000, 2500);
+  const stat2 = useCountUp(21, 1500);
 
   return (
     <div className="min-h-screen overflow-x-hidden" style={{ background: 'hsl(230 50% 3%)' }}>
@@ -51,10 +99,9 @@ const Landing = () => {
       {/* ═══ HERO — Abyssal with Kraken ═══ */}
       <section ref={heroRef} className="relative h-[120vh] flex items-center justify-center overflow-hidden">
         <DeepKraken />
-        
         <Particles />
 
-        {/* Bottom fade to page background — smooth */}
+        {/* Bottom fade */}
         <div className="absolute bottom-0 left-0 right-0 h-[40%] pointer-events-none" style={{
           background: 'linear-gradient(to top, hsl(230 50% 3%) 0%, hsl(230 50% 3% / 0.8) 30%, transparent 100%)',
         }} />
@@ -133,14 +180,12 @@ const Landing = () => {
         </motion.div>
       </section>
 
-      {/* Tentacles */}
-      <Tentacle side="left" top="105vh" color="174 72% 46%" delay={0} size={300} />
-      <Tentacle side="right" top="210vh" color="262 52% 58%" delay={1.5} size={340} />
-      <Tentacle side="left" top="360vh" color="188 78% 52%" delay={0.8} size={260} />
-      <Tentacle side="right" top="500vh" color="174 72% 46%" delay={2} size={300} />
-      <Tentacle side="left" top="640vh" color="262 52% 58%" delay={1} size={250} />
+      {/* Tentacles — fewer, subtler */}
+      <Tentacle side="left" top="120vh" color="174 72% 46%" delay={0} size={220} />
+      <Tentacle side="right" top="280vh" color="262 52% 58%" delay={1.5} size={260} />
+      <Tentacle side="left" top="480vh" color="188 78% 52%" delay={0.8} size={200} />
 
-      {/* ═══ STAT STRIP ═══ */}
+      {/* ═══ STAT STRIP — Animated counters ═══ */}
       <section className="py-24 px-6 md:px-8 relative overflow-hidden">
         <div className="absolute inset-0 pointer-events-none" style={{
           background: 'radial-gradient(ellipse at 50% 50%, hsl(174 72% 46% / 0.02) 0%, transparent 60%)',
@@ -148,24 +193,36 @@ const Landing = () => {
         <div className="max-w-5xl mx-auto">
           <div className="flex flex-col md:flex-row items-center justify-between gap-16 md:gap-0">
             {[
-              { val: "+100 000", sub: "produits analysés" },
-              { val: "21", sub: "catégories scrutées" },
-              { val: "5 min", sub: "pour trouver ta pépite" },
+              { ref: stat1.ref, val: `+${stat1.count.toLocaleString('fr-FR')}`, sub: "produits analysés", color: "174 72% 46%" },
+              { ref: stat2.ref, val: stat2.count.toString(), sub: "catégories scrutées", color: "262 52% 58%" },
+              { ref: null, val: "5 min", sub: "pour trouver ta pépite", color: "38 92% 56%" },
             ].map((s, i) => (
               <motion.div
-                key={s.val}
+                key={i}
                 initial={{ opacity: 0, y: 40 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.2, duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
                 className="text-center flex-1 relative"
               >
-                {i < 2 && <div className="hidden md:block absolute right-0 top-1/2 -translate-y-1/2 h-16 tentacle-line-v" />}
-                <span className="font-display font-black text-primary block mb-2" style={{
-                  fontSize: 'clamp(2.8rem, 5vw, 4.5rem)',
-                  textShadow: '0 0 60px hsl(174 72% 46% / 0.4)',
-                  lineHeight: 1,
-                }}>{s.val}</span>
+                <motion.span
+                  ref={s.ref}
+                  className="font-display font-black block mb-2"
+                  style={{
+                    fontSize: 'clamp(2.8rem, 5vw, 4.5rem)',
+                    color: `hsl(${s.color})`,
+                    textShadow: `0 0 60px hsl(${s.color} / 0.4), 0 0 120px hsl(${s.color} / 0.15)`,
+                    lineHeight: 1,
+                  }}
+                  whileInView={{
+                    textShadow: [
+                      `0 0 60px hsl(${s.color} / 0.3), 0 0 120px hsl(${s.color} / 0.1)`,
+                      `0 0 80px hsl(${s.color} / 0.5), 0 0 140px hsl(${s.color} / 0.2)`,
+                      `0 0 60px hsl(${s.color} / 0.3), 0 0 120px hsl(${s.color} / 0.1)`,
+                    ],
+                  }}
+                  transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                >{s.val}</motion.span>
                 <span className="text-xs text-foreground/50 tracking-widest uppercase">{s.sub}</span>
               </motion.div>
             ))}
@@ -173,9 +230,8 @@ const Landing = () => {
         </div>
       </section>
 
-      {/* ═══ PAIN — No label, immersive storytelling ═══ */}
+      {/* ═══ PAIN ═══ */}
       <section className="py-32 md:py-40 px-6 md:px-8 relative overflow-hidden">
-        <div className="absolute top-0 left-0 right-0 h-px tentacle-line" />
         <div className="absolute inset-0 pointer-events-none" style={{
           background: 'radial-gradient(ellipse at 25% 40%, hsl(348 72% 56% / 0.03) 0%, transparent 50%)',
         }} />
@@ -191,7 +247,11 @@ const Landing = () => {
             <h2 className="font-display font-black text-4xl md:text-6xl text-foreground leading-[1.05] max-w-3xl">
               Tu passes encore des heures
               <br />
-              <span className="text-foreground/45">à chercher le bon produit ?</span>
+              <motion.span 
+                className="text-foreground/45"
+                whileInView={{ opacity: [0.3, 0.6, 0.45] }}
+                transition={{ duration: 2, ease: "easeOut" }}
+              >à chercher le bon produit ?</motion.span>
             </h2>
           </motion.div>
 
@@ -228,17 +288,11 @@ const Landing = () => {
                   border: `1px solid hsl(${item.color} / 0.05)`,
                 }}
               >
-                <div className="absolute top-0 left-0 right-0 h-px" style={{
-                  background: `linear-gradient(90deg, transparent, hsl(${item.color} / 0.2), transparent)`,
-                }} />
-                <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-5" style={{
+                <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-5 relative" style={{
                   background: `hsl(${item.color} / 0.06)`,
                   border: `1px solid hsl(${item.color} / 0.1)`,
                 }}>
-                  <item.icon className="w-5 h-5" style={{
-                    color: `hsl(${item.color})`,
-                    filter: `drop-shadow(0 0 6px hsl(${item.color} / 0.4))`,
-                  }} />
+                  <GlowIcon icon={item.icon} color={item.color} />
                 </div>
                 <h4 className="font-display font-bold text-base text-foreground/90 mb-2">{item.title}</h4>
                 <p className="text-sm text-foreground/55 leading-relaxed">{item.desc}</p>
@@ -250,7 +304,6 @@ const Landing = () => {
 
       {/* ═══ SOLUTION — Dramatic 3-phase ═══ */}
       <section className="py-32 md:py-44 px-6 md:px-8 relative overflow-hidden">
-        <div className="absolute top-0 left-0 right-0 h-px tentacle-line" />
         <InkClouds />
 
         <div className="max-w-5xl mx-auto relative z-10">
@@ -262,15 +315,30 @@ const Landing = () => {
             className="text-center mb-28"
           >
             <h2 className="font-display font-black text-4xl md:text-6xl text-foreground leading-tight">
-              Trois phases.
+              <motion.span
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+              >
+                Trois phases.
+              </motion.span>
               <br />
-              <span className="kraken-title" style={{ filter: 'drop-shadow(0 0 30px hsl(174 72% 46% / 0.2))' }}>Un seul objectif.</span>
+              <motion.span 
+                className="kraken-title"
+                style={{ filter: 'drop-shadow(0 0 30px hsl(174 72% 46% / 0.2))' }}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.2 }}
+              >Un seul objectif.</motion.span>
             </h2>
           </motion.div>
 
           {/* Vertical timeline */}
           <div className="relative">
-            <div className="absolute left-1/2 top-0 bottom-0 -translate-x-1/2 tentacle-line-v hidden md:block" />
+            <div className="absolute left-1/2 top-0 bottom-0 -translate-x-1/2 w-px hidden md:block" style={{
+              background: 'linear-gradient(180deg, transparent 0%, hsl(174 72% 46% / 0.08) 20%, hsl(262 52% 58% / 0.06) 50%, hsl(38 92% 56% / 0.08) 80%, transparent 100%)',
+            }} />
 
             <div className="space-y-28 md:space-y-40">
               {[
@@ -314,27 +382,49 @@ const Landing = () => {
                     <div className="flex items-center gap-5 mb-8" style={{
                       flexDirection: step.align === "right" ? "row-reverse" : "row",
                     }}>
-                      <span className="font-display font-black" style={{
-                        fontSize: 'clamp(3rem, 5vw, 5rem)',
-                        color: `hsl(${step.color} / 0.08)`,
-                        textShadow: `0 0 60px hsl(${step.color} / 0.06)`,
-                        lineHeight: 1,
-                      }}>{step.num}</span>
-                      <div className="w-16 h-16 rounded-2xl flex items-center justify-center" style={{
-                        background: `hsl(${step.color} / 0.06)`,
-                        border: `1px solid hsl(${step.color} / 0.12)`,
-                        boxShadow: `0 0 50px -12px hsl(${step.color} / 0.25)`,
-                      }}>
-                        <step.icon className="w-7 h-7" style={{
-                          color: `hsl(${step.color})`,
-                          filter: `drop-shadow(0 0 10px hsl(${step.color} / 0.5))`,
-                        }} />
-                      </div>
+                      <motion.span 
+                        className="font-display font-black"
+                        style={{
+                          fontSize: 'clamp(3rem, 5vw, 5rem)',
+                          color: `hsl(${step.color} / 0.08)`,
+                          lineHeight: 1,
+                        }}
+                        whileInView={{
+                          textShadow: [
+                            `0 0 40px hsl(${step.color} / 0.04)`,
+                            `0 0 80px hsl(${step.color} / 0.1)`,
+                            `0 0 40px hsl(${step.color} / 0.04)`,
+                          ],
+                        }}
+                        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                      >{step.num}</motion.span>
+                      <motion.div 
+                        className="w-16 h-16 rounded-2xl flex items-center justify-center"
+                        style={{
+                          background: `hsl(${step.color} / 0.06)`,
+                          border: `1px solid hsl(${step.color} / 0.12)`,
+                        }}
+                        whileInView={{
+                          boxShadow: [
+                            `0 0 30px -12px hsl(${step.color} / 0.15)`,
+                            `0 0 60px -12px hsl(${step.color} / 0.3)`,
+                            `0 0 30px -12px hsl(${step.color} / 0.15)`,
+                          ],
+                        }}
+                        transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                      >
+                        <GlowIcon icon={step.icon} color={step.color} size={28} />
+                      </motion.div>
                     </div>
 
-                    <p className="text-[10px] font-display font-bold uppercase tracking-[0.35em] mb-3" style={{
-                      color: `hsl(${step.color} / 0.5)`,
-                    }}>{step.subtitle}</p>
+                    <motion.p 
+                      className="text-[10px] font-display font-bold uppercase tracking-[0.35em] mb-3"
+                      style={{ color: `hsl(${step.color} / 0.5)` }}
+                      initial={{ opacity: 0, letterSpacing: '0.2em' }}
+                      whileInView={{ opacity: 1, letterSpacing: '0.35em' }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.8, delay: 0.3 }}
+                    >{step.subtitle}</motion.p>
                     <h3 className="font-display font-black text-3xl md:text-4xl text-foreground mb-5" style={{
                       textShadow: `0 0 50px hsl(${step.color} / 0.1)`,
                     }}>
@@ -351,8 +441,6 @@ const Landing = () => {
 
       {/* ═══ DASHBOARD PREVIEW ═══ */}
       <section className="py-32 md:py-40 px-6 md:px-8 relative overflow-hidden">
-        <div className="absolute top-0 left-0 right-0 h-px tentacle-line" />
-
         <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
@@ -483,8 +571,6 @@ const Landing = () => {
 
       {/* ═══ FEATURES — Asymmetric premium grid ═══ */}
       <section id="features" className="py-32 md:py-40 px-6 md:px-8 relative overflow-hidden">
-        <div className="absolute top-0 left-0 right-0 h-px tentacle-line" />
-
         <div className="max-w-6xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -496,11 +582,22 @@ const Landing = () => {
             <h2 className="font-display font-black text-4xl md:text-6xl text-foreground max-w-2xl leading-tight">
               Chaque fonctionnalité
               <br />
-              <span className="kraken-title" style={{ filter: 'drop-shadow(0 0 25px hsl(174 72% 46% / 0.2))' }}>a une raison d'être.</span>
+              <motion.span 
+                className="kraken-title"
+                style={{ filter: 'drop-shadow(0 0 25px hsl(174 72% 46% / 0.2))' }}
+                whileInView={{
+                  filter: [
+                    'drop-shadow(0 0 25px hsl(174 72% 46% / 0.15))',
+                    'drop-shadow(0 0 40px hsl(174 72% 46% / 0.3))',
+                    'drop-shadow(0 0 25px hsl(174 72% 46% / 0.15))',
+                  ],
+                }}
+                transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+              >a une raison d'être.</motion.span>
             </h2>
           </motion.div>
 
-          {/* Asymmetric grid — 2 large + 4 small */}
+          {/* Asymmetric grid */}
           <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
             {/* Large card 1 */}
             <motion.div
@@ -513,13 +610,12 @@ const Landing = () => {
                 border: '1px solid hsl(174 72% 46% / 0.06)',
               }}
             >
-              <div className="absolute top-0 left-0 right-0 h-px" style={{
-                background: 'linear-gradient(90deg, transparent, hsl(174 72% 46% / 0.3), transparent)',
-              }} />
               <div className="absolute -right-20 -bottom-20 w-64 h-64 rounded-full pointer-events-none" style={{
                 background: 'radial-gradient(circle, hsl(174 72% 46% / 0.04) 0%, transparent 70%)',
               }} />
-              <RefreshCw className="w-7 h-7 mb-6 text-primary" style={{ filter: 'drop-shadow(0 0 8px hsl(174 72% 46% / 0.4))' }} />
+              <div className="mb-6">
+                <GlowIcon icon={RefreshCw} color="174 72% 46%" size={28} />
+              </div>
               <h3 className="font-display font-black text-xl md:text-2xl text-foreground mb-3">Mise à jour hebdomadaire</h3>
               <p className="text-sm text-foreground/55 leading-relaxed max-w-md">
                 De nouveaux produits gagnants chaque semaine. La base évolue avec le marché français en temps réel.
@@ -538,10 +634,9 @@ const Landing = () => {
                 border: '1px solid hsl(38 92% 56% / 0.06)',
               }}
             >
-              <div className="absolute top-0 left-0 right-0 h-px" style={{
-                background: 'linear-gradient(90deg, transparent, hsl(38 92% 56% / 0.25), transparent)',
-              }} />
-              <ExternalLink className="w-7 h-7 mb-6" style={{ color: 'hsl(38 92% 56%)', filter: 'drop-shadow(0 0 8px hsl(38 92% 56% / 0.4))' }} />
+              <div className="mb-6">
+                <GlowIcon icon={ExternalLink} color="38 92% 56%" size={28} />
+              </div>
               <h3 className="font-display font-black text-xl md:text-2xl text-foreground mb-3">Sourcing en 1 clic</h3>
               <p className="text-sm text-foreground/55 leading-relaxed">
                 AliExpress + Google Lens intégrés. Sans quitter l'interface.
@@ -567,10 +662,9 @@ const Landing = () => {
                   border: '1px solid hsl(225 20% 7%)',
                 }}
               >
-                <f.icon className="w-5 h-5 mb-4 transition-transform duration-500 group-hover:scale-110" style={{
-                  color: `hsl(${f.color})`,
-                  filter: `drop-shadow(0 0 5px hsl(${f.color} / 0.4))`,
-                }} />
+                <div className="mb-4">
+                  <GlowIcon icon={f.icon} color={f.color} />
+                </div>
                 <h4 className="font-display font-bold text-sm text-foreground/85 mb-1.5">{f.title}</h4>
                 <p className="text-xs text-foreground/55 leading-relaxed">{f.desc}</p>
               </motion.div>
@@ -579,52 +673,8 @@ const Landing = () => {
         </div>
       </section>
 
-      {/* ═══ SOCIAL PROOF ═══ */}
-      <section className="py-28 px-6 md:px-8 relative overflow-hidden">
-        <div className="absolute top-0 left-0 right-0 h-px tentacle-line" />
-
-        <div className="max-w-4xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="grid md:grid-cols-3 gap-5"
-          >
-            {[
-              { icon: Eye, stat: "+100 000", label: "produits analysés", color: "174 72% 46%" },
-              { icon: Shield, stat: "100%", label: "marché français", color: "262 52% 58%" },
-              { icon: Zap, stat: "< 5 min", label: "pour trouver un produit", color: "38 92% 56%" },
-            ].map((s, i) => (
-              <motion.div
-                key={s.label}
-                initial={{ opacity: 0, y: 25 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.15, duration: 0.7 }}
-                className="text-center p-8 md:p-10 rounded-2xl relative overflow-hidden"
-                style={{
-                  background: `hsl(${s.color} / 0.02)`,
-                  border: `1px solid hsl(${s.color} / 0.05)`,
-                }}
-              >
-                <div className="absolute top-0 left-0 right-0 h-px" style={{
-                  background: `linear-gradient(90deg, transparent, hsl(${s.color} / 0.25), transparent)`,
-                }} />
-                <s.icon className="w-5 h-5 mx-auto mb-5" style={{
-                  color: `hsl(${s.color})`,
-                  filter: `drop-shadow(0 0 8px hsl(${s.color} / 0.4))`,
-                }} />
-                <span className="font-display font-black text-3xl md:text-4xl text-foreground block mb-2">{s.stat}</span>
-                <span className="text-[10px] text-foreground/50 tracking-widest uppercase">{s.label}</span>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
-
       {/* ═══ PRICING ═══ */}
       <section id="pricing" className="py-32 md:py-40 px-6 md:px-8 relative overflow-hidden">
-        <div className="absolute top-0 left-0 right-0 h-px tentacle-line" />
         <div className="absolute inset-0 pointer-events-none" style={{
           background: 'radial-gradient(ellipse at 50% 50%, hsl(174 72% 46% / 0.03) 0%, transparent 45%)',
         }} />
@@ -678,7 +728,17 @@ const Landing = () => {
               </motion.div>
               <div className="flex items-baseline justify-center gap-2">
                 <span className="text-2xl md:text-3xl font-display font-bold text-foreground/40 line-through mr-2">39,90€</span>
-                <span className="text-6xl md:text-7xl font-display font-black text-foreground">9,90€</span>
+                <motion.span 
+                  className="text-6xl md:text-7xl font-display font-black text-foreground"
+                  whileInView={{
+                    textShadow: [
+                      '0 0 0px transparent',
+                      '0 0 30px hsl(174 72% 46% / 0.2)',
+                      '0 0 0px transparent',
+                    ],
+                  }}
+                  transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                >9,90€</motion.span>
                 <span className="text-lg text-foreground/50">/mois</span>
               </div>
             </div>
@@ -692,11 +752,18 @@ const Landing = () => {
                 "Détection des ruptures de stock",
                 "Export Excel illimité",
                 "Filtres avancés",
-              ].map(f => (
-                <div key={f} className="flex items-center gap-3">
+              ].map((f, i) => (
+                <motion.div 
+                  key={f} 
+                  className="flex items-center gap-3"
+                  initial={{ opacity: 0, x: -10 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.05, duration: 0.5 }}
+                >
                   <CheckCircle2 className="w-4 h-4 flex-shrink-0 text-primary/70" style={{ filter: 'drop-shadow(0 0 3px hsl(174 72% 46% / 0.3))' }} />
                   <span className="text-sm text-foreground/60">{f}</span>
-                </div>
+                </motion.div>
               ))}
             </div>
 
@@ -714,8 +781,6 @@ const Landing = () => {
 
       {/* ═══ FAQ ═══ */}
       <section id="faq" className="py-32 md:py-40 px-6 md:px-8 relative overflow-hidden">
-        <div className="absolute top-0 left-0 right-0 h-px tentacle-line" />
-
         <div className="max-w-2xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
