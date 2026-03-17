@@ -440,7 +440,7 @@ const Landing = () => {
       </section>
 
       {/* ═══ DASHBOARD PREVIEW ═══ */}
-      <section className="py-32 md:py-40 px-6 md:px-8 relative overflow-hidden">
+      <section className="py-16 md:py-24 px-6 md:px-8 relative overflow-hidden">
         <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
