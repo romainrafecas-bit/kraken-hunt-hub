@@ -119,8 +119,8 @@ const Landing = () => {
             initial={{ opacity: 0, y: 60 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1.2, delay: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
-            className="font-display font-black leading-[0.92] tracking-tighter mb-8"
-            style={{ fontSize: 'clamp(3.2rem, 9vw, 7.5rem)' }}
+            className="font-display font-black leading-[0.95] tracking-tighter mb-8"
+            style={{ fontSize: 'clamp(2.8rem, 7vw, 6.5rem)' }}
           >
             <span className="text-foreground block">La traque</span>
             <motion.span 
@@ -194,8 +194,8 @@ const Landing = () => {
           <div className="flex flex-col md:flex-row items-center justify-between gap-16 md:gap-0">
             {[
               { ref: stat1.ref, val: `+${stat1.count.toLocaleString('fr-FR')}`, sub: "produits analysés", color: "174 72% 46%" },
-              { ref: stat2.ref, val: stat2.count.toString(), sub: "catégories scrutées", color: "262 52% 58%" },
-              { ref: null, val: "5 min", sub: "pour trouver ta pépite", color: "38 92% 56%" },
+              { ref: stat2.ref, val: stat2.count.toString(), sub: "catégories scrutées", color: "188 78% 52%" },
+              { ref: null, val: "5 min", sub: "pour trouver ta pépite", color: "174 72% 56%" },
             ].map((s, i) => (
               <motion.div
                 key={i}
@@ -244,14 +244,14 @@ const Landing = () => {
             transition={{ duration: 0.8 }}
             className="mb-20"
           >
-            <h2 className="font-display font-black text-4xl md:text-6xl text-foreground leading-[1.05] max-w-3xl">
-              Tu passes encore des heures
+            <h2 className="font-display font-black text-3xl md:text-5xl text-foreground leading-[1.1] max-w-3xl">
+              Tu passes encore des heures à chercher
               <br />
               <motion.span 
                 className="text-foreground/45"
                 whileInView={{ opacity: [0.3, 0.6, 0.45] }}
                 transition={{ duration: 2, ease: "easeOut" }}
-              >à chercher le bon produit ?</motion.span>
+              >le bon produit ?</motion.span>
             </h2>
           </motion.div>
 
@@ -772,7 +772,7 @@ const Landing = () => {
               color: 'hsl(230 50% 3%)',
               boxShadow: '0 0 50px -10px hsl(174 72% 46% / 0.4), inset 0 1px 0 hsl(180 80% 70% / 0.2)',
             }}>
-              Commencer maintenant
+              Rejoindre Krakken
             </Link>
             <p className="text-[10px] text-foreground/40 text-center mt-4 tracking-wide">Sans engagement · Annulation à tout moment</p>
           </motion.div>
@@ -878,7 +878,7 @@ const Landing = () => {
             color: 'hsl(230 50% 3%)',
             boxShadow: '0 0 100px -20px hsl(174 72% 46% / 0.4), inset 0 1px 0 hsl(180 80% 70% / 0.2)',
           }}>
-            Accéder à la base
+            Rejoindre Krakken
             <ChevronRight className="w-4 h-4 group-hover:translate-x-2 transition-transform duration-300" />
           </Link>
         </motion.div>
