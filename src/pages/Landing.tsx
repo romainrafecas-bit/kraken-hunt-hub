@@ -743,7 +743,7 @@ const Landing = () => {
       </section>
 
       {/* ═══ PRICING ═══ */}
-      <section id="pricing" className="py-16 md:py-24 px-6 md:px-8 relative overflow-hidden">
+      <section id="acces" className="py-16 md:py-24 px-6 md:px-8 relative overflow-hidden">
         <div className="absolute inset-0 pointer-events-none" style={{
           background: 'radial-gradient(ellipse at 50% 50%, hsl(174 72% 46% / 0.03) 0%, transparent 45%)',
         }} />
