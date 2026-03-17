@@ -836,13 +836,7 @@ const Landing = () => {
               ))}
             </div>
 
-            <Link to="/" className="block w-full py-4 rounded-xl text-center text-sm font-bold tracking-wider transition-all duration-500 hover:scale-[1.02] hover:shadow-[0_0_50px_-10px_hsl(174_72%_46%_/_0.5)]" style={{
-              background: 'linear-gradient(135deg, hsl(174 72% 46%), hsl(188 78% 48%))',
-              color: 'hsl(230 50% 3%)',
-              boxShadow: '0 0 50px -10px hsl(174 72% 46% / 0.4), inset 0 1px 0 hsl(180 80% 70% / 0.2)',
-            }}>
-              Rejoindre Krakken
-            </Link>
+            <WaitlistForm variant="large" />
             <p className="text-[10px] text-foreground/40 text-center mt-4 tracking-wide">Sans engagement · Annulation à tout moment</p>
           </motion.div>
         </div>
