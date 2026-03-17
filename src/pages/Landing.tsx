@@ -123,7 +123,7 @@ const WaitlistForm = ({ variant = "default" }: { variant?: "default" | "compact"
           boxShadow: '0 0 30px -6px hsl(174 72% 46% / 0.4)',
         }}
       >
-        {status === "loading" ? <Loader2 className="w-4 h-4 animate-spin" /> : "Rejoindre la liste"}
+        {status === "loading" ? <Loader2 className="w-4 h-4 animate-spin" /> : "Rejoins l'équipage"}
       </button>
       {status === "error" && (
         <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-xs text-destructive absolute -bottom-6 left-0">
