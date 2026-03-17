@@ -119,8 +119,8 @@ const Landing = () => {
             initial={{ opacity: 0, y: 60 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1.2, delay: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
-            className="font-display font-black leading-[0.92] tracking-tighter mb-8"
-            style={{ fontSize: 'clamp(3.2rem, 9vw, 7.5rem)' }}
+            className="font-display font-black leading-[0.95] tracking-tighter mb-8"
+            style={{ fontSize: 'clamp(2.8rem, 7vw, 6.5rem)' }}
           >
             <span className="text-foreground block">La traque</span>
             <motion.span 
