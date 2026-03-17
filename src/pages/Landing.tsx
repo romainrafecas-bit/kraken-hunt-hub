@@ -835,7 +835,7 @@ const Landing = () => {
       </section>
 
       {/* ═══ FINAL CTA ═══ */}
-      <section className="py-40 md:py-52 px-6 md:px-8 relative text-center overflow-hidden">
+      <section className="py-20 md:py-28 px-6 md:px-8 relative text-center overflow-hidden">
         <InkClouds />
         <div className="absolute inset-0 pointer-events-none" style={{
           background: `
