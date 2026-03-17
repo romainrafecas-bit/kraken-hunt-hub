@@ -303,7 +303,7 @@ const Landing = () => {
       </section>
 
       {/* ═══ SOLUTION — Dramatic 3-phase ═══ */}
-      <section className="py-32 md:py-44 px-6 md:px-8 relative overflow-hidden">
+      <section className="py-16 md:py-24 px-6 md:px-8 relative overflow-hidden">
         <InkClouds />
 
         <div className="max-w-5xl mx-auto relative z-10">
