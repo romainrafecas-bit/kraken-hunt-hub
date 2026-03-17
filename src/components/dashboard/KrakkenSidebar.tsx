@@ -1,16 +1,14 @@
-import { LayoutDashboard, Package, BarChart3, Settings, Filter, Anchor, User, Heart } from "lucide-react";
+import { LayoutDashboard, Package, BarChart3, Anchor, User, Heart } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { NavLink } from "react-router-dom";
 import krakkenLogo from "@/assets/krakken-logo.png";
 
 const navItems = [
-  { icon: LayoutDashboard, label: "Dashboard", to: "/" },
+  { icon: LayoutDashboard, label: "Dashboard", to: "/dashboard" },
   { icon: Package, label: "Produits", to: "/produits" },
   { icon: BarChart3, label: "Analytics", to: "/analytics" },
   { icon: Heart, label: "Favoris", to: "/favoris" },
   { icon: User, label: "Mon profil", to: "/profil" },
-  { icon: Filter, label: "Filtres avancés", to: "/filtres" },
-  { icon: Settings, label: "Paramètres", to: "/parametres" },
 ];
 
 const KrakkenSidebar = () => {
