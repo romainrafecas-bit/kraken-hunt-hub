@@ -577,7 +577,7 @@ const Landing = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
-            className="mb-24"
+            className="mb-14"
           >
             <h2 className="font-display font-black text-4xl md:text-6xl text-foreground max-w-2xl leading-tight">
               Chaque fonctionnalité
