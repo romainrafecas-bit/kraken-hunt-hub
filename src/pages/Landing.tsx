@@ -161,7 +161,7 @@ const Landing = () => {
               color: 'hsl(230 50% 3%)',
               boxShadow: '0 0 40px -8px hsl(174 72% 46% / 0.4)',
             }}>
-              Voir les produits
+              Rejoindre Krakken
               <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>
             <div className="flex items-center gap-3">
