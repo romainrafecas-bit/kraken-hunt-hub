@@ -591,7 +591,7 @@ const Landing = () => {
             className="grid md:grid-cols-3 gap-5"
           >
             {[
-              { icon: Eye, stat: "+100K", label: "produits analysés", color: "174 72% 46%" },
+              { icon: Eye, stat: "+100 000", label: "produits analysés", color: "174 72% 46%" },
               { icon: Shield, stat: "100%", label: "marché français", color: "262 52% 58%" },
               { icon: Zap, stat: "< 5 min", label: "pour trouver un produit", color: "38 92% 56%" },
             ].map((s, i) => (
