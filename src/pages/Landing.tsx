@@ -5,11 +5,12 @@ import {
   ChevronRight, ArrowDown, Search, Package, ShoppingCart,
   ExternalLink, AlertTriangle, Filter, FileSpreadsheet, 
   LayoutGrid, RefreshCw, CheckCircle2,
-  Crosshair, TrendingDown, Users
+  Crosshair, TrendingDown, Users, Loader2
 } from "lucide-react";
 import krakkenLogo from "@/assets/krakken-logo.png";
 import { Tentacle, DeepKraken, Particles, InkClouds } from "@/components/landing/KrakenAnimations";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { supabase } from "@/integrations/supabase/client";
 
 // Animated counter hook
 const useCountUp = (end: number, duration = 2000, startOnView = true) => {
@@ -56,6 +57,83 @@ const GlowIcon = ({ icon: Icon, color, size = 20 }: { icon: React.ElementType; c
   </motion.div>
 );
 
+// Waitlist email form component
+const WaitlistForm = ({ variant = "default" }: { variant?: "default" | "compact" | "large" }) => {
+  const [email, setEmail] = useState("");
+  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [errorMsg, setErrorMsg] = useState("");
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const trimmed = email.trim();
+    if (!trimmed || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
+      setErrorMsg("Entre une adresse email valide");
+      setStatus("error");
+      return;
+    }
+    setStatus("loading");
+    const { error } = await supabase.from("waitlist").insert({ email: trimmed });
+    if (error) {
+      if (error.code === "23505") {
+        setStatus("success"); // already registered, show success anyway
+      } else {
+        setErrorMsg("Une erreur est survenue, réessaie.");
+        setStatus("error");
+      }
+    } else {
+      setStatus("success");
+    }
+  };
+
+  if (status === "success") {
+    return (
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="flex items-center gap-2.5 justify-center"
+      >
+        <CheckCircle2 className="w-5 h-5 text-primary" style={{ filter: 'drop-shadow(0 0 8px hsl(174 72% 46% / 0.5))' }} />
+        <span className="text-sm font-semibold text-primary">Tu es sur la liste ! 🎉</span>
+      </motion.div>
+    );
+  }
+
+  const isLarge = variant === "large";
+
+  return (
+    <form onSubmit={handleSubmit} className={`flex ${isLarge ? "flex-col sm:flex-row" : ""} items-center gap-3 w-full max-w-md mx-auto`}>
+      <input
+        type="email"
+        value={email}
+        onChange={(e) => { setEmail(e.target.value); setStatus("idle"); }}
+        placeholder="ton@email.com"
+        className={`flex-1 w-full px-5 ${isLarge ? "py-4" : "py-3"} rounded-xl text-sm font-medium text-foreground placeholder:text-foreground/30 outline-none transition-all duration-300 focus:ring-2 focus:ring-primary/30`}
+        style={{
+          background: 'hsl(225 30% 6%)',
+          border: '1px solid hsl(225 20% 10%)',
+        }}
+      />
+      <button
+        type="submit"
+        disabled={status === "loading"}
+        className={`${isLarge ? "w-full sm:w-auto" : ""} px-7 ${isLarge ? "py-4" : "py-3"} rounded-xl text-sm font-bold tracking-wide transition-all duration-300 hover:brightness-110 hover:scale-[1.02] disabled:opacity-60 flex items-center justify-center gap-2 whitespace-nowrap`}
+        style={{
+          background: 'linear-gradient(135deg, hsl(174 72% 46%), hsl(188 78% 48%))',
+          color: 'hsl(230 50% 3%)',
+          boxShadow: '0 0 30px -6px hsl(174 72% 46% / 0.4)',
+        }}
+      >
+        {status === "loading" ? <Loader2 className="w-4 h-4 animate-spin" /> : "Rejoindre la liste"}
+      </button>
+      {status === "error" && (
+        <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-xs text-destructive absolute -bottom-6 left-0">
+          {errorMsg}
+        </motion.p>
+      )}
+    </form>
+  );
+};
+
 const Landing = () => {
   const heroRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
@@ -85,13 +163,13 @@ const Landing = () => {
           <div className="flex items-center gap-8">
             <a href="#features" className="text-[11px] text-foreground/60 hover:text-primary transition-colors hidden sm:block tracking-widest uppercase">Features</a>
             <a href="#pricing" className="text-[11px] text-foreground/60 hover:text-primary transition-colors hidden sm:block tracking-widest uppercase">Accès</a>
-            <Link to="/" className="px-7 py-3 rounded-full text-xs font-bold tracking-widest uppercase transition-all duration-500 hover:scale-105 hover:shadow-[0_0_40px_-8px_hsl(174_72%_46%_/_0.6)]" style={{
+            <a href="#pricing" className="px-7 py-3 rounded-full text-xs font-bold tracking-widest uppercase transition-all duration-500 hover:scale-105 hover:shadow-[0_0_40px_-8px_hsl(174_72%_46%_/_0.6)]" style={{
               background: 'linear-gradient(135deg, hsl(174 72% 46%), hsl(188 78% 48%))',
               color: 'hsl(230 50% 3%)',
               boxShadow: '0 0 30px -6px hsl(174 72% 46% / 0.5)',
             }}>
-              Rejoindre Krakken
-            </Link>
+              Rejoindre la liste
+            </a>
           </div>
         </div>
       </nav>
@@ -152,16 +230,9 @@ const Landing = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 1 }}
-            className="flex flex-col items-center gap-6"
+            className="flex flex-col items-center gap-6 w-full"
           >
-            <Link to="/" className="group inline-flex items-center gap-2.5 px-10 py-4 rounded-lg text-sm font-bold tracking-wide transition-all duration-300 hover:brightness-110" style={{
-              background: 'hsl(174 72% 46%)',
-              color: 'hsl(230 50% 3%)',
-              boxShadow: '0 0 40px -8px hsl(174 72% 46% / 0.4)',
-            }}>
-              Rejoindre Krakken
-              <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            </Link>
+            <WaitlistForm variant="large" />
             <div className="flex items-center gap-3">
               <div className="w-1.5 h-1.5 rounded-full bg-kraken-emerald animate-pulse-glow" />
               <span className="text-[11px] text-foreground/50 tracking-wide">9,90€/mois · Exclusif membres de la formation</span>
@@ -765,13 +836,7 @@ const Landing = () => {
               ))}
             </div>
 
-            <Link to="/" className="block w-full py-4 rounded-xl text-center text-sm font-bold tracking-wider transition-all duration-500 hover:scale-[1.02] hover:shadow-[0_0_50px_-10px_hsl(174_72%_46%_/_0.5)]" style={{
-              background: 'linear-gradient(135deg, hsl(174 72% 46%), hsl(188 78% 48%))',
-              color: 'hsl(230 50% 3%)',
-              boxShadow: '0 0 50px -10px hsl(174 72% 46% / 0.4), inset 0 1px 0 hsl(180 80% 70% / 0.2)',
-            }}>
-              Rejoindre Krakken
-            </Link>
+            <WaitlistForm variant="large" />
             <p className="text-[10px] text-foreground/40 text-center mt-4 tracking-wide">Sans engagement · Annulation à tout moment</p>
           </motion.div>
         </div>
@@ -871,14 +936,7 @@ const Landing = () => {
           <p className="text-sm text-foreground/50 mb-12 max-w-md mx-auto">
             Pendant que tu cherches, d'autres vendent.
           </p>
-          <Link to="/" className="group inline-flex items-center gap-3 px-14 py-5 rounded-full text-sm font-bold tracking-wider transition-all duration-500 hover:scale-105 hover:shadow-[0_0_60px_-10px_hsl(174_72%_46%_/_0.6)]" style={{
-            background: 'linear-gradient(135deg, hsl(174 72% 46%), hsl(188 78% 48%))',
-            color: 'hsl(230 50% 3%)',
-            boxShadow: '0 0 100px -20px hsl(174 72% 46% / 0.4), inset 0 1px 0 hsl(180 80% 70% / 0.2)',
-          }}>
-            Rejoindre Krakken
-            <ChevronRight className="w-4 h-4 group-hover:translate-x-2 transition-transform duration-300" />
-          </Link>
+          <WaitlistForm variant="large" />
         </motion.div>
       </section>
 
