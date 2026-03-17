@@ -161,9 +161,9 @@ const Landing = () => {
             <span className="kraken-title text-lg font-black tracking-wider">KRAKKEN</span>
           </div>
           <div className="flex items-center gap-8">
-            <a href="#features" className="text-[11px] text-foreground/60 hover:text-primary transition-colors hidden sm:block tracking-widest uppercase">Features</a>
-            <a href="#pricing" className="text-[11px] text-foreground/60 hover:text-primary transition-colors hidden sm:block tracking-widest uppercase">Accès</a>
-            <a href="#pricing" className="px-7 py-3 rounded-full text-xs font-bold tracking-widest uppercase transition-all duration-500 hover:scale-105 hover:shadow-[0_0_40px_-8px_hsl(174_72%_46%_/_0.6)]" style={{
+            <a href="#fonctionnalites" className="text-[11px] text-foreground/60 hover:text-primary transition-colors hidden sm:block tracking-widest uppercase">Fonctionnalités</a>
+            <a href="#acces" className="text-[11px] text-foreground/60 hover:text-primary transition-colors hidden sm:block tracking-widest uppercase">Accès</a>
+            <a href="#acces" className="px-7 py-3 rounded-full text-xs font-bold tracking-widest uppercase transition-all duration-500 hover:scale-105 hover:shadow-[0_0_40px_-8px_hsl(174_72%_46%_/_0.6)]" style={{
               background: 'linear-gradient(135deg, hsl(174 72% 46%), hsl(188 78% 48%))',
               color: 'hsl(230 50% 3%)',
               boxShadow: '0 0 30px -6px hsl(174 72% 46% / 0.5)',
@@ -639,7 +639,7 @@ const Landing = () => {
       </section>
 
       {/* ═══ FEATURES — Asymmetric premium grid ═══ */}
-      <section id="features" className="py-16 md:py-24 px-6 md:px-8 relative overflow-hidden">
+      <section id="fonctionnalites" className="py-16 md:py-24 px-6 md:px-8 relative overflow-hidden">
         <div className="max-w-6xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -743,7 +743,7 @@ const Landing = () => {
       </section>
 
       {/* ═══ PRICING ═══ */}
-      <section id="pricing" className="py-16 md:py-24 px-6 md:px-8 relative overflow-hidden">
+      <section id="acces" className="py-16 md:py-24 px-6 md:px-8 relative overflow-hidden">
         <div className="absolute inset-0 pointer-events-none" style={{
           background: 'radial-gradient(ellipse at 50% 50%, hsl(174 72% 46% / 0.03) 0%, transparent 45%)',
         }} />
