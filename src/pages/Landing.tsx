@@ -936,14 +936,7 @@ const Landing = () => {
           <p className="text-sm text-foreground/50 mb-12 max-w-md mx-auto">
             Pendant que tu cherches, d'autres vendent.
           </p>
-          <Link to="/" className="group inline-flex items-center gap-3 px-14 py-5 rounded-full text-sm font-bold tracking-wider transition-all duration-500 hover:scale-105 hover:shadow-[0_0_60px_-10px_hsl(174_72%_46%_/_0.6)]" style={{
-            background: 'linear-gradient(135deg, hsl(174 72% 46%), hsl(188 78% 48%))',
-            color: 'hsl(230 50% 3%)',
-            boxShadow: '0 0 100px -20px hsl(174 72% 46% / 0.4), inset 0 1px 0 hsl(180 80% 70% / 0.2)',
-          }}>
-            Rejoindre Krakken
-            <ChevronRight className="w-4 h-4 group-hover:translate-x-2 transition-transform duration-300" />
-          </Link>
+          <WaitlistForm variant="large" />
         </motion.div>
       </section>
 
