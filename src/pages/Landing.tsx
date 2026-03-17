@@ -168,7 +168,7 @@ const Landing = () => {
               color: 'hsl(230 50% 3%)',
               boxShadow: '0 0 30px -6px hsl(174 72% 46% / 0.5)',
             }}>
-              Rejoindre la liste
+              Rejoins l'équipage
             </a>
           </div>
         </div>

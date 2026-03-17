@@ -51,7 +51,7 @@ const KrakkenSidebar = () => {
           <NavLink
             key={item.label}
             to={item.to}
-            end={item.to === "/"}
+            end={item.to === "/dashboard"}
             className={({ isActive }) =>
               cn(
                 "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-300 group relative",

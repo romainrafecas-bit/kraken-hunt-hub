@@ -19,7 +19,8 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Index />} />
+          <Route path="/" element={<Landing />} />
+          <Route path="/dashboard" element={<Index />} />
           <Route path="/landing" element={<Landing />} />
           <Route path="/produits" element={<Produits />} />
           <Route path="/analytics" element={<Analytics />} />
