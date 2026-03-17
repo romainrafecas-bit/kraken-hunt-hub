@@ -5,11 +5,12 @@ import {
   ChevronRight, ArrowDown, Search, Package, ShoppingCart,
   ExternalLink, AlertTriangle, Filter, FileSpreadsheet, 
   LayoutGrid, RefreshCw, CheckCircle2,
-  Crosshair, TrendingDown, Users
+  Crosshair, TrendingDown, Users, Loader2
 } from "lucide-react";
 import krakkenLogo from "@/assets/krakken-logo.png";
 import { Tentacle, DeepKraken, Particles, InkClouds } from "@/components/landing/KrakenAnimations";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { supabase } from "@/integrations/supabase/client";
 
 // Animated counter hook
 const useCountUp = (end: number, duration = 2000, startOnView = true) => {
