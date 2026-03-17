@@ -570,7 +570,7 @@ const Landing = () => {
       </section>
 
       {/* ═══ FEATURES — Asymmetric premium grid ═══ */}
-      <section id="features" className="py-32 md:py-40 px-6 md:px-8 relative overflow-hidden">
+      <section id="features" className="py-16 md:py-24 px-6 md:px-8 relative overflow-hidden">
         <div className="max-w-6xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
