@@ -161,8 +161,8 @@ const Landing = () => {
             <span className="kraken-title text-lg font-black tracking-wider">KRAKKEN</span>
           </div>
           <div className="flex items-center gap-8">
-            <a href="#features" className="text-[11px] text-foreground/60 hover:text-primary transition-colors hidden sm:block tracking-widest uppercase">Features</a>
-            <a href="#pricing" className="text-[11px] text-foreground/60 hover:text-primary transition-colors hidden sm:block tracking-widest uppercase">Accès</a>
+            <a href="#fonctionnalites" className="text-[11px] text-foreground/60 hover:text-primary transition-colors hidden sm:block tracking-widest uppercase">Fonctionnalités</a>
+            <a href="#acces" className="text-[11px] text-foreground/60 hover:text-primary transition-colors hidden sm:block tracking-widest uppercase">Accès</a>
             <a href="#pricing" className="px-7 py-3 rounded-full text-xs font-bold tracking-widest uppercase transition-all duration-500 hover:scale-105 hover:shadow-[0_0_40px_-8px_hsl(174_72%_46%_/_0.6)]" style={{
               background: 'linear-gradient(135deg, hsl(174 72% 46%), hsl(188 78% 48%))',
               color: 'hsl(230 50% 3%)',
