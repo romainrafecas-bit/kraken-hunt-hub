@@ -673,11 +673,12 @@ const Landing = () => {
               >
                 <div className="w-1.5 h-1.5 rounded-full bg-kraken-emerald animate-pulse-glow" />
                 <span className="text-[11px] font-display font-bold tracking-wider" style={{ color: 'hsl(162 72% 50%)' }}>
-                  Premier mois offert
+                  Exclusif membres de la formation
                 </span>
               </motion.div>
               <div className="flex items-baseline justify-center gap-2">
-                <span className="text-6xl md:text-7xl font-display font-black text-foreground">29,90€</span>
+                <span className="text-2xl md:text-3xl font-display font-bold text-foreground/40 line-through mr-2">39,90€</span>
+                <span className="text-6xl md:text-7xl font-display font-black text-foreground">9,90€</span>
                 <span className="text-lg text-foreground/50">/mois</span>
               </div>
             </div>
