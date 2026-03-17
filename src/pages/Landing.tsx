@@ -186,7 +186,7 @@ const Landing = () => {
       <Tentacle side="left" top="480vh" color="188 78% 52%" delay={0.8} size={200} />
 
       {/* ═══ STAT STRIP — Animated counters ═══ */}
-      <section className="py-24 px-6 md:px-8 relative overflow-hidden">
+      <section className="py-12 md:py-16 px-6 md:px-8 relative overflow-hidden">
         <div className="absolute inset-0 pointer-events-none" style={{
           background: 'radial-gradient(ellipse at 50% 50%, hsl(174 72% 46% / 0.02) 0%, transparent 60%)',
         }} />
