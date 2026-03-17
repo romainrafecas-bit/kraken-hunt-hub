@@ -772,7 +772,7 @@ const Landing = () => {
               color: 'hsl(230 50% 3%)',
               boxShadow: '0 0 50px -10px hsl(174 72% 46% / 0.4), inset 0 1px 0 hsl(180 80% 70% / 0.2)',
             }}>
-              Commencer maintenant
+              Rejoindre Krakken
             </Link>
             <p className="text-[10px] text-foreground/40 text-center mt-4 tracking-wide">Sans engagement · Annulation à tout moment</p>
           </motion.div>
