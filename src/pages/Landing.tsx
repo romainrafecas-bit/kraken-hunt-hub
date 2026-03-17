@@ -312,7 +312,7 @@ const Landing = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
-            className="text-center mb-28"
+            className="text-center mb-16"
           >
             <h2 className="font-display font-black text-4xl md:text-6xl text-foreground leading-tight">
               <motion.span
