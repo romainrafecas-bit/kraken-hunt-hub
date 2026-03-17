@@ -145,9 +145,7 @@ const Landing = () => {
             transition={{ duration: 0.8, delay: 0.7 }}
             className="max-w-xl mx-auto text-base md:text-lg leading-relaxed mb-14 text-foreground/55"
           >
-            La base de données des produits qui se vendent <em className="text-foreground/90 not-italic font-semibold">vraiment</em> en France.
-            <br className="hidden md:block" />
-            Mise à jour chaque semaine. Sourcing en un clic.
+            La base de données des produits qui se vendent <em className="text-foreground/90 not-italic font-semibold">vraiment</em> en France. Mise à jour chaque semaine. Sourcing en un clic.
           </motion.p>
 
           <motion.div
