@@ -119,7 +119,7 @@ const Landing = () => {
             </Link>
             <div className="flex items-center gap-3">
               <div className="w-1.5 h-1.5 rounded-full bg-kraken-emerald animate-pulse-glow" />
-              <span className="text-[11px] text-foreground/50 tracking-wide">Premier mois offert · Puis 29,90€/mois</span>
+              <span className="text-[11px] text-foreground/50 tracking-wide">9,90€/mois · Exclusif membres de la formation</span>
             </div>
           </motion.div>
         </motion.div>
@@ -148,7 +148,7 @@ const Landing = () => {
         <div className="max-w-5xl mx-auto">
           <div className="flex flex-col md:flex-row items-center justify-between gap-16 md:gap-0">
             {[
-              { val: "+100K", sub: "produits analysés" },
+              { val: "+100 000", sub: "produits analysés" },
               { val: "21", sub: "catégories scrutées" },
               { val: "5 min", sub: "pour trouver ta pépite" },
             ].map((s, i) => (
@@ -189,9 +189,9 @@ const Landing = () => {
             className="mb-20"
           >
             <h2 className="font-display font-black text-4xl md:text-6xl text-foreground leading-[1.05] max-w-3xl">
-              Tu scrolles encore Cdiscount
+              Tu passes encore des heures
               <br />
-              <span className="text-foreground/45">à la recherche du bon produit ?</span>
+              <span className="text-foreground/45">à chercher le bon produit ?</span>
             </h2>
           </motion.div>
 
@@ -199,14 +199,14 @@ const Landing = () => {
             {[
               {
                 icon: Crosshair,
-                title: "Des heures perdues",
-                desc: "À scroller des marketplaces sans savoir si ça se vend. À tester au pif. À espérer.",
+                title: "Des heures de recherche",
+                desc: "À taper des Google Dorks pour trouver des avis Cdiscount qui remontent sur Google. À croiser les données à la main.",
                 color: "348 72% 56%",
               },
               {
                 icon: TrendingDown,
-                title: "Aucune data fiable",
-                desc: "Pas d'outil sérieux pour le marché français. Que du réchauffé US et des \"tendances\" bidon.",
+                title: "Des résultats peu fiables",
+                desc: "Pas d'outil dédié au marché français. Tu perds du temps à chercher sans jamais être sûr que le produit se vend vraiment.",
                 color: "38 92% 56%",
               },
               {
@@ -591,7 +591,7 @@ const Landing = () => {
             className="grid md:grid-cols-3 gap-5"
           >
             {[
-              { icon: Eye, stat: "+100K", label: "produits analysés", color: "174 72% 46%" },
+              { icon: Eye, stat: "+100 000", label: "produits analysés", color: "174 72% 46%" },
               { icon: Shield, stat: "100%", label: "marché français", color: "262 52% 58%" },
               { icon: Zap, stat: "< 5 min", label: "pour trouver un produit", color: "38 92% 56%" },
             ].map((s, i) => (
@@ -673,11 +673,12 @@ const Landing = () => {
               >
                 <div className="w-1.5 h-1.5 rounded-full bg-kraken-emerald animate-pulse-glow" />
                 <span className="text-[11px] font-display font-bold tracking-wider" style={{ color: 'hsl(162 72% 50%)' }}>
-                  Premier mois offert
+                  Exclusif membres de la formation
                 </span>
               </motion.div>
               <div className="flex items-baseline justify-center gap-2">
-                <span className="text-6xl md:text-7xl font-display font-black text-foreground">29,90€</span>
+                <span className="text-2xl md:text-3xl font-display font-bold text-foreground/40 line-through mr-2">39,90€</span>
+                <span className="text-6xl md:text-7xl font-display font-black text-foreground">9,90€</span>
                 <span className="text-lg text-foreground/50">/mois</span>
               </div>
             </div>
