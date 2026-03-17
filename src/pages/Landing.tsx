@@ -244,14 +244,14 @@ const Landing = () => {
             transition={{ duration: 0.8 }}
             className="mb-20"
           >
-            <h2 className="font-display font-black text-4xl md:text-6xl text-foreground leading-[1.05] max-w-3xl">
-              Tu passes encore des heures
+            <h2 className="font-display font-black text-3xl md:text-5xl text-foreground leading-[1.1] max-w-3xl">
+              Tu passes encore des heures à chercher
               <br />
               <motion.span 
                 className="text-foreground/45"
                 whileInView={{ opacity: [0.3, 0.6, 0.45] }}
                 transition={{ duration: 2, ease: "easeOut" }}
-              >à chercher le bon produit ?</motion.span>
+              >le bon produit ?</motion.span>
             </h2>
           </motion.div>
 
