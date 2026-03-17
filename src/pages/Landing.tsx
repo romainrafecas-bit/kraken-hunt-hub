@@ -90,7 +90,7 @@ const Landing = () => {
               color: 'hsl(230 50% 3%)',
               boxShadow: '0 0 30px -6px hsl(174 72% 46% / 0.5)',
             }}>
-              Commencer
+              Rejoindre Krakken
             </Link>
           </div>
         </div>
