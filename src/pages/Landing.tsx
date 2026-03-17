@@ -340,7 +340,7 @@ const Landing = () => {
               background: 'linear-gradient(180deg, transparent 0%, hsl(174 72% 46% / 0.08) 20%, hsl(262 52% 58% / 0.06) 50%, hsl(38 92% 56% / 0.08) 80%, transparent 100%)',
             }} />
 
-            <div className="space-y-28 md:space-y-40">
+            <div className="space-y-16 md:space-y-24">
               {[
                 {
                   num: "I",
