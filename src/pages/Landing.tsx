@@ -194,8 +194,8 @@ const Landing = () => {
           <div className="flex flex-col md:flex-row items-center justify-between gap-16 md:gap-0">
             {[
               { ref: stat1.ref, val: `+${stat1.count.toLocaleString('fr-FR')}`, sub: "produits analysés", color: "174 72% 46%" },
-              { ref: stat2.ref, val: stat2.count.toString(), sub: "catégories scrutées", color: "262 52% 58%" },
-              { ref: null, val: "5 min", sub: "pour trouver ta pépite", color: "38 92% 56%" },
+              { ref: stat2.ref, val: stat2.count.toString(), sub: "catégories scrutées", color: "188 78% 52%" },
+              { ref: null, val: "5 min", sub: "pour trouver ta pépite", color: "174 72% 56%" },
             ].map((s, i) => (
               <motion.div
                 key={i}
