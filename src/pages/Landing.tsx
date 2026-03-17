@@ -230,16 +230,9 @@ const Landing = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 1 }}
-            className="flex flex-col items-center gap-6"
+            className="flex flex-col items-center gap-6 w-full"
           >
-            <Link to="/" className="group inline-flex items-center gap-2.5 px-10 py-4 rounded-lg text-sm font-bold tracking-wide transition-all duration-300 hover:brightness-110" style={{
-              background: 'hsl(174 72% 46%)',
-              color: 'hsl(230 50% 3%)',
-              boxShadow: '0 0 40px -8px hsl(174 72% 46% / 0.4)',
-            }}>
-              Rejoindre Krakken
-              <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            </Link>
+            <WaitlistForm variant="large" />
             <div className="flex items-center gap-3">
               <div className="w-1.5 h-1.5 rounded-full bg-kraken-emerald animate-pulse-glow" />
               <span className="text-[11px] text-foreground/50 tracking-wide">9,90€/mois · Exclusif membres de la formation</span>
