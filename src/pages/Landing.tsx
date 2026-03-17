@@ -57,6 +57,83 @@ const GlowIcon = ({ icon: Icon, color, size = 20 }: { icon: React.ElementType; c
   </motion.div>
 );
 
+// Waitlist email form component
+const WaitlistForm = ({ variant = "default" }: { variant?: "default" | "compact" | "large" }) => {
+  const [email, setEmail] = useState("");
+  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [errorMsg, setErrorMsg] = useState("");
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const trimmed = email.trim();
+    if (!trimmed || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
+      setErrorMsg("Entre une adresse email valide");
+      setStatus("error");
+      return;
+    }
+    setStatus("loading");
+    const { error } = await supabase.from("waitlist").insert({ email: trimmed });
+    if (error) {
+      if (error.code === "23505") {
+        setStatus("success"); // already registered, show success anyway
+      } else {
+        setErrorMsg("Une erreur est survenue, réessaie.");
+        setStatus("error");
+      }
+    } else {
+      setStatus("success");
+    }
+  };
+
+  if (status === "success") {
+    return (
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="flex items-center gap-2.5 justify-center"
+      >
+        <CheckCircle2 className="w-5 h-5 text-primary" style={{ filter: 'drop-shadow(0 0 8px hsl(174 72% 46% / 0.5))' }} />
+        <span className="text-sm font-semibold text-primary">Tu es sur la liste ! 🎉</span>
+      </motion.div>
+    );
+  }
+
+  const isLarge = variant === "large";
+
+  return (
+    <form onSubmit={handleSubmit} className={`flex ${isLarge ? "flex-col sm:flex-row" : ""} items-center gap-3 w-full max-w-md mx-auto`}>
+      <input
+        type="email"
+        value={email}
+        onChange={(e) => { setEmail(e.target.value); setStatus("idle"); }}
+        placeholder="ton@email.com"
+        className={`flex-1 w-full px-5 ${isLarge ? "py-4" : "py-3"} rounded-xl text-sm font-medium text-foreground placeholder:text-foreground/30 outline-none transition-all duration-300 focus:ring-2 focus:ring-primary/30`}
+        style={{
+          background: 'hsl(225 30% 6%)',
+          border: '1px solid hsl(225 20% 10%)',
+        }}
+      />
+      <button
+        type="submit"
+        disabled={status === "loading"}
+        className={`${isLarge ? "w-full sm:w-auto" : ""} px-7 ${isLarge ? "py-4" : "py-3"} rounded-xl text-sm font-bold tracking-wide transition-all duration-300 hover:brightness-110 hover:scale-[1.02] disabled:opacity-60 flex items-center justify-center gap-2 whitespace-nowrap`}
+        style={{
+          background: 'linear-gradient(135deg, hsl(174 72% 46%), hsl(188 78% 48%))',
+          color: 'hsl(230 50% 3%)',
+          boxShadow: '0 0 30px -6px hsl(174 72% 46% / 0.4)',
+        }}
+      >
+        {status === "loading" ? <Loader2 className="w-4 h-4 animate-spin" /> : "Rejoindre la liste"}
+      </button>
+      {status === "error" && (
+        <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-xs text-destructive absolute -bottom-6 left-0">
+          {errorMsg}
+        </motion.p>
+      )}
+    </form>
+  );
+};
+
 const Landing = () => {
   const heroRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
