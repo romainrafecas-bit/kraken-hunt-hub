@@ -90,7 +90,7 @@ const Landing = () => {
               color: 'hsl(230 50% 3%)',
               boxShadow: '0 0 30px -6px hsl(174 72% 46% / 0.5)',
             }}>
-              Commencer
+              Rejoindre Krakken
             </Link>
           </div>
         </div>
@@ -186,7 +186,7 @@ const Landing = () => {
       <Tentacle side="left" top="480vh" color="188 78% 52%" delay={0.8} size={200} />
 
       {/* ═══ STAT STRIP — Animated counters ═══ */}
-      <section className="py-24 px-6 md:px-8 relative overflow-hidden">
+      <section className="py-12 md:py-16 px-6 md:px-8 relative overflow-hidden">
         <div className="absolute inset-0 pointer-events-none" style={{
           background: 'radial-gradient(ellipse at 50% 50%, hsl(174 72% 46% / 0.02) 0%, transparent 60%)',
         }} />
@@ -231,7 +231,7 @@ const Landing = () => {
       </section>
 
       {/* ═══ PAIN ═══ */}
-      <section className="py-32 md:py-40 px-6 md:px-8 relative overflow-hidden">
+      <section className="py-16 md:py-24 px-6 md:px-8 relative overflow-hidden">
         <div className="absolute inset-0 pointer-events-none" style={{
           background: 'radial-gradient(ellipse at 25% 40%, hsl(348 72% 56% / 0.03) 0%, transparent 50%)',
         }} />
@@ -303,7 +303,7 @@ const Landing = () => {
       </section>
 
       {/* ═══ SOLUTION — Dramatic 3-phase ═══ */}
-      <section className="py-32 md:py-44 px-6 md:px-8 relative overflow-hidden">
+      <section className="py-16 md:py-24 px-6 md:px-8 relative overflow-hidden">
         <InkClouds />
 
         <div className="max-w-5xl mx-auto relative z-10">
@@ -312,7 +312,7 @@ const Landing = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
-            className="text-center mb-28"
+            className="text-center mb-16"
           >
             <h2 className="font-display font-black text-4xl md:text-6xl text-foreground leading-tight">
               <motion.span
@@ -340,7 +340,7 @@ const Landing = () => {
               background: 'linear-gradient(180deg, transparent 0%, hsl(174 72% 46% / 0.08) 20%, hsl(262 52% 58% / 0.06) 50%, hsl(38 92% 56% / 0.08) 80%, transparent 100%)',
             }} />
 
-            <div className="space-y-28 md:space-y-40">
+            <div className="space-y-16 md:space-y-24">
               {[
                 {
                   num: "I",
@@ -440,7 +440,7 @@ const Landing = () => {
       </section>
 
       {/* ═══ DASHBOARD PREVIEW ═══ */}
-      <section className="py-32 md:py-40 px-6 md:px-8 relative overflow-hidden">
+      <section className="py-16 md:py-24 px-6 md:px-8 relative overflow-hidden">
         <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
@@ -570,14 +570,14 @@ const Landing = () => {
       </section>
 
       {/* ═══ FEATURES — Asymmetric premium grid ═══ */}
-      <section id="features" className="py-32 md:py-40 px-6 md:px-8 relative overflow-hidden">
+      <section id="features" className="py-16 md:py-24 px-6 md:px-8 relative overflow-hidden">
         <div className="max-w-6xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
-            className="mb-24"
+            className="mb-14"
           >
             <h2 className="font-display font-black text-4xl md:text-6xl text-foreground max-w-2xl leading-tight">
               Chaque fonctionnalité
@@ -674,7 +674,7 @@ const Landing = () => {
       </section>
 
       {/* ═══ PRICING ═══ */}
-      <section id="pricing" className="py-32 md:py-40 px-6 md:px-8 relative overflow-hidden">
+      <section id="pricing" className="py-16 md:py-24 px-6 md:px-8 relative overflow-hidden">
         <div className="absolute inset-0 pointer-events-none" style={{
           background: 'radial-gradient(ellipse at 50% 50%, hsl(174 72% 46% / 0.03) 0%, transparent 45%)',
         }} />
@@ -780,7 +780,7 @@ const Landing = () => {
       </section>
 
       {/* ═══ FAQ ═══ */}
-      <section id="faq" className="py-32 md:py-40 px-6 md:px-8 relative overflow-hidden">
+      <section id="faq" className="py-16 md:py-24 px-6 md:px-8 relative overflow-hidden">
         <div className="max-w-2xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -835,7 +835,7 @@ const Landing = () => {
       </section>
 
       {/* ═══ FINAL CTA ═══ */}
-      <section className="py-40 md:py-52 px-6 md:px-8 relative text-center overflow-hidden">
+      <section className="py-20 md:py-28 px-6 md:px-8 relative text-center overflow-hidden">
         <InkClouds />
         <div className="absolute inset-0 pointer-events-none" style={{
           background: `
