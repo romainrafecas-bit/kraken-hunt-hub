@@ -878,7 +878,7 @@ const Landing = () => {
             color: 'hsl(230 50% 3%)',
             boxShadow: '0 0 100px -20px hsl(174 72% 46% / 0.4), inset 0 1px 0 hsl(180 80% 70% / 0.2)',
           }}>
-            Accéder à la base
+            Rejoindre Krakken
             <ChevronRight className="w-4 h-4 group-hover:translate-x-2 transition-transform duration-300" />
           </Link>
         </motion.div>
