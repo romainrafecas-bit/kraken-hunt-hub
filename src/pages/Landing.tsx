@@ -148,7 +148,7 @@ const Landing = () => {
         <div className="max-w-5xl mx-auto">
           <div className="flex flex-col md:flex-row items-center justify-between gap-16 md:gap-0">
             {[
-              { val: "+100K", sub: "produits analysés" },
+              { val: "+100 000", sub: "produits analysés" },
               { val: "21", sub: "catégories scrutées" },
               { val: "5 min", sub: "pour trouver ta pépite" },
             ].map((s, i) => (
