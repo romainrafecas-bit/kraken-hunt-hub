@@ -119,7 +119,7 @@ const Landing = () => {
             </Link>
             <div className="flex items-center gap-3">
               <div className="w-1.5 h-1.5 rounded-full bg-kraken-emerald animate-pulse-glow" />
-              <span className="text-[11px] text-foreground/50 tracking-wide">Premier mois offert · Puis 29,90€/mois</span>
+              <span className="text-[11px] text-foreground/50 tracking-wide">9,90€/mois · Exclusif membres de la formation</span>
             </div>
           </motion.div>
         </motion.div>
