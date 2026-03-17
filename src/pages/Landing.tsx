@@ -199,14 +199,14 @@ const Landing = () => {
             {[
               {
                 icon: Crosshair,
-                title: "Des heures perdues",
-                desc: "À scroller des marketplaces sans savoir si ça se vend. À tester au pif. À espérer.",
+                title: "Des heures de recherche",
+                desc: "À taper des Google Dorks pour trouver des avis Cdiscount qui remontent sur Google. À croiser les données à la main.",
                 color: "348 72% 56%",
               },
               {
                 icon: TrendingDown,
-                title: "Aucune data fiable",
-                desc: "Pas d'outil sérieux pour le marché français. Que du réchauffé US et des \"tendances\" bidon.",
+                title: "Des résultats peu fiables",
+                desc: "Pas d'outil dédié au marché français. Tu perds du temps à chercher sans jamais être sûr que le produit se vend vraiment.",
                 color: "38 92% 56%",
               },
               {
