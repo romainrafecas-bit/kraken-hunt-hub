@@ -466,13 +466,9 @@ const Landing = () => {
                           border: `1px solid hsl(${step.color} / 0.12)`,
                         }}
                         whileInView={{
-                          boxShadow: [
-                            `0 0 30px -12px hsl(${step.color} / 0.15)`,
-                            `0 0 60px -12px hsl(${step.color} / 0.3)`,
-                            `0 0 30px -12px hsl(${step.color} / 0.15)`,
-                          ],
+                          boxShadow: `0 0 60px -12px hsl(${step.color} / 0.3)`,
                         }}
-                        transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                        transition={{ duration: 1, ease: "easeOut" }}
                       >
                         <GlowIcon icon={step.icon} color={step.color} size={28} />
                       </motion.div>
