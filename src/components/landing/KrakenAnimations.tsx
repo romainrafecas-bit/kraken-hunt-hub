@@ -191,12 +191,12 @@ const DeepKraken = () => {
 
 // Floating particles
 const Particles = () => {
-  const particles = Array.from({ length: 25 }, (_, i) => ({
+  const particles = Array.from({ length: 12 }, (_, i) => ({
     id: i,
     x: Math.random() * 100,
     y: Math.random() * 100,
     size: 1 + Math.random() * 3,
-    duration: 3 + Math.random() * 7,
+    duration: 5 + Math.random() * 7,
     delay: Math.random() * 5,
     color: i % 4 === 0 ? "174 72% 46%" : i % 4 === 1 ? "262 52% 58%" : i % 4 === 2 ? "188 78% 52%" : "174 72% 60%",
   }));
@@ -214,6 +214,7 @@ const Particles = () => {
             height: p.size,
             backgroundColor: `hsl(${p.color} / 0.5)`,
             boxShadow: `0 0 ${p.size * 4}px hsl(${p.color} / 0.35)`,
+            willChange: 'transform, opacity',
           }}
           animate={{
             y: [-30, 30, -30],
