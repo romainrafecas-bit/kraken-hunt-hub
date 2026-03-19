@@ -236,12 +236,14 @@ const Particles = () => {
 
 // Ink cloud effect
 const InkClouds = () => {
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref as React.RefObject<Element>, { once: false, margin: "200px" });
+
   return (
-    <div className="absolute inset-0 pointer-events-none overflow-hidden">
-      {[
+    <div ref={ref} className="absolute inset-0 pointer-events-none overflow-hidden">
+      {inView && [
         { x: '15%', y: '30%', size: 500, color: '174 72% 46%', delay: 0 },
         { x: '75%', y: '60%', size: 400, color: '262 52% 58%', delay: 3 },
-        { x: '50%', y: '80%', size: 600, color: '188 78% 52%', delay: 6 },
       ].map((cloud, i) => (
         <motion.div
           key={i}
@@ -252,12 +254,11 @@ const InkClouds = () => {
             transform: 'translate(-50%, -50%)',
             background: `radial-gradient(circle, hsl(${cloud.color} / 0.04) 0%, transparent 60%)`,
             filter: 'blur(40px)',
+            willChange: 'transform, opacity',
           }}
           animate={{
             scale: [1, 1.4, 1],
             opacity: [0.3, 0.7, 0.3],
-            x: [-30, 30, -30],
-            y: [-20, 20, -20],
           }}
           transition={{
             duration: 15 + i * 3,
