@@ -455,13 +455,9 @@ const Landing = () => {
                           lineHeight: 1,
                         }}
                         whileInView={{
-                          textShadow: [
-                            `0 0 40px hsl(${step.color} / 0.04)`,
-                            `0 0 80px hsl(${step.color} / 0.1)`,
-                            `0 0 40px hsl(${step.color} / 0.04)`,
-                          ],
+                          textShadow: `0 0 80px hsl(${step.color} / 0.1)`,
                         }}
-                        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                        transition={{ duration: 1, ease: "easeOut" }}
                       >{step.num}</motion.span>
                       <motion.div 
                         className="w-16 h-16 rounded-2xl flex items-center justify-center"
