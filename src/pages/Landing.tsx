@@ -284,13 +284,9 @@ const Landing = () => {
                     lineHeight: 1,
                   }}
                   whileInView={{
-                    textShadow: [
-                      `0 0 60px hsl(${s.color} / 0.3), 0 0 120px hsl(${s.color} / 0.1)`,
-                      `0 0 80px hsl(${s.color} / 0.5), 0 0 140px hsl(${s.color} / 0.2)`,
-                      `0 0 60px hsl(${s.color} / 0.3), 0 0 120px hsl(${s.color} / 0.1)`,
-                    ],
+                    textShadow: `0 0 80px hsl(${s.color} / 0.5), 0 0 140px hsl(${s.color} / 0.2)`,
                   }}
-                  transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                  transition={{ duration: 1, ease: "easeOut" }}
                 >{s.val}</motion.span>
                 <span className="text-xs text-foreground/50 tracking-widest uppercase">{s.sub}</span>
               </motion.div>
