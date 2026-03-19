@@ -284,13 +284,9 @@ const Landing = () => {
                     lineHeight: 1,
                   }}
                   whileInView={{
-                    textShadow: [
-                      `0 0 60px hsl(${s.color} / 0.3), 0 0 120px hsl(${s.color} / 0.1)`,
-                      `0 0 80px hsl(${s.color} / 0.5), 0 0 140px hsl(${s.color} / 0.2)`,
-                      `0 0 60px hsl(${s.color} / 0.3), 0 0 120px hsl(${s.color} / 0.1)`,
-                    ],
+                    textShadow: `0 0 80px hsl(${s.color} / 0.5), 0 0 140px hsl(${s.color} / 0.2)`,
                   }}
-                  transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                  transition={{ duration: 1, ease: "easeOut" }}
                 >{s.val}</motion.span>
                 <span className="text-xs text-foreground/50 tracking-widest uppercase">{s.sub}</span>
               </motion.div>
@@ -459,13 +455,9 @@ const Landing = () => {
                           lineHeight: 1,
                         }}
                         whileInView={{
-                          textShadow: [
-                            `0 0 40px hsl(${step.color} / 0.04)`,
-                            `0 0 80px hsl(${step.color} / 0.1)`,
-                            `0 0 40px hsl(${step.color} / 0.04)`,
-                          ],
+                          textShadow: `0 0 80px hsl(${step.color} / 0.1)`,
                         }}
-                        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                        transition={{ duration: 1, ease: "easeOut" }}
                       >{step.num}</motion.span>
                       <motion.div 
                         className="w-16 h-16 rounded-2xl flex items-center justify-center"
@@ -474,13 +466,9 @@ const Landing = () => {
                           border: `1px solid hsl(${step.color} / 0.12)`,
                         }}
                         whileInView={{
-                          boxShadow: [
-                            `0 0 30px -12px hsl(${step.color} / 0.15)`,
-                            `0 0 60px -12px hsl(${step.color} / 0.3)`,
-                            `0 0 30px -12px hsl(${step.color} / 0.15)`,
-                          ],
+                          boxShadow: `0 0 60px -12px hsl(${step.color} / 0.3)`,
                         }}
-                        transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                        transition={{ duration: 1, ease: "easeOut" }}
                       >
                         <GlowIcon icon={step.icon} color={step.color} size={28} />
                       </motion.div>
