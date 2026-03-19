@@ -19,12 +19,11 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Landing />} />
-          <Route path="/dashboard" element={<Navigate to="/" replace />} />
-          <Route path="/landing" element={<Navigate to="/" replace />} />
-          <Route path="/produits" element={<Navigate to="/" replace />} />
-          <Route path="/analytics" element={<Navigate to="/" replace />} />
-          <Route path="/profil" element={<Navigate to="/" replace />} />
-          <Route path="/favoris" element={<Navigate to="/" replace />} />
+          <Route path="/dashboard" element={<Index />} />
+          <Route path="/produits" element={<Produits />} />
+          <Route path="/analytics" element={<Analytics />} />
+          <Route path="/profil" element={<Profil />} />
+          <Route path="/favoris" element={<Favoris />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>
