@@ -178,6 +178,9 @@ const Abonnement = () => {
               >
                 {plan.cta}
               </button>
+              {plan.subtitle && (
+                <p className="text-[11px] text-muted-foreground text-center mt-2">{plan.subtitle}</p>
+              )}
             </motion.div>
           ))}
         </div>
