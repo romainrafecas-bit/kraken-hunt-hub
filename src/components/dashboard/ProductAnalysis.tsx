@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
-import { ArrowUpDown, ArrowUp, ArrowDown, ChevronLeft, ChevronRight, Search, Users, CalendarDays, Crosshair, Clock, MoreHorizontal } from "lucide-react";
+import { ArrowUpDown, ArrowUp, ArrowDown, ChevronLeft, ChevronRight, Search, Users, CalendarDays, Crosshair, Clock, MoreHorizontal, Heart } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Product, products as allProducts, categories, brands } from "@/data/products";
 
@@ -22,6 +22,16 @@ const ProductAnalysis = () => {
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [page, setPage] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
+  const [favorites, setFavorites] = useState<Set<number>>(new Set());
+
+  const toggleFavorite = (id: number) => {
+    setFavorites(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
 
   const filtered = useMemo(() => {
     let data = [...allProducts];
@@ -190,6 +200,7 @@ const ProductAnalysis = () => {
               <SortHeader label="Note" sortKeyName="rating" />
               <SortHeader label="Vendeurs" sortKeyName="sellers" />
               <SortHeader label="Score" sortKeyName="score" />
+              <th className="text-left px-4 py-3"><span className="soft-label"></span></th>
             </tr>
           </thead>
           <tbody>
@@ -300,6 +311,20 @@ const ProductAnalysis = () => {
                         textShadow: `0 0 8px ${scoreStyle.shadow}`,
                       }}>{product.score}</span>
                     </div>
+                  </td>
+                  <td className="px-4 py-3">
+                    <button
+                      onClick={(e) => { e.stopPropagation(); toggleFavorite(product.id); }}
+                      className="p-1.5 rounded-lg hover:bg-secondary/50 transition-all"
+                    >
+                      <Heart
+                        className={cn("w-4 h-4 transition-all", favorites.has(product.id) ? "fill-current" : "")}
+                        style={{
+                          color: favorites.has(product.id) ? 'hsl(340 75% 55%)' : 'hsl(210 10% 30%)',
+                          filter: favorites.has(product.id) ? 'drop-shadow(0 0 6px hsl(340 75% 55% / 0.4))' : undefined,
+                        }}
+                      />
+                    </button>
                   </td>
                 </motion.tr>
               );
