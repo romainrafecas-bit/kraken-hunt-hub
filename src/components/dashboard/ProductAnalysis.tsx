@@ -200,6 +200,7 @@ const ProductAnalysis = () => {
               <SortHeader label="Note" sortKeyName="rating" />
               <SortHeader label="Vendeurs" sortKeyName="sellers" />
               <SortHeader label="Score" sortKeyName="score" />
+              <th className="text-left px-4 py-3"><span className="soft-label"></span></th>
             </tr>
           </thead>
           <tbody>
