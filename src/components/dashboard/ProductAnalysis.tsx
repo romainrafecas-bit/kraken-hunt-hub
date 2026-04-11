@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
-import { ArrowUpDown, ArrowUp, ArrowDown, ChevronLeft, ChevronRight, Search, Users, CalendarDays, Crosshair, Clock, MoreHorizontal } from "lucide-react";
+import { ArrowUpDown, ArrowUp, ArrowDown, ChevronLeft, ChevronRight, Search, Users, CalendarDays, Crosshair, Clock, MoreHorizontal, Heart } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Product, products as allProducts, categories, brands } from "@/data/products";
 
@@ -22,6 +22,16 @@ const ProductAnalysis = () => {
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [page, setPage] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
+  const [favorites, setFavorites] = useState<Set<number>>(new Set());
+
+  const toggleFavorite = (id: number) => {
+    setFavorites(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
 
   const filtered = useMemo(() => {
     let data = [...allProducts];
