@@ -312,6 +312,20 @@ const ProductAnalysis = () => {
                       }}>{product.score}</span>
                     </div>
                   </td>
+                  <td className="px-4 py-3">
+                    <button
+                      onClick={(e) => { e.stopPropagation(); toggleFavorite(product.id); }}
+                      className="p-1.5 rounded-lg hover:bg-secondary/50 transition-all"
+                    >
+                      <Heart
+                        className={cn("w-4 h-4 transition-all", favorites.has(product.id) ? "fill-current" : "")}
+                        style={{
+                          color: favorites.has(product.id) ? 'hsl(340 75% 55%)' : 'hsl(210 10% 30%)',
+                          filter: favorites.has(product.id) ? 'drop-shadow(0 0 6px hsl(340 75% 55% / 0.4))' : undefined,
+                        }}
+                      />
+                    </button>
+                  </td>
                 </motion.tr>
               );
             })}
