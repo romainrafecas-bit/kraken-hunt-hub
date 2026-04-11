@@ -1,10 +1,10 @@
 import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
-import { ArrowUpDown, ArrowUp, ArrowDown, ChevronLeft, ChevronRight, Search, Users, CalendarDays, Crosshair } from "lucide-react";
+import { ArrowUpDown, ArrowUp, ArrowDown, ChevronLeft, ChevronRight, Search, Users, CalendarDays, Crosshair, Clock, MoreHorizontal } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Product, products as allProducts, categories, brands } from "@/data/products";
 
-type SortKey = "score" | "price" | "recurrences" | "rating" | "name" | "brand" | "sellers";
+type SortKey = "score" | "price" | "recurrences" | "rating" | "name" | "brand" | "sellers" | "lastSeen";
 type SortDir = "asc" | "desc";
 
 const ITEMS_PER_PAGE = 12;
@@ -186,7 +186,7 @@ const ProductAnalysis = () => {
               <SortHeader label="Marque" sortKeyName="brand" />
               <th className="text-left px-4 py-3"><span className="soft-label">Catégorie</span></th>
               <SortHeader label="Prix" sortKeyName="price" />
-              <SortHeader label="Récurrences" sortKeyName="recurrences" />
+              <SortHeader label="Dernier vu" sortKeyName="lastSeen" />
               <SortHeader label="Note" sortKeyName="rating" />
               <SortHeader label="Vendeurs" sortKeyName="sellers" />
               <SortHeader label="Score" sortKeyName="score" />
@@ -240,18 +240,18 @@ const ProductAnalysis = () => {
                     </div>
                   </td>
                   <td className="px-4 py-3">
-                    <span className="text-sm font-mono font-bold" style={{
-                      color: product.recurrences >= 8000
-                        ? 'hsl(162 72% 52%)'
-                        : product.recurrences >= 4000
-                        ? 'hsl(174 72% 56%)'
-                        : 'hsl(185 20% 60%)',
-                      textShadow: product.recurrences >= 8000
-                        ? '0 0 8px hsl(162 68% 44% / 0.3)'
-                        : undefined,
-                    }}>
-                      {product.recurrences.toLocaleString()}
-                    </span>
+                    <div className="flex items-center gap-1.5">
+                      <Clock className="w-3 h-3" style={{ color: 'hsl(174 72% 56%)', opacity: 0.6 }} />
+                      <span className="text-sm font-medium" style={{
+                        color: product.lastSeen.includes('min') || product.lastSeen.includes('1h') || product.lastSeen.includes('2h')
+                          ? 'hsl(162 72% 52%)'
+                          : product.lastSeen.includes('j')
+                          ? 'hsl(210 10% 50%)'
+                          : 'hsl(174 72% 56%)',
+                      }}>
+                        {product.lastSeen}
+                      </span>
+                    </div>
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-1.5">
@@ -323,18 +323,36 @@ const ProductAnalysis = () => {
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
-            {Array.from({ length: totalPages }, (_, i) => (
-              <button
-                key={i}
-                onClick={() => setPage(i)}
-                className={cn(
-                  "w-8 h-8 rounded-lg text-xs font-bold transition-all",
-                  i === page ? "bio-teal" : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
-                )}
-              >
-                {i + 1}
-              </button>
-            ))}
+            {(() => {
+              const pages: (number | 'ellipsis')[] = [];
+              if (totalPages <= 5) {
+                for (let i = 0; i < totalPages; i++) pages.push(i);
+              } else {
+                pages.push(0);
+                if (page > 2) pages.push('ellipsis');
+                for (let i = Math.max(1, page - 1); i <= Math.min(totalPages - 2, page + 1); i++) pages.push(i);
+                if (page < totalPages - 3) pages.push('ellipsis');
+                pages.push(totalPages - 1);
+              }
+              return pages.map((p, idx) =>
+                p === 'ellipsis' ? (
+                  <span key={`e-${idx}`} className="w-8 h-8 flex items-center justify-center text-muted-foreground/40">
+                    <MoreHorizontal className="w-4 h-4" />
+                  </span>
+                ) : (
+                  <button
+                    key={p}
+                    onClick={() => setPage(p)}
+                    className={cn(
+                      "w-8 h-8 rounded-lg text-xs font-bold transition-all",
+                      p === page ? "bio-teal" : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
+                    )}
+                  >
+                    {p + 1}
+                  </button>
+                )
+              );
+            })()}
             <button
               onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))}
               disabled={page === totalPages - 1}
