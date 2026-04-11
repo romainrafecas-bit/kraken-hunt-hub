@@ -11,6 +11,7 @@ const Produits = lazy(() => import("./pages/Produits"));
 const Analytics = lazy(() => import("./pages/Analytics"));
 const Profil = lazy(() => import("./pages/Profil"));
 const Favoris = lazy(() => import("./pages/Favoris"));
+const Abonnement = lazy(() => import("./pages/Abonnement"));
 
 const queryClient = new QueryClient();
 
@@ -34,6 +35,7 @@ const App = () => (
             <Route path="/analytics" element={<Analytics />} />
             <Route path="/profil" element={<Profil />} />
             <Route path="/favoris" element={<Favoris />} />
+            <Route path="/abonnement" element={<Abonnement />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Suspense>

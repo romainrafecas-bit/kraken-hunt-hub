@@ -4,6 +4,7 @@ import { User, Mail, Calendar, Eye, Heart, Package, Tag, ChevronDown } from "luc
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { products, categories } from "@/data/products";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const stats = [
   { label: "Produits consultés", value: "128", icon: Eye },
@@ -15,6 +16,7 @@ const allCategories = categories.filter(c => c !== "Tous");
 const priceRanges = ["0 – 100€", "100 – 300€", "300 – 500€", "500 – 1 000€", "1 000€+"];
 
 const Profil = () => {
+  const navigate = useNavigate();
   const [selectedCategories, setSelectedCategories] = useState<string[]>(["Smartphones", "Gaming"]);
   const [priceRange, setPriceRange] = useState("100 – 300€");
   const [catOpen, setCatOpen] = useState(false);
@@ -66,7 +68,10 @@ const Profil = () => {
               </div>
             </div>
 
-            <button className="glass-panel px-4 py-2.5 rounded-xl text-sm font-semibold text-foreground hover:border-primary/30 transition-all whitespace-nowrap">
+            <button
+              onClick={() => navigate("/abonnement")}
+              className="glass-panel px-4 py-2.5 rounded-xl text-sm font-semibold text-foreground hover:border-primary/30 transition-all whitespace-nowrap"
+            >
               Gérer mon abonnement
             </button>
           </div>
