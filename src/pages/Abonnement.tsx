@@ -5,17 +5,18 @@ import { useNavigate } from "react-router-dom";
 
 const plans = [
   {
-    name: "Gratuit",
+    name: "Essai gratuit",
     price: "0€",
-    period: "/mois",
+    period: "pendant 14 jours",
     badge: "bio-violet" as const,
     features: [
-      "5 produits suivis",
-      "Alertes prix basiques",
-      "1 collection",
-      "Données sur 7 jours",
+      "Accès complet pendant 14 jours",
+      "Produits illimités",
+      "Toutes les fonctionnalités Pro",
+      "Sans engagement",
     ],
-    cta: "Plan actuel",
+    cta: "Période d'essai en cours",
+    subtitle: "Votre essai expire dans 11 jours",
     disabled: true,
     highlighted: false,
   },
@@ -35,7 +36,8 @@ const plans = [
       "Score de récurrence avancé",
       "Support prioritaire",
     ],
-    cta: "Passer au Pro",
+    cta: "S'abonner au Pro",
+    subtitle: "Obligatoire après la période d'essai",
     disabled: false,
     highlighted: true,
   },
@@ -176,6 +178,9 @@ const Abonnement = () => {
               >
                 {plan.cta}
               </button>
+              {plan.subtitle && (
+                <p className="text-[11px] text-muted-foreground text-center mt-2">{plan.subtitle}</p>
+              )}
             </motion.div>
           ))}
         </div>
