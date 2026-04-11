@@ -6,6 +6,7 @@ export interface Product {
   price: number;
   originalPrice: number;
   recurrences: number;
+  lastSeen: string;
   rating: number;
   score: number;
   sellers: number;
