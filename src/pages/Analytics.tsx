@@ -1,58 +1,20 @@
 import KrakkenSidebar from "@/components/dashboard/KrakkenSidebar";
 import { motion } from "framer-motion";
 import { BarChart3, TrendingUp, ShoppingCart, Star } from "lucide-react";
-import { products, categories } from "@/data/products";
+import { useProducts } from "@/hooks/useProducts";
+import { Skeleton } from "@/components/ui/skeleton";
+import EmptyState from "@/components/dashboard/EmptyState";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, AreaChart, Area } from "recharts";
 
-const categoryData = categories.filter(c => c !== "Tous").map(cat => {
-  const catProducts = products.filter(p => p.category === cat);
-  return {
-    name: cat.length > 10 ? cat.slice(0, 10) + "…" : cat,
-    fullName: cat,
-    ventes: catProducts.reduce((s, p) => s + p.recurrences, 0),
-    produits: catProducts.length,
-    avgScore: catProducts.length ? Math.round(catProducts.reduce((s, p) => s + p.score, 0) / catProducts.length) : 0,
-  };
-}).sort((a, b) => b.ventes - a.ventes);
-
-const priceRanges = [
-  { range: "0-100€", count: products.filter(p => p.price <= 100).length },
-  { range: "100-300€", count: products.filter(p => p.price > 100 && p.price <= 300).length },
-  { range: "300-500€", count: products.filter(p => p.price > 300 && p.price <= 500).length },
-  { range: "500-1000€", count: products.filter(p => p.price > 500 && p.price <= 1000).length },
-  { range: "1000€+", count: products.filter(p => p.price > 1000).length },
+const COLORS = [
+  "hsl(176, 88%, 55%)", "hsl(190, 82%, 63%)", "hsl(188, 78%, 52%)", "hsl(194, 88%, 67%)",
+  "hsl(168, 70%, 50%)", "hsl(204, 64%, 60%)", "hsl(262, 48%, 62%)", "hsl(186, 55%, 46%)",
 ];
 
 const trendData = [
-  { jour: "Lun", ventes: 8200 },
-  { jour: "Mar", ventes: 9100 },
-  { jour: "Mer", ventes: 7800 },
-  { jour: "Jeu", ventes: 10500 },
-  { jour: "Ven", ventes: 12300 },
-  { jour: "Sam", ventes: 15800 },
-  { jour: "Dim", ventes: 11200 },
+  { jour: "Lun", ventes: 8200 }, { jour: "Mar", ventes: 9100 }, { jour: "Mer", ventes: 7800 },
+  { jour: "Jeu", ventes: 10500 }, { jour: "Ven", ventes: 12300 }, { jour: "Sam", ventes: 15800 }, { jour: "Dim", ventes: 11200 },
 ];
-
-const radarData = categoryData.slice(0, 6).map(c => ({
-  category: c.name,
-  score: c.avgScore,
-  volume: Math.min(100, Math.round(c.ventes / 200)),
-}));
-
-const COLORS = [
-  "hsl(176, 88%, 55%)",
-  "hsl(190, 82%, 63%)",
-  "hsl(188, 78%, 52%)",
-  "hsl(194, 88%, 67%)",
-  "hsl(168, 70%, 50%)",
-  "hsl(204, 64%, 60%)",
-  "hsl(262, 48%, 62%)",
-  "hsl(186, 55%, 46%)",
-];
-
-const topProducts = [...products].sort((a, b) => b.score - a.score).slice(0, 5);
-const avgSellers = Math.round(products.reduce((s, p) => s + p.sellers, 0) / products.length);
-const avgDiscount = Math.round(products.reduce((s, p) => s + (1 - p.price / p.originalPrice) * 100, 0) / products.length);
 
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (!active || !payload) return null;
@@ -60,26 +22,71 @@ const CustomTooltip = ({ active, payload, label }: any) => {
     <div className="bg-card/95 backdrop-blur-xl border border-border/50 rounded-xl px-3 py-2 shadow-xl">
       <p className="text-xs font-semibold text-foreground mb-1">{label}</p>
       {payload.map((p: any, i: number) => (
-        <p key={i} className="text-xs text-muted-foreground">
-          {p.name}: <span className="text-primary font-mono font-semibold">{p.value?.toLocaleString()}</span>
-        </p>
+        <p key={i} className="text-xs text-muted-foreground">{p.name}: <span className="text-primary font-mono font-semibold">{p.value?.toLocaleString()}</span></p>
       ))}
     </div>
   );
 };
 
 const Analytics = () => {
+  const { products, loading } = useProducts();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen abyss-gradient">
+        <KrakkenSidebar />
+        <main className="pl-16 xl:pl-56 p-4 lg:p-6 space-y-5">
+          <Skeleton className="h-20 w-full rounded-2xl" />
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+            {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-64 rounded-2xl" />)}
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  if (products.length === 0) {
+    return (
+      <div className="min-h-screen abyss-gradient">
+        <KrakkenSidebar />
+        <main className="pl-16 xl:pl-56 p-4 lg:p-6"><EmptyState /></main>
+      </div>
+    );
+  }
+
+  const categories = [...new Set(products.map(p => p.category))];
+  const categoryData = categories.map(cat => {
+    const catProducts = products.filter(p => p.category === cat);
+    return {
+      name: cat.length > 10 ? cat.slice(0, 10) + "…" : cat,
+      fullName: cat,
+      ventes: catProducts.reduce((s, p) => s + p.recurrences, 0),
+      produits: catProducts.length,
+      avgScore: catProducts.length ? Math.round(catProducts.reduce((s, p) => s + p.score, 0) / catProducts.length) : 0,
+    };
+  }).sort((a, b) => b.ventes - a.ventes);
+
+  const priceRanges = [
+    { range: "0-100€", count: products.filter(p => p.price <= 100).length },
+    { range: "100-300€", count: products.filter(p => p.price > 100 && p.price <= 300).length },
+    { range: "300-500€", count: products.filter(p => p.price > 300 && p.price <= 500).length },
+    { range: "500-1000€", count: products.filter(p => p.price > 500 && p.price <= 1000).length },
+    { range: "1000€+", count: products.filter(p => p.price > 1000).length },
+  ];
+
+  const radarData = categoryData.slice(0, 6).map(c => ({
+    category: c.name, score: c.avgScore, volume: Math.min(100, Math.round(c.ventes / 200)),
+  }));
+
+  const topProducts = [...products].sort((a, b) => b.score - a.score).slice(0, 5);
+  const avgSellers = products.length ? Math.round(products.reduce((s, p) => s + p.sellers, 0) / products.length) : 0;
+  const avgDiscount = products.length ? Math.round(products.reduce((s, p) => s + (1 - p.price / p.originalPrice) * 100, 0) / products.length) : 0;
+
   return (
     <div className="min-h-screen abyss-gradient">
       <KrakkenSidebar />
       <main className="pl-16 xl:pl-56 p-4 lg:p-6 space-y-5">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5 }}
-          className="glass-panel-glow p-5"
-        >
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }} className="glass-panel-glow p-5">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-9 h-9 rounded-xl bg-primary/12 flex items-center justify-center">
@@ -107,17 +114,10 @@ const Analytics = () => {
           </div>
         </motion.div>
 
-        {/* Charts grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="glass-panel-glow p-5"
-          >
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="glass-panel-glow p-5">
             <h3 className="font-display text-sm font-bold text-foreground mb-4 flex items-center gap-2">
-              <TrendingUp className="w-4 h-4 text-primary" />
-              Tendance des ventes
+              <TrendingUp className="w-4 h-4 text-primary" /> Tendance des ventes
             </h3>
             <ResponsiveContainer width="100%" height={220}>
               <AreaChart data={trendData}>
@@ -135,15 +135,9 @@ const Analytics = () => {
             </ResponsiveContainer>
           </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.15 }}
-            className="glass-panel-glow p-5"
-          >
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }} className="glass-panel-glow p-5">
             <h3 className="font-display text-sm font-bold text-foreground mb-4 flex items-center gap-2">
-              <ShoppingCart className="w-4 h-4 text-accent" />
-              Ventes par catégorie
+              <ShoppingCart className="w-4 h-4 text-accent" /> Ventes par catégorie
             </h3>
             <ResponsiveContainer width="100%" height={220}>
               <BarChart data={categoryData.slice(0, 8)}>
@@ -151,29 +145,18 @@ const Analytics = () => {
                 <YAxis tick={{ fontSize: 11, fill: "hsl(215, 12%, 50%)" }} axisLine={false} tickLine={false} />
                 <Tooltip content={<CustomTooltip />} />
                 <Bar dataKey="ventes" radius={[6, 6, 0, 0]}>
-                  {categoryData.slice(0, 8).map((_, i) => (
-                    <Cell key={i} fill={COLORS[i % COLORS.length]} fillOpacity={0.75} />
-                  ))}
+                  {categoryData.slice(0, 8).map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} fillOpacity={0.75} />)}
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
           </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="glass-panel-glow p-5"
-          >
-            <h3 className="font-display text-sm font-bold text-foreground mb-4">
-              Distribution des prix
-            </h3>
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="glass-panel-glow p-5">
+            <h3 className="font-display text-sm font-bold text-foreground mb-4">Distribution des prix</h3>
             <ResponsiveContainer width="100%" height={220}>
               <PieChart>
                 <Pie data={priceRanges} dataKey="count" nameKey="range" cx="50%" cy="50%" outerRadius={80} innerRadius={45} strokeWidth={0}>
-                  {priceRanges.map((_, i) => (
-                    <Cell key={i} fill={COLORS[i % COLORS.length]} fillOpacity={0.8} />
-                  ))}
+                  {priceRanges.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} fillOpacity={0.8} />)}
                 </Pie>
                 <Tooltip content={<CustomTooltip />} />
               </PieChart>
@@ -188,15 +171,8 @@ const Analytics = () => {
             </div>
           </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.25 }}
-            className="glass-panel-glow p-5"
-          >
-            <h3 className="font-display text-sm font-bold text-foreground mb-4">
-              Score par catégorie
-            </h3>
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }} className="glass-panel-glow p-5">
+            <h3 className="font-display text-sm font-bold text-foreground mb-4">Score par catégorie</h3>
             <ResponsiveContainer width="100%" height={250}>
               <RadarChart data={radarData}>
                 <PolarGrid stroke="hsl(222, 25%, 14%)" />
@@ -209,16 +185,9 @@ const Analytics = () => {
           </motion.div>
         </div>
 
-        {/* Top 5 */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="glass-panel-glow p-5"
-        >
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="glass-panel-glow p-5">
           <h3 className="font-display text-sm font-bold text-foreground mb-4 flex items-center gap-2">
-            <Star className="w-4 h-4 text-kraken-eye" />
-            Top 5 produits par score
+            <Star className="w-4 h-4 text-kraken-eye" /> Top 5 produits par score
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
             {topProducts.map((p, i) => (
