@@ -36,28 +36,27 @@ function formatLastSeen(lastSeen: string | null): string {
   if (!lastSeen) return "Inconnu";
   const date = parseDate(lastSeen);
   if (!date) return "Inconnu";
-  const diff = Date.now() - date.getTime();
-  const mins = Math.floor(diff / 60000);
-  if (mins < 60) return `Il y a ${mins}min`;
-  const hours = Math.floor(mins / 60);
-  if (hours < 24) return `Il y a ${hours}h`;
-  const days = Math.floor(hours / 24);
-  return `Il y a ${days}j`;
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = date.getFullYear();
+  return `${day}/${month}/${year}`;
 }
 
 export function mapToProduct(p: SupabaseProduct, index: number): Product {
-  // sellers_count: 0 means 1 seller, unless out of stock
   const sellers = (p.sellers_count === 0 || p.sellers_count === null) 
     ? (p.in_stock === false ? 0 : 1) 
     : p.sellers_count;
+
+  const rawPrice = Number(p.price);
+  const isOutOfStock = rawPrice === -1 || p.in_stock === false;
 
   return {
     id: index + 1,
     name: p.title,
     brand: p.brand || "Inconnu",
     category: p.category || "Autre",
-    price: Number(p.price) || 0,
-    originalPrice: Math.round((Number(p.price) || 0) * 1.3),
+    price: isOutOfStock ? -1 : (rawPrice || 0),
+    originalPrice: 0,
     recurrences: p.recurrences || 0,
     lastSeen: formatLastSeen(p.last_seen),
     rating: Number(p.rating) || 0,
