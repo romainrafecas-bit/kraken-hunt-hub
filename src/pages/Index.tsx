@@ -1,6 +1,7 @@
 import KrakkenSidebar from "@/components/dashboard/KrakkenSidebar";
 import { motion } from "framer-motion";
-import { useProducts } from "@/hooks/useProducts";
+import { useDashboardStats } from "@/hooks/useDashboardStats";
+import { mapToProduct } from "@/hooks/useProducts";
 import { useState, useMemo } from "react";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import krakkenLogo from "@/assets/krakken-logo.png";
@@ -30,49 +31,20 @@ function formatCat(slug: string): string {
 }
 
 const Index = () => {
-  const { products, loading } = useProducts();
+  const { totalProducts, totalBrands, totalRecurrences, cumulativeData, categoryStats, latestProducts, loading } = useDashboardStats();
   const [hoveredCat, setHoveredCat] = useState<string | null>(null);
   const [hoveredProduct, setHoveredProduct] = useState<number | null>(null);
 
-  // Build cumulative chart data from added_date
-  const cumulativeData = useMemo(() => {
-    const dateCountMap: Record<string, number> = {};
-    products.forEach(p => {
-      if (!p.addedDate) return;
-      // Parse added_date (could be ISO or dd/mm/yyyy)
-      let date: Date | null = null;
-      const ddmmyyyy = p.addedDate.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
-      if (ddmmyyyy) {
-        date = new Date(Number(ddmmyyyy[3]), Number(ddmmyyyy[2]) - 1, Number(ddmmyyyy[1]));
-      } else {
-        date = new Date(p.addedDate);
-        if (isNaN(date.getTime())) date = null;
-      }
-      if (!date) return;
-      const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-      dateCountMap[key] = (dateCountMap[key] || 0) + 1;
-    });
-    const sortedDays = Object.keys(dateCountMap).sort();
-    let cumul = 0;
-    return sortedDays.map(day => {
-      cumul += dateCountMap[day];
-      const d = new Date(day);
-      const label = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}`;
-      return { day: label, v: cumul, added: dateCountMap[day] };
-    });
-  }, [products]);
-
-  const catStats = Object.entries(
-    products.reduce((acc, p) => {
-      if (!acc[p.category]) acc[p.category] = { sales: 0, count: 0 };
-      acc[p.category].sales += p.recurrences;
-      acc[p.category].count += 1;
-      return acc;
-    }, {} as Record<string, { sales: number; count: number }>)
-  ).map(([name, d]) => ({ name: formatCat(name), slug: name, ...d })).sort((a, b) => b.sales - a.sales);
+  const catStats = useMemo(() => 
+    categoryStats.map(c => ({ name: formatCat(c.name), slug: c.name, sales: c.recurrences, count: c.count })),
+    [categoryStats]
+  );
   const catTotal = catStats.reduce((s, c) => s + c.sales, 0) || 1;
 
-  const topProducts = [...products].slice(0, 8);
+  const topProducts = useMemo(() => 
+    latestProducts.map((p: any, i: number) => mapToProduct(p, i)),
+    [latestProducts]
+  );
 
   if (loading) {
     return (
@@ -89,7 +61,7 @@ const Index = () => {
     );
   }
 
-  if (products.length === 0) {
+  if (totalProducts === 0) {
     return (
       <div className="min-h-screen abyss-gradient overflow-hidden">
         <KrakkenSidebar />
@@ -125,9 +97,9 @@ const Index = () => {
                 </motion.p>
                 <motion.div initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="flex items-center gap-2 mt-2">
                   {[
-                    { label: `${products.length} produits`, hue: '174 72% 46%' },
+                    { label: `${totalProducts.toLocaleString("fr-FR")} produits`, hue: '174 72% 46%' },
                     { label: `${catStats.length} catégories`, hue: '262 52% 58%' },
-                    { label: `${new Set(products.map(p => p.brand)).size} marques`, hue: '188 78% 52%' },
+                    { label: `${totalBrands} marques`, hue: '188 78% 52%' },
                   ].map((tag) => (
                     <span key={tag.label} className="text-[10px] font-display font-bold px-2.5 py-1 rounded-full"
                       style={{ color: `hsl(${tag.hue})`, background: `hsl(${tag.hue} / 0.1)`, border: `1px solid hsl(${tag.hue} / 0.2)` }}>
@@ -140,9 +112,9 @@ const Index = () => {
             <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
               className="hidden md:flex items-stretch gap-px rounded-xl overflow-hidden" style={{ border: '1px solid hsl(225 20% 12%)' }}>
               <div className="px-5 py-3 text-center" style={{ background: 'hsl(225 25% 7%)' }}>
-                <p className="text-[8px] font-display uppercase tracking-[0.2em] text-foreground/50 mb-1">Traqués</p>
+                <p className="text-[8px] font-display uppercase tracking-[0.2em] text-foreground/50 mb-1">Récurrences</p>
                 <p className="text-xl font-display font-black tabular-nums" style={{ color: 'hsl(174 72% 56%)', textShadow: '0 0 16px hsl(174 72% 46% / 0.3)' }}>
-                  {products.reduce((s, p) => s + p.recurrences, 0).toLocaleString("fr-FR")}
+                  {totalRecurrences.toLocaleString("fr-FR")}
                 </p>
               </div>
               <span className="w-2 h-2 rounded-full flex-shrink-0" style={{
@@ -159,7 +131,7 @@ const Index = () => {
               <p className="text-[9px] font-display uppercase tracking-[0.3em] text-foreground/60 mb-1">Évolution</p>
               <div className="flex items-baseline gap-3">
                 <p className="text-4xl font-display font-black tabular-nums" style={{ color: 'hsl(174 72% 56%)', textShadow: '0 0 30px hsl(174 72% 46% / 0.4)' }}>
-                  {products.length.toLocaleString("fr-FR")}
+                  {totalProducts.toLocaleString("fr-FR")}
                 </p>
                 <p className="text-[10px] font-display text-foreground/55">produits scannés</p>
               </div>
@@ -281,7 +253,11 @@ const Index = () => {
                     <p className="text-[10px] font-display text-foreground/50 mt-0.5">{p.brand} · {formatCat(p.category)}</p>
                   </div>
                   <div className="text-right flex-shrink-0">
-                    <p className="text-sm font-display font-black text-foreground tabular-nums">{p.price}<span className="text-[10px] text-foreground/50">€</span></p>
+                    {p.price === -1 ? (
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-bold bg-red-500/15 text-red-400 border border-red-500/25">Rupture</span>
+                    ) : (
+                      <p className="text-sm font-display font-black text-foreground tabular-nums">{p.price}<span className="text-[10px] text-foreground/50">€</span></p>
+                    )}
                     <p className="text-[9px] font-display text-foreground/45">{p.lastSeen}</p>
                   </div>
                   <div className="flex items-center gap-1 flex-shrink-0">
