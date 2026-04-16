@@ -14,6 +14,98 @@ export type Database = {
   }
   public: {
     Tables: {
+      favorites: {
+        Row: {
+          collection: string | null
+          created_at: string | null
+          id: string
+          note: string | null
+          product_url: string
+          user_id: string
+        }
+        Insert: {
+          collection?: string | null
+          created_at?: string | null
+          id?: string
+          note?: string | null
+          product_url: string
+          user_id: string
+        }
+        Update: {
+          collection?: string | null
+          created_at?: string | null
+          id?: string
+          note?: string | null
+          product_url?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "favorites_product_url_fkey"
+            columns: ["product_url"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["url"]
+          },
+        ]
+      }
+      products: {
+        Row: {
+          added_date: string | null
+          brand: string | null
+          category: string | null
+          dates_seen: string[] | null
+          enriched: boolean | null
+          image_url: string | null
+          in_stock: boolean | null
+          last_seen: string | null
+          price: number | null
+          rating: number | null
+          recurrences: number | null
+          review_count: number | null
+          sellers_count: number | null
+          title: string
+          updated_at: string | null
+          url: string
+        }
+        Insert: {
+          added_date?: string | null
+          brand?: string | null
+          category?: string | null
+          dates_seen?: string[] | null
+          enriched?: boolean | null
+          image_url?: string | null
+          in_stock?: boolean | null
+          last_seen?: string | null
+          price?: number | null
+          rating?: number | null
+          recurrences?: number | null
+          review_count?: number | null
+          sellers_count?: number | null
+          title: string
+          updated_at?: string | null
+          url: string
+        }
+        Update: {
+          added_date?: string | null
+          brand?: string | null
+          category?: string | null
+          dates_seen?: string[] | null
+          enriched?: boolean | null
+          image_url?: string | null
+          in_stock?: boolean | null
+          last_seen?: string | null
+          price?: number | null
+          rating?: number | null
+          recurrences?: number | null
+          review_count?: number | null
+          sellers_count?: number | null
+          title?: string
+          updated_at?: string | null
+          url?: string
+        }
+        Relationships: []
+      }
       waitlist: {
         Row: {
           created_at: string
