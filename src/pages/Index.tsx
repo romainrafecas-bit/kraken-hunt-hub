@@ -1,18 +1,16 @@
 import KrakkenSidebar from "@/components/dashboard/KrakkenSidebar";
 import { motion } from "framer-motion";
 import { useProducts } from "@/hooks/useProducts";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import krakkenLogo from "@/assets/krakken-logo.png";
 import { Skeleton } from "@/components/ui/skeleton";
 import EmptyState from "@/components/dashboard/EmptyState";
 
-const dailyData = [
-  { day: "Lun", v: 3 }, { day: "Mar", v: 5 }, { day: "Mer", v: 7 },
-  { day: "Jeu", v: 4 }, { day: "Ven", v: 9 }, { day: "Sam", v: 6 }, { day: "Dim", v: 10 },
-];
-
 const catHues = [
+  "174 72% 46%", "262 52% 58%", "188 78% 52%", "38 92% 56%",
+  "162 68% 44%", "348 72% 56%", "310 55% 50%", "200 65% 55%", "38 72% 50%",
+];
   "174 72% 46%", "262 52% 58%", "188 78% 52%", "38 92% 56%",
   "162 68% 44%", "348 72% 56%", "310 55% 50%", "200 65% 55%", "38 72% 50%",
 ];
