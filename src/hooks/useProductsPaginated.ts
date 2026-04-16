@@ -22,7 +22,7 @@ const sortKeyToColumn: Record<string, string> = {
   price: "price",
   rating: "rating",
   sellers: "sellers_count",
-  lastSeen: "last_seen",
+  lastSeen: "added_date", // last_seen is text dd/mm/yyyy — added_date used as sort proxy
   recurrences: "recurrences",
 };
 
@@ -56,8 +56,10 @@ export function useProductsPaginated(filters: Filters) {
         query = query.or("price.eq.-1,in_stock.eq.false");
       }
 
-      // Date filter
-      if (filters.datePreset !== "all") {
+      // Date filter — dates stored as text dd/mm/yyyy, use text matching
+      if (filters.datePreset === "2026") {
+        query = query.like("added_date", "%/2026");
+      } else if (filters.datePreset !== "all") {
         const cutoffs: Record<string, number> = {
           "24h": 1, "7d": 7, "30d": 30, "3m": 90, "6m": 180,
         };
@@ -65,7 +67,8 @@ export function useProductsPaginated(filters: Filters) {
         if (days) {
           const cutoff = new Date();
           cutoff.setDate(cutoff.getDate() - days);
-          query = query.gte("last_seen", cutoff.toISOString());
+          const yyyy = cutoff.getFullYear();
+          query = query.like("added_date", `%/${yyyy}`);
         }
       }
 
