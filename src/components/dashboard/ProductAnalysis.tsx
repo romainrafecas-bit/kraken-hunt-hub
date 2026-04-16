@@ -42,8 +42,9 @@ const ProductAnalysis = ({ externalProducts, externalLoading }: ProductAnalysisP
   const isLoading = externalLoading ?? fetchLoading;
 
   const [selectedCategory, setSelectedCategory] = useState("Tous");
-  const [selectedBrand, setSelectedBrand] = useState("Toutes");
-  const [selectedMonth, setSelectedMonth] = useState(1);
+  const [excludedBrands, setExcludedBrands] = useState<Set<string>>(new Set());
+  const [selectedDatePreset, setSelectedDatePreset] = useState("all");
+  const catScrollRef = useRef<HTMLDivElement>(null);
   const [sortKey, setSortKey] = useState<SortKey>("score");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [page, setPage] = useState(0);
@@ -89,11 +90,41 @@ const ProductAnalysis = ({ externalProducts, externalLoading }: ProductAnalysisP
     return ["Toutes", ...b];
   }, [allProducts]);
 
+  const toggleExcludeBrand = (brand: string) => {
+    setExcludedBrands(prev => {
+      const next = new Set(prev);
+      if (next.has(brand)) next.delete(brand); else next.add(brand);
+      return next;
+    });
+    setPage(0);
+  };
+
   const filtered = useMemo(() => {
     let data = [...allProducts];
     if (selectedCategory !== "Tous") data = data.filter(p => p.category === selectedCategory);
-    if (selectedBrand !== "Toutes") data = data.filter(p => p.brand === selectedBrand);
+    if (excludedBrands.size > 0) data = data.filter(p => !excludedBrands.has(p.brand));
     if (searchQuery) data = data.filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()) || p.brand.toLowerCase().includes(searchQuery.toLowerCase()));
+    // Date filtering
+    if (selectedDatePreset !== "all") {
+      const now = Date.now();
+      const cutoffs: Record<string, number> = { "24h": 86400000, "7d": 604800000, "30d": 2592000000, "3m": 7776000000, "6m": 15552000000 };
+      const cutoff = cutoffs[selectedDatePreset];
+      if (cutoff) {
+        data = data.filter(p => {
+          const ls = p.lastSeen;
+          if (!ls) return false;
+          // Parse "Il y a Xmin/Xh/Xj" format
+          const minMatch = ls.match(/(\d+)\s*min/);
+          const hMatch = ls.match(/(\d+)\s*h/);
+          const dMatch = ls.match(/(\d+)\s*j/);
+          let age = Infinity;
+          if (minMatch) age = parseInt(minMatch[1]) * 60000;
+          else if (hMatch) age = parseInt(hMatch[1]) * 3600000;
+          else if (dMatch) age = parseInt(dMatch[1]) * 86400000;
+          return age <= cutoff;
+        });
+      }
+    }
     data.sort((a, b) => {
       const av = a[sortKey];
       const bv = b[sortKey];
@@ -101,7 +132,7 @@ const ProductAnalysis = ({ externalProducts, externalLoading }: ProductAnalysisP
       return sortDir === "asc" ? (av as number) - (bv as number) : (bv as number) - (av as number);
     });
     return data;
-  }, [allProducts, selectedCategory, selectedBrand, sortKey, sortDir, searchQuery]);
+  }, [allProducts, selectedCategory, excludedBrands, sortKey, sortDir, searchQuery, selectedDatePreset]);
 
   const paged = filtered.slice(page * ITEMS_PER_PAGE, (page + 1) * ITEMS_PER_PAGE);
   const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
