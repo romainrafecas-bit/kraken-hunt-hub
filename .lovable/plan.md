@@ -1,36 +1,61 @@
 
-Objectif: corriger le tri "Dernier vu" pour qu’il respecte réellement `last_seen` et non une date proxy.
+Objectif
 
-1. Corriger la source du tri
-- Dans `src/hooks/useProductsPaginated.ts`, remettre `sortKeyToColumn.lastSeen` sur `last_seen`.
-- Supprimer le workaround actuel qui trie sur `added_date`, car c’est précisément ce qui mélange les dates affichées.
+Faire apparaître les vrais produits 2026 sur `/produits` et remettre un tri chronologique fiable sur `last_seen`, sans jamais le remplacer par `updated_at`.
 
-2. Nettoyer la logique basée sur une mauvaise hypothèse
-- Le hook part encore du principe que les dates sont du texte (`like("%/2026")`, commentaire “text dd/mm/yyyy”).
-- Remplacer cette logique par des filtres cohérents avec un vrai champ date/heure:
-  - `2026` => bornes de début/fin d’année
-  - `24h`, `7d`, `30d`, `3m`, `6m` => comparaison chronologique sur le champ attendu
-- Vérifier que le filtre temporel utilisé pour la page Produits est bien aligné avec la colonne affichée à l’utilisateur.
+Constat confirmé
 
-3. Sécuriser l’affichage de la date
-- Dans `src/hooks/useProducts.ts`, garder le format visuel `dd/mm/yyyy` mais fiabiliser le parsing/formatage pour éviter tout décalage de jour lié au timezone.
-- Si `last_seen` contient une heure, conserver le tri sur le timestamp complet même si l’UI n’affiche que le jour.
+- `/produits` ne lit pas le backend intégré du projet: la page lit encore une base externe via `externalSupabase`.
+- Le backend intégré du projet est vide (`public.products` = 0 ligne), donc ce n’est pas lui qui alimente l’écran actuel.
+- Le dashboard “Dernières prises” est lui aussi faux aujourd’hui: `useDashboardStats` prend `limit(200)` sans tri serveur puis trie localement sur `added_date`.
+- `/produits` démarre trié par `price`, pas par `lastSeen`.
 
-4. Vérifier les endroits liés
-- Contrôler `ProductAnalysis.tsx` pour s’assurer que le clic sur l’en-tête "Dernier vu" demande bien `sortKey = "lastSeen"` en desc par défaut.
-- Vérifier qu’aucun autre écran Produits/Favoris ne repose encore sur `added_date` pour simuler `last_seen`.
+Plan
 
-5. Validation après implémentation
-- Sur `/produits`, cliquer sur "Dernier vu" et confirmer que les premières lignes sont bien les plus récentes.
-- Vérifier qu’on ne voit plus des inversions du type `01/02/2026` avant `03/02/2026`.
-- Tester aussi la pagination pour confirmer que la page 1 contient bien les dernières dates globales.
-- Revalider les presets de date pour s’assurer qu’ils filtrent la bonne période.
+1. Vérifier la vraie source utilisée par `/produits`
+- Inspecter la table `products` de la base externe réellement appelée par le front.
+- Confirmer 3 choses: type réel de `last_seen`, existence de lignes en 2026, et résultat brut d’un tri descendant sur `last_seen`.
 
-Fichiers à modifier
+2. Corriger le tri selon le vrai type de `last_seen`
+- Si `last_seen` est un vrai timestamp:
+  - garder `last_seen` comme source unique de vérité
+  - trier serveur sur `last_seen desc`
+  - ajouter seulement un tri secondaire stable pour départager les égalités si besoin
+  - réaligner tous les filtres de date sur `last_seen`
+- Si `last_seen` est du texte ou un format mixte:
+  - supprimer définitivement les contournements via `added_date` ou `updated_at`
+  - créer une date canonique parsée côté backend
+  - brancher `/produits` sur cette date canonique pour le tri et les filtres
+
+3. Corriger `/produits`
+- Mettre le tri par défaut sur `lastSeen desc` pour afficher directement les produits les plus récents.
+- Conserver l’affichage en `dd/mm/yyyy`, mais fiabiliser le parsing pour éviter les séquences absurdes du type `31/03 -> 15/04 -> 04/10`.
+- Garder `updated_at` totalement séparé de `last_seen`.
+
+4. Corriger aussi le dashboard
+- Remplacer la logique actuelle de “Dernières prises”, qui ne récupère pas réellement les derniers produits.
+- Utiliser le même tri/date canonique que `/produits` pour que les deux écrans racontent la même chose.
+- Uniformiser les liens produits sur le dashboard si nécessaire.
+
+5. Validation
+- Page 1 de `/produits` = produits 2026 en tête quand ils existent.
+- Clic sur “Dernier vu” = ordre strictement décroissant.
+- Les presets `24h / 7j / 30j / 3m / 6m / 2026` filtrent bien sur `last_seen`.
+- Le bloc “Dernières prises” du dashboard est cohérent avec `/produits`.
+
+Fichiers concernés
+
 - `src/hooks/useProductsPaginated.ts`
 - `src/hooks/useProducts.ts`
+- `src/hooks/useDashboardStats.ts`
+- `src/components/dashboard/ProductAnalysis.tsx`
+- éventuellement la couche d’accès aux données si on retire `externalSupabase` ou si on ajoute une date canonique côté backend
 
 Détail technique
-- Le bug visible vient du fait que l’interface affiche `last_seen`, mais le tri serveur utilise actuellement `added_date`.
-- Donc l’ordre affiché et la valeur montrée ne parlent pas de la même chose, ce qui produit un classement incohérent.
-- Même si `last_seen` contient aussi une heure, ce n’est pas un problème: le tri doit rester sur le timestamp complet, puis l’UI peut continuer à n’afficher que la date.
+
+Le problème n’est pas juste “un mauvais tri”. Il y a aujourd’hui:
+- une base externe encore utilisée par le front,
+- un backend intégré vide,
+- et une logique dashboard qui ne demande même pas les dernières lignes au serveur.
+
+Tant qu’on ne vérifie pas la base externe réellement lue par `/produits` et qu’on ne normalise pas `last_seen` si nécessaire, le front ne peut pas garantir un vrai ordre chronologique.
