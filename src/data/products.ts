@@ -12,6 +12,7 @@ export interface Product {
   sellers: number;
   image: string;
   url?: string;
+  addedDate?: string;
 }
 
 export const categories = [
