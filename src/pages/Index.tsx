@@ -10,11 +10,9 @@ import EmptyState from "@/components/dashboard/EmptyState";
 const catHues = [
   "174 72% 46%", "262 52% 58%", "188 78% 52%", "38 92% 56%",
   "162 68% 44%", "348 72% 56%", "310 55% 50%", "200 65% 55%", "38 72% 50%",
-];
   "174 72% 46%", "262 52% 58%", "188 78% 52%", "38 92% 56%",
   "162 68% 44%", "348 72% 56%", "310 55% 50%", "200 65% 55%", "38 72% 50%",
 ];
-
 const categoryDisplayNames: Record<string, string> = {
   "telephonie": "Téléphonie", "photo-numerique": "Photo Numérique", "informatique": "Informatique",
   "tv-son": "TV & Son", "electromenager": "Électroménager", "gaming": "Gaming", "maison": "Maison",
