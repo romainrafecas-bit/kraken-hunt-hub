@@ -22,13 +22,43 @@ const datePresets = [
   { label: "6 mois", value: "6m" },
 ];
 
+const categoryDisplayNames: Record<string, string> = {
+  "Tous": "Tous",
+  "telephonie": "Téléphonie",
+  "photo-numerique": "Photo Numérique",
+  "informatique": "Informatique",
+  "tv-son": "TV & Son",
+  "electromenager": "Électroménager",
+  "gaming": "Gaming",
+  "maison": "Maison",
+  "jouets": "Jouets",
+  "sport": "Sport",
+  "mode": "Mode",
+  "beaute": "Beauté",
+  "auto": "Auto",
+  "bagages": "Bagages",
+  "juniors": "Juniors",
+  "image-son": "Image & Son",
+  "high-tech": "High-Tech",
+  "bricolage": "Bricolage",
+  "jardin": "Jardin",
+  "animalerie": "Animalerie",
+  "epicerie": "Épicerie",
+  "bebe": "Bébé",
+  "loisirs": "Loisirs",
+  "bijoux": "Bijoux & Montres",
+  "literie": "Literie",
+  "bureau": "Bureau",
+  "vin": "Vin & Spiritueux",
+};
+
 function formatCategoryName(slug: string): string {
-  if (!slug) return slug;
-  // Handle slug format: photo-numerique -> Photo Numérique
+  if (categoryDisplayNames[slug]) return categoryDisplayNames[slug];
+  if (categoryDisplayNames[slug.toLowerCase()]) return categoryDisplayNames[slug.toLowerCase()];
+  // Fallback: capitalize each word, replace dashes/underscores with spaces
   return slug
-    .split(/[-_]/)
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-    .join(' ');
+    .replace(/[-_]/g, ' ')
+    .replace(/\b\w/g, c => c.toUpperCase());
 }
 
 interface ProductAnalysisProps {
@@ -44,13 +74,25 @@ const ProductAnalysis = ({ externalProducts, externalLoading }: ProductAnalysisP
   const [selectedCategory, setSelectedCategory] = useState("Tous");
   const [excludedBrands, setExcludedBrands] = useState<Set<string>>(new Set());
   const [selectedDatePreset, setSelectedDatePreset] = useState("all");
-  const catScrollRef = useRef<HTMLDivElement>(null);
+  const [brandDropdownOpen, setBrandDropdownOpen] = useState(false);
+  const brandDropdownRef = useRef<HTMLDivElement>(null);
   const [sortKey, setSortKey] = useState<SortKey>("score");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [page, setPage] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [userId, setUserId] = useState<string | null>(null);
+
+  // Close brand dropdown on outside click
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (brandDropdownRef.current && !brandDropdownRef.current.contains(e.target as Node)) {
+        setBrandDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
@@ -183,7 +225,7 @@ const ProductAnalysis = ({ externalProducts, externalLoading }: ProductAnalysisP
       {/* Header */}
       <div className="p-5 border-b border-border/40 relative">
         <div className="absolute top-0 left-0 right-0 h-px tentacle-line" />
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+        <div className="flex items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-3">
               <Crosshair className="w-4 h-4" style={{ color: 'hsl(174 72% 56%)', filter: 'drop-shadow(0 0 4px hsl(174 72% 46% / 0.4))' }} />
@@ -192,63 +234,101 @@ const ProductAnalysis = ({ externalProducts, externalLoading }: ProductAnalysisP
             </div>
             <p className="text-xs text-muted-foreground mt-1 ml-7">Données en temps réel</p>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="flex items-center gap-2">
-              <CalendarDays className="w-3.5 h-3.5" style={{ color: 'hsl(262 72% 72%)' }} />
-              {datePresets.map(dp => (
-                <button key={dp.value} onClick={() => { setSelectedDatePreset(dp.value); setPage(0); }}
-                  className={cn("px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all duration-200",
-                    selectedDatePreset === dp.value ? "bio-violet" : "bg-secondary/40 text-muted-foreground hover:text-foreground hover:bg-secondary/70")}>
-                  {dp.label}
-                </button>
-              ))}
-            </div>
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
-              <input type="text" placeholder="Traquer un produit..." value={searchQuery}
-                onChange={e => { setSearchQuery(e.target.value); setPage(0); }}
-                className="bg-secondary/60 border border-border/40 rounded-xl pl-9 pr-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 w-full lg:w-56 transition-all" />
-            </div>
-          </div>
         </div>
-        {/* Filters */}
-        <div className="mt-4 space-y-3">
-          {/* Categories - horizontal scroll */}
-          <div className="flex items-center gap-2">
-            <span className="soft-label mr-1 flex-shrink-0">Catégorie</span>
-            <div ref={catScrollRef} className="flex items-center gap-2 overflow-x-auto scrollbar-hide pb-1" style={{ scrollbarWidth: 'none' }}>
+        {/* Filters row */}
+        <div className="mt-4 flex flex-wrap items-center gap-3">
+          {/* Category dropdown */}
+          <div className="relative">
+            <select
+              value={selectedCategory}
+              onChange={e => { setSelectedCategory(e.target.value); setPage(0); }}
+              className="bg-secondary/60 border border-border/40 rounded-xl px-3 py-2 text-sm text-foreground focus:outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all appearance-none cursor-pointer pr-8 min-w-[160px]"
+              style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%234dd4ac' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 10px center' }}
+            >
               {dynamicCategories.map(cat => (
-                <button key={cat} onClick={() => { setSelectedCategory(cat); setPage(0); }}
-                  className={cn("px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 whitespace-nowrap flex-shrink-0",
-                    selectedCategory === cat ? "bio-teal" : "bg-secondary/40 text-muted-foreground border border-transparent hover:text-foreground hover:bg-secondary/70")}>
-                  {cat === "Tous" ? "Tous" : formatCategoryName(cat)}
-                </button>
+                <option key={cat} value={cat} className="bg-card text-foreground">
+                  {formatCategoryName(cat)}
+                </option>
               ))}
-            </div>
+            </select>
           </div>
-          {/* Brands - excludable */}
-          <div className="flex items-center gap-2">
-            <span className="soft-label mr-1 flex-shrink-0 flex items-center gap-1">
-              <Filter className="w-3 h-3" /> Exclure
-            </span>
-            <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide pb-1" style={{ scrollbarWidth: 'none' }}>
-              {dynamicBrands.filter(b => b !== "Toutes").map(brand => (
-                <button key={brand} onClick={() => toggleExcludeBrand(brand)}
-                  className={cn("px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 whitespace-nowrap flex-shrink-0 flex items-center gap-1",
-                    excludedBrands.has(brand)
-                      ? "bg-red-500/15 text-red-400 border border-red-500/30"
-                      : "bg-secondary/40 text-muted-foreground border border-transparent hover:text-foreground hover:bg-secondary/70")}>
+
+          {/* Date preset dropdown */}
+          <div className="relative flex items-center gap-2">
+            <CalendarDays className="w-3.5 h-3.5 flex-shrink-0" style={{ color: 'hsl(262 72% 72%)' }} />
+            <select
+              value={selectedDatePreset}
+              onChange={e => { setSelectedDatePreset(e.target.value); setPage(0); }}
+              className="bg-secondary/60 border border-border/40 rounded-xl px-3 py-2 text-sm text-foreground focus:outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all appearance-none cursor-pointer pr-8 min-w-[120px]"
+              style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%234dd4ac' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 10px center' }}
+            >
+              {datePresets.map(dp => (
+                <option key={dp.value} value={dp.value} className="bg-card text-foreground">{dp.label}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* Exclude brands dropdown (multi-select styled) */}
+          <div className="relative" ref={brandDropdownRef}>
+            <button
+              onClick={() => setBrandDropdownOpen(prev => !prev)}
+              className="bg-secondary/60 border border-border/40 rounded-xl px-3 py-2 text-sm text-foreground focus:outline-none focus:border-primary/40 transition-all cursor-pointer pr-8 min-w-[180px] text-left flex items-center gap-2"
+              style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%234dd4ac' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 10px center' }}
+            >
+              <Filter className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
+              <span className="truncate">
+                {excludedBrands.size === 0 ? "Exclure des marques" : `${excludedBrands.size} marque${excludedBrands.size > 1 ? 's' : ''} exclue${excludedBrands.size > 1 ? 's' : ''}`}
+              </span>
+            </button>
+            {brandDropdownOpen && (
+              <div className="absolute z-30 mt-1 w-64 bg-card border border-border/50 rounded-xl p-2 shadow-2xl max-h-56 overflow-auto">
+                {excludedBrands.size > 0 && (
+                  <button
+                    onClick={() => { setExcludedBrands(new Set()); setPage(0); }}
+                    className="w-full text-left px-3 py-1.5 rounded-lg text-xs text-primary hover:bg-primary/10 transition-colors mb-1 font-medium"
+                  >
+                    ✕ Réinitialiser tout
+                  </button>
+                )}
+                {dynamicBrands.filter(b => b !== "Toutes").map(brand => (
+                  <button
+                    key={brand}
+                    onClick={() => toggleExcludeBrand(brand)}
+                    className={cn(
+                      "w-full text-left px-3 py-1.5 rounded-lg text-sm transition-colors flex items-center justify-between",
+                      excludedBrands.has(brand)
+                        ? "text-red-400 bg-red-500/10"
+                        : "text-muted-foreground hover:text-foreground hover:bg-secondary/60"
+                    )}
+                  >
+                    <span>{formatCategoryName(brand)}</span>
+                    {excludedBrands.has(brand) && <X className="w-3.5 h-3.5" />}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Excluded brand pills */}
+          {excludedBrands.size > 0 && (
+            <div className="flex items-center gap-1.5 flex-wrap">
+              {[...excludedBrands].map(brand => (
+                <span key={brand} className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs bg-red-500/10 text-red-400 border border-red-500/20">
                   {formatCategoryName(brand)}
-                  {excludedBrands.has(brand) && <X className="w-3 h-3" />}
-                </button>
+                  <button onClick={() => toggleExcludeBrand(brand)} className="hover:text-red-300 transition-colors">
+                    <X className="w-3 h-3" />
+                  </button>
+                </span>
               ))}
             </div>
-            {excludedBrands.size > 0 && (
-              <button onClick={() => { setExcludedBrands(new Set()); setPage(0); }}
-                className="text-xs text-muted-foreground hover:text-foreground transition-colors flex-shrink-0 underline">
-                Réinitialiser
-              </button>
-            )}
+          )}
+
+          {/* Search */}
+          <div className="relative ml-auto">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+            <input type="text" placeholder="Traquer un produit..." value={searchQuery}
+              onChange={e => { setSearchQuery(e.target.value); setPage(0); }}
+              className="bg-secondary/60 border border-border/40 rounded-xl pl-9 pr-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 w-full lg:w-56 transition-all" />
           </div>
         </div>
       </div>
@@ -297,7 +377,7 @@ const ProductAnalysis = ({ externalProducts, externalLoading }: ProductAnalysisP
                     <span className="text-sm text-foreground/90 font-medium group-hover:text-primary transition-colors">{product.name}</span>
                   </td>
                   <td className="px-4 py-3"><span className="text-xs text-secondary-foreground font-medium">{product.brand}</span></td>
-                  <td className="px-4 py-3"><span className="bio-badge bio-cyan text-[10px]">{product.category}</span></td>
+                  <td className="px-4 py-3"><span className="bio-badge bio-cyan text-[10px]">{formatCategoryName(product.category)}</span></td>
                   <td className="px-4 py-3">
                     <div className="flex flex-col">
                       <span className="text-sm font-mono font-bold text-foreground">{product.price}€</span>
