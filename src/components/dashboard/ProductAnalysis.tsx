@@ -146,7 +146,7 @@ const ProductAnalysis = ({ externalProducts, externalLoading }: ProductAnalysisP
     if (selectedCategory !== "Tous") data = data.filter(p => p.category === selectedCategory);
     if (excludedBrands.size > 0) data = data.filter(p => !excludedBrands.has(p.brand));
     if (searchQuery) data = data.filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()) || p.brand.toLowerCase().includes(searchQuery.toLowerCase()));
-    // Date filtering
+    // Date filtering based on actual dd/mm/yyyy dates
     if (selectedDatePreset !== "all") {
       const now = Date.now();
       const cutoffs: Record<string, number> = { "24h": 86400000, "7d": 604800000, "30d": 2592000000, "3m": 7776000000, "6m": 15552000000 };
@@ -154,16 +154,11 @@ const ProductAnalysis = ({ externalProducts, externalLoading }: ProductAnalysisP
       if (cutoff) {
         data = data.filter(p => {
           const ls = p.lastSeen;
-          if (!ls) return false;
-          // Parse "Il y a Xmin/Xh/Xj" format
-          const minMatch = ls.match(/(\d+)\s*min/);
-          const hMatch = ls.match(/(\d+)\s*h/);
-          const dMatch = ls.match(/(\d+)\s*j/);
-          let age = Infinity;
-          if (minMatch) age = parseInt(minMatch[1]) * 60000;
-          else if (hMatch) age = parseInt(hMatch[1]) * 3600000;
-          else if (dMatch) age = parseInt(dMatch[1]) * 86400000;
-          return age <= cutoff;
+          if (!ls || ls === "Inconnu") return false;
+          const parts = ls.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+          if (!parts) return false;
+          const date = new Date(Number(parts[3]), Number(parts[2]) - 1, Number(parts[1]));
+          return (now - date.getTime()) <= cutoff;
         });
       }
     }
@@ -374,23 +369,24 @@ const ProductAnalysis = ({ externalProducts, externalLoading }: ProductAnalysisP
                     </div>
                   </td>
                   <td className="px-4 py-3">
-                    <span className="text-sm text-foreground/90 font-medium group-hover:text-primary transition-colors">{product.name}</span>
+                    <a href={product.url} target="_blank" rel="noopener noreferrer" 
+                       className="text-sm text-foreground/90 font-medium hover:text-primary transition-colors hover:underline">
+                      {product.name}
+                    </a>
                   </td>
                   <td className="px-4 py-3"><span className="text-xs text-secondary-foreground font-medium">{product.brand}</span></td>
                   <td className="px-4 py-3"><span className="bio-badge bio-cyan text-[10px]">{formatCategoryName(product.category)}</span></td>
                   <td className="px-4 py-3">
-                    <div className="flex flex-col">
+                    {product.price === -1 ? (
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-bold bg-red-500/15 text-red-400 border border-red-500/25">Rupture</span>
+                    ) : (
                       <span className="text-sm font-mono font-bold text-foreground">{product.price}€</span>
-                      <span className="text-[10px] text-muted-foreground/35 line-through">{product.originalPrice}€</span>
-                    </div>
+                    )}
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-1.5">
                       <Clock className="w-3 h-3" style={{ color: 'hsl(174 72% 56%)', opacity: 0.6 }} />
-                      <span className="text-sm font-medium" style={{
-                        color: product.lastSeen.includes('min') || product.lastSeen.includes('1h') || product.lastSeen.includes('2h')
-                          ? 'hsl(162 72% 52%)' : product.lastSeen.includes('j') ? 'hsl(210 10% 50%)' : 'hsl(174 72% 56%)',
-                      }}>{product.lastSeen}</span>
+                      <span className="text-sm font-medium" style={{ color: 'hsl(174 72% 56%)' }}>{product.lastSeen}</span>
                     </div>
                   </td>
                   <td className="px-4 py-3">
