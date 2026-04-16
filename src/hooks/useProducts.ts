@@ -21,9 +21,22 @@ export interface SupabaseProduct {
   updated_at: string | null;
 }
 
+function parseDate(dateStr: string): Date | null {
+  // Handle dd/mm/yyyy format
+  const ddmmyyyy = dateStr.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+  if (ddmmyyyy) {
+    return new Date(Number(ddmmyyyy[3]), Number(ddmmyyyy[2]) - 1, Number(ddmmyyyy[1]));
+  }
+  // Fallback to ISO/standard parsing
+  const d = new Date(dateStr);
+  return isNaN(d.getTime()) ? null : d;
+}
+
 function formatLastSeen(lastSeen: string | null): string {
   if (!lastSeen) return "Inconnu";
-  const diff = Date.now() - new Date(lastSeen).getTime();
+  const date = parseDate(lastSeen);
+  if (!date) return "Inconnu";
+  const diff = Date.now() - date.getTime();
   const mins = Math.floor(diff / 60000);
   if (mins < 60) return `Il y a ${mins}min`;
   const hours = Math.floor(mins / 60);
