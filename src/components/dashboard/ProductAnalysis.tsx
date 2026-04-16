@@ -213,7 +213,7 @@ const ProductAnalysis = ({ externalProducts, externalLoading }: ProductAnalysisP
       {/* Header */}
       <div className="p-5 border-b border-border/40 relative">
         <div className="absolute top-0 left-0 right-0 h-px tentacle-line" />
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+        <div className="flex items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-3">
               <Crosshair className="w-4 h-4" style={{ color: 'hsl(174 72% 56%)', filter: 'drop-shadow(0 0 4px hsl(174 72% 46% / 0.4))' }} />
@@ -221,24 +221,6 @@ const ProductAnalysis = ({ externalProducts, externalLoading }: ProductAnalysisP
               <span className="bio-badge bio-teal">{filtered.length} proies</span>
             </div>
             <p className="text-xs text-muted-foreground mt-1 ml-7">Données en temps réel</p>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="flex items-center gap-2">
-              <CalendarDays className="w-3.5 h-3.5" style={{ color: 'hsl(262 72% 72%)' }} />
-              {datePresets.map(dp => (
-                <button key={dp.value} onClick={() => { setSelectedDatePreset(dp.value); setPage(0); }}
-                  className={cn("px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all duration-200",
-                    selectedDatePreset === dp.value ? "bio-violet" : "bg-secondary/40 text-muted-foreground hover:text-foreground hover:bg-secondary/70")}>
-                  {dp.label}
-                </button>
-              ))}
-            </div>
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
-              <input type="text" placeholder="Traquer un produit..." value={searchQuery}
-                onChange={e => { setSearchQuery(e.target.value); setPage(0); }}
-                className="bg-secondary/60 border border-border/40 rounded-xl pl-9 pr-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 w-full lg:w-56 transition-all" />
-            </div>
           </div>
         </div>
         {/* Filters row */}
