@@ -1,6 +1,6 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
-import { ArrowUpDown, ArrowUp, ArrowDown, ChevronLeft, ChevronRight, Search, Users, CalendarDays, Crosshair, Clock, MoreHorizontal, Heart } from "lucide-react";
+import { ArrowUpDown, ArrowUp, ArrowDown, ChevronLeft, ChevronRight, Search, Users, CalendarDays, Crosshair, Clock, Heart, X, Filter } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Product, categories, brands } from "@/data/products";
 import { useProducts } from "@/hooks/useProducts";
@@ -13,10 +13,23 @@ type SortDir = "asc" | "desc";
 
 const ITEMS_PER_PAGE = 12;
 
-const months = [
-  "Janvier", "Février", "Mars", "Avril", "Mai", "Juin",
-  "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"
+const datePresets = [
+  { label: "Tout", value: "all" },
+  { label: "24h", value: "24h" },
+  { label: "7 jours", value: "7d" },
+  { label: "30 jours", value: "30d" },
+  { label: "3 mois", value: "3m" },
+  { label: "6 mois", value: "6m" },
 ];
+
+function formatCategoryName(slug: string): string {
+  if (!slug) return slug;
+  // Handle slug format: photo-numerique -> Photo Numérique
+  return slug
+    .split(/[-_]/)
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
+}
 
 interface ProductAnalysisProps {
   externalProducts?: Product[];
