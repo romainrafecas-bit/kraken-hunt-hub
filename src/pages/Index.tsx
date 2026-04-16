@@ -48,7 +48,7 @@ const Index = () => {
   ).map(([name, d]) => ({ name: formatCat(name), slug: name, ...d })).sort((a, b) => b.sales - a.sales);
   const catTotal = catStats.reduce((s, c) => s + c.sales, 0) || 1;
 
-  const topProducts = [...products].sort((a, b) => b.score - a.score).slice(0, 6);
+  const topProducts = [...products].slice(0, 8);
 
   if (loading) {
     return (
