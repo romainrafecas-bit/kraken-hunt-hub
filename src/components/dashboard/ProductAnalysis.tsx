@@ -377,7 +377,7 @@ const ProductAnalysis = ({ externalProducts, externalLoading }: ProductAnalysisP
                     <span className="text-sm text-foreground/90 font-medium group-hover:text-primary transition-colors">{product.name}</span>
                   </td>
                   <td className="px-4 py-3"><span className="text-xs text-secondary-foreground font-medium">{product.brand}</span></td>
-                  <td className="px-4 py-3"><span className="bio-badge bio-cyan text-[10px]">{product.category}</span></td>
+                  <td className="px-4 py-3"><span className="bio-badge bio-cyan text-[10px]">{formatCategoryName(product.category)}</span></td>
                   <td className="px-4 py-3">
                     <div className="flex flex-col">
                       <span className="text-sm font-mono font-bold text-foreground">{product.price}€</span>
