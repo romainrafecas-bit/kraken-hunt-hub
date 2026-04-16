@@ -61,9 +61,13 @@ export function useProductsPaginated(filters: Filters) {
         query = query.or("price.eq.-1,in_stock.eq.false");
       }
 
-      // Date filter — last_seen is timestamp with time zone
+      // Date filter — applied on `updated_at` (real timestamptz) since
+      // `last_seen` is stored as text dd/mm/yyyy and cannot be filtered
+      // chronologically server-side.
       if (filters.datePreset === "2026") {
-        query = query.gte("last_seen", "2026-01-01T00:00:00Z").lt("last_seen", "2027-01-01T00:00:00Z");
+        query = query
+          .gte("updated_at", "2026-01-01T00:00:00Z")
+          .lt("updated_at", "2027-01-01T00:00:00Z");
       } else if (filters.datePreset !== "all") {
         const cutoffs: Record<string, number> = {
           "24h": 1, "7d": 7, "30d": 30, "3m": 90, "6m": 180,
@@ -72,20 +76,22 @@ export function useProductsPaginated(filters: Filters) {
         if (days) {
           const cutoff = new Date();
           cutoff.setDate(cutoff.getDate() - days);
-          query = query.gte("last_seen", cutoff.toISOString());
+          query = query.gte("updated_at", cutoff.toISOString());
         }
       }
 
       // Excluded brands
       if (filters.excludedBrands.size > 0) {
-        // Supabase doesn't have a "not in" directly for text, use .not().in()
         const excluded = [...filters.excludedBrands];
         query = query.not("brand", "in", `(${excluded.map(b => `"${b}"`).join(",")})`);
       }
 
-      // Sort
-      const column = sortKeyToColumn[filters.sortKey] || "last_seen";
+      // Sort — primary on requested column, secondary on updated_at desc for stability
+      const column = sortKeyToColumn[filters.sortKey] || "updated_at";
       query = query.order(column, { ascending: filters.sortDir === "asc" });
+      if (column !== "updated_at") {
+        query = query.order("updated_at", { ascending: false });
+      }
 
       // Pagination
       const from = filters.page * filters.pageSize;
