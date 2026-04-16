@@ -94,6 +94,7 @@ const ProductAnalysis = ({ externalProducts, externalLoading }: ProductAnalysisP
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
+  useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
       if (data.user) {
         setUserId(data.user.id);
