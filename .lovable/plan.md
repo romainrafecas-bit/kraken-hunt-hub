@@ -1,35 +1,36 @@
 
+Objectif: corriger le tri "Dernier vu" pour qu’il respecte réellement `last_seen` et non une date proxy.
 
-## Diagnostic
+1. Corriger la source du tri
+- Dans `src/hooks/useProductsPaginated.ts`, remettre `sortKeyToColumn.lastSeen` sur `last_seen`.
+- Supprimer le workaround actuel qui trie sur `added_date`, car c’est précisément ce qui mélange les dates affichées.
 
-Le problème vient du fait que `last_seen` est probablement stocké en **texte** au format `dd/mm/yyyy` dans la base externe. Quand Supabase trie côté serveur avec `.order("last_seen", { ascending: false })`, il fait un tri **lexicographique** (alphabétique) :
+2. Nettoyer la logique basée sur une mauvaise hypothèse
+- Le hook part encore du principe que les dates sont du texte (`like("%/2026")`, commentaire “text dd/mm/yyyy”).
+- Remplacer cette logique par des filtres cohérents avec un vrai champ date/heure:
+  - `2026` => bornes de début/fin d’année
+  - `24h`, `7d`, `30d`, `3m`, `6m` => comparaison chronologique sur le champ attendu
+- Vérifier que le filtre temporel utilisé pour la page Produits est bien aligné avec la colonne affichée à l’utilisateur.
 
-```text
-"31/12/2025" > "16/04/2026"  ← car "3" > "1" en ASCII
-```
+3. Sécuriser l’affichage de la date
+- Dans `src/hooks/useProducts.ts`, garder le format visuel `dd/mm/yyyy` mais fiabiliser le parsing/formatage pour éviter tout décalage de jour lié au timezone.
+- Si `last_seen` contient une heure, conserver le tri sur le timestamp complet même si l’UI n’affiche que le jour.
 
-Résultat : les produits de 2026 (qui commencent par "0", "1") se retrouvent après ceux de fin 2025 (qui commencent par "3").
+4. Vérifier les endroits liés
+- Contrôler `ProductAnalysis.tsx` pour s’assurer que le clic sur l’en-tête "Dernier vu" demande bien `sortKey = "lastSeen"` en desc par défaut.
+- Vérifier qu’aucun autre écran Produits/Favoris ne repose encore sur `added_date` pour simuler `last_seen`.
 
-Avec la pagination serveur, on ne peut pas re-trier côté client — on ne voit que 20 produits à la fois.
+5. Validation après implémentation
+- Sur `/produits`, cliquer sur "Dernier vu" et confirmer que les premières lignes sont bien les plus récentes.
+- Vérifier qu’on ne voit plus des inversions du type `01/02/2026` avant `03/02/2026`.
+- Tester aussi la pagination pour confirmer que la page 1 contient bien les dernières dates globales.
+- Revalider les presets de date pour s’assurer qu’ils filtrent la bonne période.
 
-## Solution proposée
+Fichiers à modifier
+- `src/hooks/useProductsPaginated.ts`
+- `src/hooks/useProducts.ts`
 
-Puisqu'on ne peut pas modifier la base externe, la solution est de **ne pas trier par `last_seen` côté serveur** quand c'est du texte. À la place :
-
-1. **Ajouter un log de debug** temporaire pour confirmer le format exact de `last_seen` dans la base (texte ou timestamp)
-2. **Si c'est du texte** : utiliser le filtre date (`datePreset`) qui fonctionne déjà avec `.gte("last_seen", cutoff.toISOString())` — mais le **tri par défaut** sera changé pour utiliser `added_date` (qui est un vrai timestamp) quand l'utilisateur clique sur "Dernier vu"
-3. **L'affichage** reste `last_seen` (la vraie date du dernier avis), seul le **tri serveur** utilise `added_date` comme approximation pour l'ordre chronologique
-
-### Alternative : si `last_seen` est bien un timestamp
-
-Si le debug confirme que c'est un vrai timestamp, alors le tri fonctionne déjà et le problème est ailleurs (peut-être qu'il n'y a tout simplement pas de produits avec un `last_seen` en 2026 — les produits "de 2026" ont peut-être un `added_date` en 2026 mais un `last_seen` encore en 2025).
-
-### Fichiers à modifier
-
-- **`src/hooks/useProductsPaginated.ts`** — Ajouter un `console.log` sur le premier résultat pour inspecter le format, puis adapter le mapping de tri si nécessaire
-- **`src/components/dashboard/ProductAnalysis.tsx`** — Aucun changement structurel
-
-### Étape 1 : Vérification
-
-Avant tout changement, je vais ajouter un log pour voir le format exact de `last_seen` retourné par la base. Ça permettra de choisir la bonne stratégie.
-
+Détail technique
+- Le bug visible vient du fait que l’interface affiche `last_seen`, mais le tri serveur utilise actuellement `added_date`.
+- Donc l’ordre affiché et la valeur montrée ne parlent pas de la même chose, ce qui produit un classement incohérent.
+- Même si `last_seen` contient aussi une heure, ce n’est pas un problème: le tri doit rester sur le timestamp complet, puis l’UI peut continuer à n’afficher que la date.
