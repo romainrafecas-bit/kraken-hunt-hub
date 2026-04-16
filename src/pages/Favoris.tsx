@@ -2,7 +2,7 @@ import KrakkenSidebar from "@/components/dashboard/KrakkenSidebar";
 import { motion, AnimatePresence } from "framer-motion";
 import { Heart, Star, ExternalLink, Trash2, Pencil, ChevronDown, Download, Search as SearchIcon } from "lucide-react";
 import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { externalSupabase as supabase } from "@/integrations/supabase/external-client";
 import { mapToProduct } from "@/hooks/useProducts";
 import { Product } from "@/data/products";
 import { Skeleton } from "@/components/ui/skeleton";
