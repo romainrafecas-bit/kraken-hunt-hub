@@ -92,6 +92,10 @@ export function useProductsPaginated(filters: Filters) {
         setProducts([]);
         setTotalCount(0);
       } else {
+        // DEBUG: inspect last_seen format
+        if (data && data.length > 0) {
+          console.log("[DEBUG] First 3 products last_seen values:", data.slice(0, 3).map((p: any) => ({ last_seen: p.last_seen, added_date: p.added_date, title: p.title })));
+        }
         setProducts((data || []).map((p: any, i: number) => mapToProduct(p, from + i)));
         setTotalCount(count || 0);
         setError(null);
