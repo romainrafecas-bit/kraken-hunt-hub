@@ -46,7 +46,7 @@ const ProductAnalysis = () => {
   const [selectedDatePreset, setSelectedDatePreset] = useState("all");
   const [brandDropdownOpen, setBrandDropdownOpen] = useState(false);
   const brandDropdownRef = useRef<HTMLDivElement>(null);
-  const [sortKey, setSortKey] = useState<SortKey>("price");
+  const [sortKey, setSortKey] = useState<SortKey>("lastSeen");
   const [stockFilter, setStockFilter] = useState<"all" | "in_stock" | "out_of_stock">("all");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [page, setPage] = useState(0);
