@@ -8,7 +8,7 @@ import { externalSupabase as supabase } from "@/integrations/supabase/external-c
 import ProductSkeleton from "./ProductSkeleton";
 import EmptyState from "./EmptyState";
 
-type SortKey = "score" | "price" | "recurrences" | "rating" | "name" | "brand" | "sellers" | "lastSeen";
+type SortKey = "price" | "recurrences" | "rating" | "name" | "brand" | "sellers" | "lastSeen";
 type SortDir = "asc" | "desc";
 
 const ITEMS_PER_PAGE = 12;
@@ -76,7 +76,8 @@ const ProductAnalysis = ({ externalProducts, externalLoading }: ProductAnalysisP
   const [selectedDatePreset, setSelectedDatePreset] = useState("all");
   const [brandDropdownOpen, setBrandDropdownOpen] = useState(false);
   const brandDropdownRef = useRef<HTMLDivElement>(null);
-  const [sortKey, setSortKey] = useState<SortKey>("score");
+  const [sortKey, setSortKey] = useState<SortKey>("price");
+  const [stockFilter, setStockFilter] = useState<"all" | "in_stock" | "out_of_stock">("all");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [page, setPage] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
@@ -146,6 +147,9 @@ const ProductAnalysis = ({ externalProducts, externalLoading }: ProductAnalysisP
     if (selectedCategory !== "Tous") data = data.filter(p => p.category === selectedCategory);
     if (excludedBrands.size > 0) data = data.filter(p => !excludedBrands.has(p.brand));
     if (searchQuery) data = data.filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()) || p.brand.toLowerCase().includes(searchQuery.toLowerCase()));
+    // Stock filter
+    if (stockFilter === "in_stock") data = data.filter(p => p.price !== -1);
+    if (stockFilter === "out_of_stock") data = data.filter(p => p.price === -1);
     // Date filtering based on actual dd/mm/yyyy dates
     if (selectedDatePreset !== "all") {
       const now = Date.now();
@@ -169,7 +173,7 @@ const ProductAnalysis = ({ externalProducts, externalLoading }: ProductAnalysisP
       return sortDir === "asc" ? (av as number) - (bv as number) : (bv as number) - (av as number);
     });
     return data;
-  }, [allProducts, selectedCategory, excludedBrands, sortKey, sortDir, searchQuery, selectedDatePreset]);
+  }, [allProducts, selectedCategory, excludedBrands, sortKey, sortDir, searchQuery, selectedDatePreset, stockFilter]);
 
   const paged = filtered.slice(page * ITEMS_PER_PAGE, (page + 1) * ITEMS_PER_PAGE);
   const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
@@ -342,7 +346,7 @@ const ProductAnalysis = ({ externalProducts, externalLoading }: ProductAnalysisP
               <SortHeader label="Dernier vu" sortKeyName="lastSeen" />
               <SortHeader label="Note" sortKeyName="rating" />
               <SortHeader label="Vendeurs" sortKeyName="sellers" />
-              <SortHeader label="Score" sortKeyName="score" />
+              <th className="text-left px-4 py-3"><span className="soft-label"></span></th>
               <th className="text-left px-4 py-3"><span className="soft-label"></span></th>
             </tr>
           </thead>
@@ -409,14 +413,6 @@ const ProductAnalysis = ({ externalProducts, externalLoading }: ProductAnalysisP
                         color: product.sellers >= 25 ? 'hsl(262 72% 72%)' : product.sellers >= 15 ? 'hsl(262 50% 62%)' : 'hsl(210 10% 50%)',
                         textShadow: product.sellers >= 25 ? '0 0 8px hsl(262 52% 58% / 0.3)' : undefined,
                       }}>{product.sellers}</span>
-                    </div>
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-2">
-                      <div className="w-16 h-2 rounded-full overflow-hidden" style={{ background: 'hsl(225 18% 12%)' }}>
-                        <div className="h-full rounded-full" style={{ width: `${product.score}%`, backgroundColor: scoreStyle.bg, boxShadow: `0 0 8px ${scoreStyle.shadow}` }} />
-                      </div>
-                      <span className="text-xs font-black font-mono" style={{ color: scoreStyle.color, textShadow: `0 0 8px ${scoreStyle.shadow}` }}>{product.score}</span>
                     </div>
                   </td>
                   <td className="px-4 py-3">
