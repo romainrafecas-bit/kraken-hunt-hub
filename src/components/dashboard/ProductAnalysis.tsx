@@ -241,44 +241,103 @@ const ProductAnalysis = ({ externalProducts, externalLoading }: ProductAnalysisP
             </div>
           </div>
         </div>
-        {/* Filters */}
-        <div className="mt-4 space-y-3">
-          {/* Categories - horizontal scroll */}
-          <div className="flex items-center gap-2">
-            <span className="soft-label mr-1 flex-shrink-0">Catégorie</span>
-            <div ref={catScrollRef} className="flex items-center gap-2 overflow-x-auto scrollbar-hide pb-1" style={{ scrollbarWidth: 'none' }}>
+        {/* Filters row */}
+        <div className="mt-4 flex flex-wrap items-center gap-3">
+          {/* Category dropdown */}
+          <div className="relative">
+            <select
+              value={selectedCategory}
+              onChange={e => { setSelectedCategory(e.target.value); setPage(0); }}
+              className="bg-secondary/60 border border-border/40 rounded-xl px-3 py-2 text-sm text-foreground focus:outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all appearance-none cursor-pointer pr-8 min-w-[160px]"
+              style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%234dd4ac' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 10px center' }}
+            >
               {dynamicCategories.map(cat => (
-                <button key={cat} onClick={() => { setSelectedCategory(cat); setPage(0); }}
-                  className={cn("px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 whitespace-nowrap flex-shrink-0",
-                    selectedCategory === cat ? "bio-teal" : "bg-secondary/40 text-muted-foreground border border-transparent hover:text-foreground hover:bg-secondary/70")}>
-                  {cat === "Tous" ? "Tous" : formatCategoryName(cat)}
-                </button>
+                <option key={cat} value={cat} className="bg-card text-foreground">
+                  {formatCategoryName(cat)}
+                </option>
               ))}
+            </select>
+          </div>
+
+          {/* Date preset dropdown */}
+          <div className="relative flex items-center gap-2">
+            <CalendarDays className="w-3.5 h-3.5 flex-shrink-0" style={{ color: 'hsl(262 72% 72%)' }} />
+            <select
+              value={selectedDatePreset}
+              onChange={e => { setSelectedDatePreset(e.target.value); setPage(0); }}
+              className="bg-secondary/60 border border-border/40 rounded-xl px-3 py-2 text-sm text-foreground focus:outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all appearance-none cursor-pointer pr-8 min-w-[120px]"
+              style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%234dd4ac' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 10px center' }}
+            >
+              {datePresets.map(dp => (
+                <option key={dp.value} value={dp.value} className="bg-card text-foreground">{dp.label}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* Exclude brands dropdown (multi-select styled) */}
+          <div className="relative">
+            <div className="relative">
+              <button
+                onClick={() => {
+                  const el = document.getElementById('brand-exclude-dropdown');
+                  if (el) el.classList.toggle('hidden');
+                }}
+                className="bg-secondary/60 border border-border/40 rounded-xl px-3 py-2 text-sm text-foreground focus:outline-none focus:border-primary/40 transition-all cursor-pointer pr-8 min-w-[180px] text-left flex items-center gap-2"
+                style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%234dd4ac' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 10px center' }}
+              >
+                <Filter className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
+                <span className="truncate">
+                  {excludedBrands.size === 0 ? "Exclure des marques" : `${excludedBrands.size} marque${excludedBrands.size > 1 ? 's' : ''} exclue${excludedBrands.size > 1 ? 's' : ''}`}
+                </span>
+              </button>
+              <div id="brand-exclude-dropdown" className="hidden absolute z-30 mt-1 w-64 bg-card border border-border/50 rounded-xl p-2 shadow-2xl max-h-56 overflow-auto">
+                {excludedBrands.size > 0 && (
+                  <button
+                    onClick={() => { setExcludedBrands(new Set()); setPage(0); }}
+                    className="w-full text-left px-3 py-1.5 rounded-lg text-xs text-primary hover:bg-primary/10 transition-colors mb-1 font-medium"
+                  >
+                    ✕ Réinitialiser tout
+                  </button>
+                )}
+                {dynamicBrands.filter(b => b !== "Toutes").map(brand => (
+                  <button
+                    key={brand}
+                    onClick={() => toggleExcludeBrand(brand)}
+                    className={cn(
+                      "w-full text-left px-3 py-1.5 rounded-lg text-sm transition-colors flex items-center justify-between",
+                      excludedBrands.has(brand)
+                        ? "text-red-400 bg-red-500/10"
+                        : "text-muted-foreground hover:text-foreground hover:bg-secondary/60"
+                    )}
+                  >
+                    <span>{formatCategoryName(brand)}</span>
+                    {excludedBrands.has(brand) && <X className="w-3.5 h-3.5" />}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
-          {/* Brands - excludable */}
-          <div className="flex items-center gap-2">
-            <span className="soft-label mr-1 flex-shrink-0 flex items-center gap-1">
-              <Filter className="w-3 h-3" /> Exclure
-            </span>
-            <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide pb-1" style={{ scrollbarWidth: 'none' }}>
-              {dynamicBrands.filter(b => b !== "Toutes").map(brand => (
-                <button key={brand} onClick={() => toggleExcludeBrand(brand)}
-                  className={cn("px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 whitespace-nowrap flex-shrink-0 flex items-center gap-1",
-                    excludedBrands.has(brand)
-                      ? "bg-red-500/15 text-red-400 border border-red-500/30"
-                      : "bg-secondary/40 text-muted-foreground border border-transparent hover:text-foreground hover:bg-secondary/70")}>
+
+          {/* Excluded brand pills */}
+          {excludedBrands.size > 0 && (
+            <div className="flex items-center gap-1.5 flex-wrap">
+              {[...excludedBrands].map(brand => (
+                <span key={brand} className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs bg-red-500/10 text-red-400 border border-red-500/20">
                   {formatCategoryName(brand)}
-                  {excludedBrands.has(brand) && <X className="w-3 h-3" />}
-                </button>
+                  <button onClick={() => toggleExcludeBrand(brand)} className="hover:text-red-300 transition-colors">
+                    <X className="w-3 h-3" />
+                  </button>
+                </span>
               ))}
             </div>
-            {excludedBrands.size > 0 && (
-              <button onClick={() => { setExcludedBrands(new Set()); setPage(0); }}
-                className="text-xs text-muted-foreground hover:text-foreground transition-colors flex-shrink-0 underline">
-                Réinitialiser
-              </button>
-            )}
+          )}
+
+          {/* Search */}
+          <div className="relative ml-auto">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+            <input type="text" placeholder="Traquer un produit..." value={searchQuery}
+              onChange={e => { setSearchQuery(e.target.value); setPage(0); }}
+              className="bg-secondary/60 border border-border/40 rounded-xl pl-9 pr-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 w-full lg:w-56 transition-all" />
           </div>
         </div>
       </div>
