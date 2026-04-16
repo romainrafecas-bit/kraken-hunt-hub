@@ -2,8 +2,8 @@ import { useState, useMemo, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { ArrowUpDown, ArrowUp, ArrowDown, ChevronLeft, ChevronRight, Search, Users, CalendarDays, Crosshair, Clock, Heart, X, Filter } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Product, categories, brands } from "@/data/products";
-import { useProducts } from "@/hooks/useProducts";
+import { Product } from "@/data/products";
+import { useProductsPaginated } from "@/hooks/useProductsPaginated";
 import { externalSupabase as supabase } from "@/integrations/supabase/external-client";
 import ProductSkeleton from "./ProductSkeleton";
 import EmptyState from "./EmptyState";
@@ -11,7 +11,7 @@ import EmptyState from "./EmptyState";
 type SortKey = "price" | "recurrences" | "rating" | "name" | "brand" | "sellers" | "lastSeen";
 type SortDir = "asc" | "desc";
 
-const ITEMS_PER_PAGE = 12;
+const ITEMS_PER_PAGE = 20;
 
 const datePresets = [
   { label: "Tout", value: "all" },
@@ -24,53 +24,22 @@ const datePresets = [
 
 const categoryDisplayNames: Record<string, string> = {
   "Tous": "Tous",
-  "telephonie": "Téléphonie",
-  "photo-numerique": "Photo Numérique",
-  "informatique": "Informatique",
-  "tv-son": "TV & Son",
-  "electromenager": "Électroménager",
-  "gaming": "Gaming",
-  "maison": "Maison",
-  "jouets": "Jouets",
-  "sport": "Sport",
-  "mode": "Mode",
-  "beaute": "Beauté",
-  "auto": "Auto",
-  "bagages": "Bagages",
-  "juniors": "Juniors",
-  "image-son": "Image & Son",
-  "high-tech": "High-Tech",
-  "bricolage": "Bricolage",
-  "jardin": "Jardin",
-  "animalerie": "Animalerie",
-  "epicerie": "Épicerie",
-  "bebe": "Bébé",
-  "loisirs": "Loisirs",
-  "bijoux": "Bijoux & Montres",
-  "literie": "Literie",
-  "bureau": "Bureau",
-  "vin": "Vin & Spiritueux",
+  "telephonie": "Téléphonie", "photo-numerique": "Photo Numérique", "informatique": "Informatique",
+  "tv-son": "TV & Son", "electromenager": "Électroménager", "gaming": "Gaming", "maison": "Maison",
+  "jouets": "Jouets", "sport": "Sport", "mode": "Mode", "beaute": "Beauté", "auto": "Auto",
+  "bagages": "Bagages", "juniors": "Juniors", "image-son": "Image & Son", "high-tech": "High-Tech",
+  "bricolage": "Bricolage", "jardin": "Jardin", "animalerie": "Animalerie", "epicerie": "Épicerie",
+  "bebe": "Bébé", "loisirs": "Loisirs", "bijoux": "Bijoux & Montres", "literie": "Literie",
+  "bureau": "Bureau", "vin": "Vin & Spiritueux",
 };
 
 function formatCategoryName(slug: string): string {
   if (categoryDisplayNames[slug]) return categoryDisplayNames[slug];
   if (categoryDisplayNames[slug.toLowerCase()]) return categoryDisplayNames[slug.toLowerCase()];
-  // Fallback: capitalize each word, replace dashes/underscores with spaces
-  return slug
-    .replace(/[-_]/g, ' ')
-    .replace(/\b\w/g, c => c.toUpperCase());
+  return slug.replace(/[-_]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
 }
 
-interface ProductAnalysisProps {
-  externalProducts?: Product[];
-  externalLoading?: boolean;
-}
-
-const ProductAnalysis = ({ externalProducts, externalLoading }: ProductAnalysisProps) => {
-  const { products: fetchedProducts, loading: fetchLoading } = useProducts();
-  const allProducts = externalProducts || fetchedProducts;
-  const isLoading = externalLoading ?? fetchLoading;
-
+const ProductAnalysis = () => {
   const [selectedCategory, setSelectedCategory] = useState("Tous");
   const [excludedBrands, setExcludedBrands] = useState<Set<string>>(new Set());
   const [selectedDatePreset, setSelectedDatePreset] = useState("all");
@@ -84,7 +53,51 @@ const ProductAnalysis = ({ externalProducts, externalLoading }: ProductAnalysisP
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [userId, setUserId] = useState<string | null>(null);
 
-  // Close brand dropdown on outside click
+  // Fetch categories list for dropdown
+  const [dynamicCategories, setDynamicCategories] = useState<string[]>(["Tous"]);
+  const [dynamicBrands, setDynamicBrands] = useState<string[]>(["Toutes"]);
+
+  useEffect(() => {
+    // Fetch distinct categories and brands (lightweight)
+    const fetchMeta = async () => {
+      const PAGE = 1000;
+      const cats = new Set<string>();
+      const brands = new Set<string>();
+      let from = 0;
+      while (true) {
+        const { data } = await supabase
+          .from("products")
+          .select("category, brand")
+          .range(from, from + PAGE - 1);
+        if (!data || data.length === 0) break;
+        data.forEach((r: any) => {
+          if (r.category) cats.add(r.category);
+          if (r.brand) brands.add(r.brand);
+        });
+        if (data.length < PAGE) break;
+        from += PAGE;
+      }
+      setDynamicCategories(["Tous", ...[...cats].sort()]);
+      setDynamicBrands(["Toutes", ...[...brands].sort()]);
+    };
+    fetchMeta();
+  }, []);
+
+  const filters = useMemo(() => ({
+    category: selectedCategory,
+    excludedBrands,
+    searchQuery,
+    stockFilter,
+    datePreset: selectedDatePreset,
+    sortKey,
+    sortDir,
+    page,
+    pageSize: ITEMS_PER_PAGE,
+  }), [selectedCategory, excludedBrands, searchQuery, stockFilter, selectedDatePreset, sortKey, sortDir, page]);
+
+  const { products: paged, totalCount, loading: isLoading } = useProductsPaginated(filters);
+  const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE);
+
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (brandDropdownRef.current && !brandDropdownRef.current.contains(e.target as Node)) {
@@ -123,16 +136,6 @@ const ProductAnalysis = ({ externalProducts, externalLoading }: ProductAnalysisP
     }
   };
 
-  const dynamicCategories = useMemo(() => {
-    const cats = [...new Set(allProducts.map(p => p.category))].sort();
-    return ["Tous", ...cats];
-  }, [allProducts]);
-
-  const dynamicBrands = useMemo(() => {
-    const b = [...new Set(allProducts.map(p => p.brand))].sort();
-    return ["Toutes", ...b];
-  }, [allProducts]);
-
   const toggleExcludeBrand = (brand: string) => {
     setExcludedBrands(prev => {
       const next = new Set(prev);
@@ -141,42 +144,6 @@ const ProductAnalysis = ({ externalProducts, externalLoading }: ProductAnalysisP
     });
     setPage(0);
   };
-
-  const filtered = useMemo(() => {
-    let data = [...allProducts];
-    if (selectedCategory !== "Tous") data = data.filter(p => p.category === selectedCategory);
-    if (excludedBrands.size > 0) data = data.filter(p => !excludedBrands.has(p.brand));
-    if (searchQuery) data = data.filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()) || p.brand.toLowerCase().includes(searchQuery.toLowerCase()));
-    // Stock filter
-    if (stockFilter === "in_stock") data = data.filter(p => p.price !== -1);
-    if (stockFilter === "out_of_stock") data = data.filter(p => p.price === -1);
-    // Date filtering based on actual dd/mm/yyyy dates
-    if (selectedDatePreset !== "all") {
-      const now = Date.now();
-      const cutoffs: Record<string, number> = { "24h": 86400000, "7d": 604800000, "30d": 2592000000, "3m": 7776000000, "6m": 15552000000 };
-      const cutoff = cutoffs[selectedDatePreset];
-      if (cutoff) {
-        data = data.filter(p => {
-          const ls = p.lastSeen;
-          if (!ls || ls === "Inconnu") return false;
-          const parts = ls.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
-          if (!parts) return false;
-          const date = new Date(Number(parts[3]), Number(parts[2]) - 1, Number(parts[1]));
-          return (now - date.getTime()) <= cutoff;
-        });
-      }
-    }
-    data.sort((a, b) => {
-      const av = a[sortKey];
-      const bv = b[sortKey];
-      if (typeof av === "string" && typeof bv === "string") return sortDir === "asc" ? av.localeCompare(bv) : bv.localeCompare(av);
-      return sortDir === "asc" ? (av as number) - (bv as number) : (bv as number) - (av as number);
-    });
-    return data;
-  }, [allProducts, selectedCategory, excludedBrands, sortKey, sortDir, searchQuery, selectedDatePreset, stockFilter]);
-
-  const paged = filtered.slice(page * ITEMS_PER_PAGE, (page + 1) * ITEMS_PER_PAGE);
-  const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
 
   const toggleSort = (key: SortKey) => {
     if (sortKey === key) setSortDir(d => d === "asc" ? "desc" : "asc");
@@ -197,13 +164,6 @@ const ProductAnalysis = ({ externalProducts, externalLoading }: ProductAnalysisP
     </th>
   );
 
-  const getScoreStyle = (score: number) => {
-    if (score >= 90) return { color: 'hsl(162 72% 52%)', shadow: 'hsl(162 68% 44% / 0.4)', bg: 'hsl(162 68% 44%)' };
-    if (score >= 80) return { color: 'hsl(174 72% 56%)', shadow: 'hsl(174 72% 46% / 0.4)', bg: 'hsl(174 72% 46%)' };
-    if (score >= 70) return { color: 'hsl(188 80% 62%)', shadow: 'hsl(188 78% 52% / 0.4)', bg: 'hsl(188 78% 52%)' };
-    return { color: 'hsl(210 10% 50%)', shadow: 'transparent', bg: 'hsl(210 10% 40%)' };
-  };
-
   const getRatingColor = (rating: number) => {
     if (rating >= 4.7) return 'hsl(38 92% 60%)';
     if (rating >= 4.4) return 'hsl(45 85% 55%)';
@@ -211,8 +171,7 @@ const ProductAnalysis = ({ externalProducts, externalLoading }: ProductAnalysisP
     return 'hsl(210 10% 50%)';
   };
 
-  if (isLoading) return <ProductSkeleton />;
-  if (allProducts.length === 0) return <EmptyState />;
+  if (isLoading && paged.length === 0) return <ProductSkeleton />;
 
   return (
     <motion.div
@@ -229,9 +188,9 @@ const ProductAnalysis = ({ externalProducts, externalLoading }: ProductAnalysisP
             <div className="flex items-center gap-3">
               <Crosshair className="w-4 h-4" style={{ color: 'hsl(174 72% 56%)', filter: 'drop-shadow(0 0 4px hsl(174 72% 46% / 0.4))' }} />
               <h3 className="font-display text-base font-bold text-foreground">Résultats d'analyse</h3>
-              <span className="bio-badge bio-teal">{filtered.length} proies</span>
+              <span className="bio-badge bio-teal">{totalCount.toLocaleString("fr-FR")} proies</span>
             </div>
-            <p className="text-xs text-muted-foreground mt-1 ml-7">Données en temps réel</p>
+            <p className="text-xs text-muted-foreground mt-1 ml-7">Données en temps réel — pagination serveur</p>
           </div>
         </div>
         {/* Filters row */}
@@ -279,7 +238,7 @@ const ProductAnalysis = ({ externalProducts, externalLoading }: ProductAnalysisP
             <option value="out_of_stock" className="bg-card text-foreground">En rupture</option>
           </select>
 
-          {/* Exclude brands dropdown (multi-select styled) */}
+          {/* Exclude brands dropdown */}
           <div className="relative" ref={brandDropdownRef}>
             <button
               onClick={() => setBrandDropdownOpen(prev => !prev)}
@@ -345,7 +304,12 @@ const ProductAnalysis = ({ externalProducts, externalLoading }: ProductAnalysisP
       </div>
 
       {/* Table */}
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto relative">
+        {isLoading && (
+          <div className="absolute inset-0 bg-background/50 backdrop-blur-sm z-10 flex items-center justify-center">
+            <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+          </div>
+        )}
         <table className="w-full">
           <thead>
             <tr className="border-b border-border/30">
@@ -359,18 +323,16 @@ const ProductAnalysis = ({ externalProducts, externalLoading }: ProductAnalysisP
               <SortHeader label="Note" sortKeyName="rating" />
               <SortHeader label="Vendeurs" sortKeyName="sellers" />
               <th className="text-left px-4 py-3"><span className="soft-label"></span></th>
-              <th className="text-left px-4 py-3"><span className="soft-label"></span></th>
             </tr>
           </thead>
           <tbody>
             {paged.map((product, i) => {
               const globalRank = page * ITEMS_PER_PAGE + i + 1;
-              const scoreStyle = getScoreStyle(product.score);
               const ratingColor = getRatingColor(product.rating);
               const isFav = product.url ? favorites.has(product.url) : false;
 
               return (
-                <motion.tr key={product.url || product.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.03 }}
+                <motion.tr key={product.url || product.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.02 }}
                   className="border-b border-border/10 hover:bg-primary/[0.03] transition-all duration-200 cursor-pointer group">
                   <td className="px-4 py-3">
                     <span className={cn("font-display text-sm font-black")}
@@ -385,7 +347,7 @@ const ProductAnalysis = ({ externalProducts, externalLoading }: ProductAnalysisP
                     </div>
                   </td>
                   <td className="px-4 py-3">
-                    <a href={product.url} target="_blank" rel="noopener noreferrer" 
+                    <a href={product.url} target="_blank" rel="noopener noreferrer"
                        className="text-sm text-foreground/90 font-medium hover:text-primary transition-colors hover:underline">
                       {product.name}
                     </a>
@@ -449,7 +411,7 @@ const ProductAnalysis = ({ externalProducts, externalLoading }: ProductAnalysisP
         <div className="p-4 border-t border-border/20 flex items-center justify-between relative">
           <div className="absolute top-0 left-0 right-0 h-px tentacle-line" />
           <span className="text-xs text-muted-foreground">
-            {page * ITEMS_PER_PAGE + 1}–{Math.min((page + 1) * ITEMS_PER_PAGE, filtered.length)} sur {filtered.length}
+            {(page * ITEMS_PER_PAGE + 1).toLocaleString("fr-FR")}–{Math.min((page + 1) * ITEMS_PER_PAGE, totalCount).toLocaleString("fr-FR")} sur {totalCount.toLocaleString("fr-FR")}
           </span>
           <div className="flex items-center gap-1.5">
             <button onClick={() => setPage(p => Math.max(0, p - 1))} disabled={page === 0}
@@ -458,7 +420,7 @@ const ProductAnalysis = ({ externalProducts, externalLoading }: ProductAnalysisP
             </button>
             {(() => {
               const pages: (number | 'ellipsis')[] = [];
-              if (totalPages <= 5) {
+              if (totalPages <= 7) {
                 for (let i = 0; i < totalPages; i++) pages.push(i);
               } else {
                 pages.push(0);
