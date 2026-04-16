@@ -4,7 +4,7 @@ import { ArrowUpDown, ArrowUp, ArrowDown, ChevronLeft, ChevronRight, Search, Use
 import { cn } from "@/lib/utils";
 import { Product, categories, brands } from "@/data/products";
 import { useProducts } from "@/hooks/useProducts";
-import { supabase } from "@/integrations/supabase/client";
+import { externalSupabase as supabase } from "@/integrations/supabase/external-client";
 import ProductSkeleton from "./ProductSkeleton";
 import EmptyState from "./EmptyState";
 
