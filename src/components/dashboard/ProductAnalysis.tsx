@@ -22,13 +22,43 @@ const datePresets = [
   { label: "6 mois", value: "6m" },
 ];
 
+const categoryDisplayNames: Record<string, string> = {
+  "Tous": "Tous",
+  "telephonie": "Téléphonie",
+  "photo-numerique": "Photo Numérique",
+  "informatique": "Informatique",
+  "tv-son": "TV & Son",
+  "electromenager": "Électroménager",
+  "gaming": "Gaming",
+  "maison": "Maison",
+  "jouets": "Jouets",
+  "sport": "Sport",
+  "mode": "Mode",
+  "beaute": "Beauté",
+  "auto": "Auto",
+  "bagages": "Bagages",
+  "juniors": "Juniors",
+  "image-son": "Image & Son",
+  "high-tech": "High-Tech",
+  "bricolage": "Bricolage",
+  "jardin": "Jardin",
+  "animalerie": "Animalerie",
+  "epicerie": "Épicerie",
+  "bebe": "Bébé",
+  "loisirs": "Loisirs",
+  "bijoux": "Bijoux & Montres",
+  "literie": "Literie",
+  "bureau": "Bureau",
+  "vin": "Vin & Spiritueux",
+};
+
 function formatCategoryName(slug: string): string {
-  if (!slug) return slug;
-  // Handle slug format: photo-numerique -> Photo Numérique
+  if (categoryDisplayNames[slug]) return categoryDisplayNames[slug];
+  if (categoryDisplayNames[slug.toLowerCase()]) return categoryDisplayNames[slug.toLowerCase()];
+  // Fallback: capitalize each word, replace dashes/underscores with spaces
   return slug
-    .split(/[-_]/)
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-    .join(' ');
+    .replace(/[-_]/g, ' ')
+    .replace(/\b\w/g, c => c.toUpperCase());
 }
 
 interface ProductAnalysisProps {
