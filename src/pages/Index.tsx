@@ -230,42 +230,40 @@ const Index = () => {
 
         <div className="px-6 lg:px-10 my-8"><div className="tentacle-line" /></div>
 
-        {/* TOP PRODUCTS */}
+        {/* DERNIÈRES PRISES */}
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }} className="px-6 lg:px-10 pb-16 relative z-10">
-          <p className="text-[10px] font-display uppercase tracking-[0.25em] text-foreground/55 font-bold mb-8">Meilleures prises</p>
+          <p className="text-[10px] font-display uppercase tracking-[0.25em] text-foreground/55 font-bold mb-8">Dernières prises</p>
           <div className="space-y-2">
             {topProducts.map((p, i) => {
               const isHovered = hoveredProduct === p.id;
-              const scoreColor = p.score >= 90 ? "162 72% 52%" : p.score >= 80 ? "174 72% 56%" : "210 10% 50%";
-              const discount = Math.round(((p.originalPrice - p.price) / p.originalPrice) * 100);
+              const ratingColor = p.rating >= 4.5 ? "162 72% 52%" : p.rating >= 3.5 ? "174 72% 56%" : p.rating >= 2.5 ? "38 92% 56%" : "210 10% 50%";
+              const stars = p.rating > 0 ? p.rating.toFixed(1) : "—";
               return (
                 <motion.div key={p.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.65 + i * 0.06, ease: [0.16, 1, 0.3, 1] }}
                   onMouseEnter={() => setHoveredProduct(p.id)} onMouseLeave={() => setHoveredProduct(null)}
                   className="group cursor-pointer relative flex items-center gap-4 p-3 rounded-xl transition-all duration-300"
-                  style={{ background: isHovered ? 'hsl(225 25% 8%)' : 'transparent', border: `1px solid ${isHovered ? `hsl(${scoreColor} / 0.15)` : 'transparent'}` }}>
+                  style={{ background: isHovered ? 'hsl(225 25% 8%)' : 'transparent', border: `1px solid ${isHovered ? `hsl(${ratingColor} / 0.15)` : 'transparent'}` }}>
                   <span className="text-lg font-display font-black w-7 text-center tabular-nums flex-shrink-0"
-                    style={{ color: i === 0 ? 'hsl(38 92% 56%)' : i < 3 ? `hsl(${scoreColor})` : 'hsl(210 14% 50%)', textShadow: i === 0 ? '0 0 14px hsl(38 92% 56% / 0.4)' : 'none' }}>
+                    style={{ color: i === 0 ? 'hsl(38 92% 56%)' : i < 3 ? `hsl(${ratingColor})` : 'hsl(210 14% 50%)', textShadow: i === 0 ? '0 0 14px hsl(38 92% 56% / 0.4)' : 'none' }}>
                     {i + 1}
                   </span>
-                  <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
-                    <img src={p.image} alt={p.name} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" style={{ filter: 'brightness(0.8) saturate(0.9)' }} />
+                  <div className="w-14 h-14 rounded-lg overflow-hidden flex-shrink-0">
+                    <img src={p.image} alt={p.name} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" style={{ filter: 'brightness(0.85) saturate(0.9)' }} />
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-display font-bold text-foreground group-hover:text-foreground transition-colors truncate">{p.name}</p>
-                    <p className="text-[10px] font-display text-foreground/50 mt-0.5">{p.brand} · {p.category}</p>
+                    <p className="text-[10px] font-display text-foreground/50 mt-0.5">{p.brand} · {formatCat(p.category)}</p>
                   </div>
                   <div className="text-right flex-shrink-0">
                     <p className="text-sm font-display font-black text-foreground tabular-nums">{p.price}<span className="text-[10px] text-foreground/50">€</span></p>
-                    {discount > 0 && <span className="text-[10px] font-display font-bold" style={{ color: 'hsl(162 68% 50%)' }}>-{discount}%</span>}
+                    <p className="text-[9px] font-display text-foreground/45">{p.lastSeen}</p>
                   </div>
-                  <div className="text-right flex-shrink-0 w-20">
-                    <p className="text-sm font-display font-black tabular-nums" style={{ color: `hsl(${scoreColor})` }}>{p.recurrences.toLocaleString("fr-FR")}</p>
-                    <p className="text-[9px] font-display text-foreground/45">récurrences</p>
+                  <div className="flex items-center gap-1 flex-shrink-0">
+                    <span className="text-base" style={{ color: `hsl(${ratingColor})` }}>★</span>
+                    <span className="text-sm font-display font-black tabular-nums" style={{ color: `hsl(${ratingColor})`, textShadow: isHovered ? `0 0 8px hsl(${ratingColor} / 0.4)` : 'none' }}>
+                      {stars}
+                    </span>
                   </div>
-                  <span className="text-[11px] font-display font-black tabular-nums px-2.5 py-1 rounded-full flex-shrink-0"
-                    style={{ background: `hsl(${scoreColor} / 0.1)`, color: `hsl(${scoreColor})`, border: `1px solid hsl(${scoreColor} / 0.15)`, textShadow: isHovered ? `0 0 8px hsl(${scoreColor} / 0.4)` : 'none' }}>
-                    {p.score}
-                  </span>
                 </motion.div>
               );
             })}
