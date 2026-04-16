@@ -79,16 +79,15 @@ export function useDashboardStats(): DashboardStats {
         for (const r of rows) {
           // Date
           if (r.added_date) {
-            let key: string;
-            const iso = new Date(r.added_date);
-            if (!isNaN(iso.getTime())) {
-              key = `${iso.getFullYear()}-${String(iso.getMonth() + 1).padStart(2, '0')}-${String(iso.getDate()).padStart(2, '0')}`;
+            let key = "";
+            // Try dd/mm/yyyy FIRST (before ISO, to avoid US mm/dd/yyyy misparse)
+            const m = r.added_date.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+            if (m) {
+              key = `${m[3]}-${m[2]}-${m[1]}`;
             } else {
-              const m = r.added_date.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
-              if (m) {
-                key = `${m[3]}-${m[2]}-${m[1]}`;
-              } else {
-                key = "";
+              const iso = new Date(r.added_date);
+              if (!isNaN(iso.getTime())) {
+                key = `${iso.getFullYear()}-${String(iso.getMonth() + 1).padStart(2, '0')}-${String(iso.getDate()).padStart(2, '0')}`;
               }
             }
             if (key) dateCountMap[key] = (dateCountMap[key] || 0) + 1;
@@ -120,12 +119,23 @@ export function useDashboardStats(): DashboardStats {
           .map(([name, d]) => ({ name, ...d }))
           .sort((a, b) => b.recurrences - a.recurrences);
 
-        // 3. Latest products (top 8)
-        const { data: latest } = await supabase
+        // 3. Latest products — fetch a batch and sort client-side since dates may be stored as text
+        const { data: latestRaw } = await supabase
           .from("products")
           .select("*")
-          .order("last_seen", { ascending: false })
-          .limit(8);
+          .limit(200);
+
+        // Parse dates and sort to find truly latest
+        const parseAnyDate = (d: string | null): number => {
+          if (!d) return 0;
+          const m = d.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+          if (m) return new Date(Number(m[3]), Number(m[2]) - 1, Number(m[1])).getTime();
+          const iso = new Date(d);
+          return isNaN(iso.getTime()) ? 0 : iso.getTime();
+        };
+        const latest = (latestRaw || [])
+          .sort((a: any, b: any) => parseAnyDate(b.added_date) - parseAnyDate(a.added_date))
+          .slice(0, 8);
 
         setStats({
           totalProducts: count || rows.length,

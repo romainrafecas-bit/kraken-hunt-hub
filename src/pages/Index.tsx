@@ -157,11 +157,13 @@ const Index = () => {
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(225, 20%, 14%)" vertical={false} />
                 <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fill: 'hsl(210, 14%, 65%)', fontSize: 11, fontWeight: 600, fontFamily: 'DM Sans' }} />
                 <YAxis axisLine={false} tickLine={false} tick={{ fill: 'hsl(210, 14%, 55%)', fontSize: 10, fontFamily: 'DM Sans' }} domain={[0, 'auto']} />
-                <Tooltip contentStyle={{ background: 'hsl(225, 32%, 8%)', border: '1px solid hsl(174, 72%, 46%, 0.2)', borderRadius: '12px', boxShadow: '0 8px 32px hsl(228, 50%, 2%, 0.6)', color: 'hsl(185, 20%, 88%)', fontSize: 12, fontFamily: 'DM Sans' }}
+                <Tooltip
+                  formatter={(value: number, name: string) => [value.toLocaleString("fr-FR"), "Total produits"]}
+                  contentStyle={{ background: 'hsl(225, 32%, 8%)', border: '1px solid hsl(174, 72%, 46%, 0.2)', borderRadius: '12px', boxShadow: '0 8px 32px hsl(228, 50%, 2%, 0.6)', color: 'hsl(185, 20%, 88%)', fontSize: 12, fontFamily: 'DM Sans' }}
                   labelStyle={{ color: 'hsl(174, 72%, 56%)', fontWeight: 700 }} cursor={{ stroke: 'hsl(174, 72%, 46%, 0.2)', strokeWidth: 1 }} />
-                <Area type="monotone" dataKey="v" stroke="hsl(174, 72%, 56%)" strokeWidth={2.5} fill="url(#chartGrad)"
-                  dot={{ r: 4, fill: 'hsl(174, 72%, 56%)', stroke: 'hsl(225, 25%, 10%)', strokeWidth: 2 }}
-                  activeDot={{ r: 6, fill: 'hsl(174, 72%, 60%)', stroke: 'hsl(174, 72%, 70%)', strokeWidth: 2, style: { filter: 'drop-shadow(0 0 6px hsl(174, 72%, 46%, 0.6))' } as any }}
+                <Area type="natural" dataKey="v" name="Total" stroke="hsl(174, 72%, 56%)" strokeWidth={2.5} fill="url(#chartGrad)"
+                  dot={false}
+                  activeDot={{ r: 5, fill: 'hsl(174, 72%, 60%)', stroke: 'hsl(174, 72%, 70%)', strokeWidth: 2, style: { filter: 'drop-shadow(0 0 6px hsl(174, 72%, 46%, 0.6))' } as any }}
                   animationDuration={1200} animationEasing="ease-out" />
               </AreaChart>
             </ResponsiveContainer>
@@ -237,9 +239,9 @@ const Index = () => {
               const ratingColor = p.rating >= 4.5 ? "162 72% 52%" : p.rating >= 3.5 ? "174 72% 56%" : p.rating >= 2.5 ? "38 92% 56%" : "210 10% 50%";
               const stars = p.rating > 0 ? p.rating.toFixed(1) : "—";
               return (
-                <motion.div key={p.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.65 + i * 0.06, ease: [0.16, 1, 0.3, 1] }}
+                <a href={p.url} target="_blank" rel="noopener noreferrer"
                   onMouseEnter={() => setHoveredProduct(p.id)} onMouseLeave={() => setHoveredProduct(null)}
-                  className="group cursor-pointer relative flex items-center gap-4 p-3 rounded-xl transition-all duration-300"
+                  className="group cursor-pointer relative flex items-center gap-4 p-3 rounded-xl transition-all duration-300 no-underline"
                   style={{ background: isHovered ? 'hsl(225 25% 8%)' : 'transparent', border: `1px solid ${isHovered ? `hsl(${ratingColor} / 0.15)` : 'transparent'}` }}>
                   <span className="text-lg font-display font-black w-7 text-center tabular-nums flex-shrink-0"
                     style={{ color: i === 0 ? 'hsl(38 92% 56%)' : i < 3 ? `hsl(${ratingColor})` : 'hsl(210 14% 50%)', textShadow: i === 0 ? '0 0 14px hsl(38 92% 56% / 0.4)' : 'none' }}>
@@ -266,7 +268,7 @@ const Index = () => {
                       {stars}
                     </span>
                   </div>
-                </motion.div>
+                </a>
               );
             })}
           </div>
