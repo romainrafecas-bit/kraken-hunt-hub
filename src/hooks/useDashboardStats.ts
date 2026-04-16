@@ -119,23 +119,16 @@ export function useDashboardStats(): DashboardStats {
           .map(([name, d]) => ({ name, ...d }))
           .sort((a, b) => b.recurrences - a.recurrences);
 
-        // 3. Latest products — fetch a batch and sort client-side since dates may be stored as text
+        // 3. Latest products — server-side sort on `updated_at` (real timestamptz),
+        // since `last_seen` and `added_date` are stored as text dd/mm/yyyy and
+        // would yield a lexicographic order (e.g. "31/12/2025" before "01/02/2026").
         const { data: latestRaw } = await supabase
           .from("products")
           .select("*")
-          .limit(200);
+          .order("updated_at", { ascending: false })
+          .limit(8);
 
-        // Parse dates and sort to find truly latest
-        const parseAnyDate = (d: string | null): number => {
-          if (!d) return 0;
-          const m = d.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
-          if (m) return new Date(Number(m[3]), Number(m[2]) - 1, Number(m[1])).getTime();
-          const iso = new Date(d);
-          return isNaN(iso.getTime()) ? 0 : iso.getTime();
-        };
-        const latest = (latestRaw || [])
-          .sort((a: any, b: any) => parseAnyDate(b.added_date) - parseAnyDate(a.added_date))
-          .slice(0, 8);
+        const latest = latestRaw || [];
 
         setStats({
           totalProducts: count || rows.length,
