@@ -79,16 +79,15 @@ export function useDashboardStats(): DashboardStats {
         for (const r of rows) {
           // Date
           if (r.added_date) {
-            let key: string;
-            const iso = new Date(r.added_date);
-            if (!isNaN(iso.getTime())) {
-              key = `${iso.getFullYear()}-${String(iso.getMonth() + 1).padStart(2, '0')}-${String(iso.getDate()).padStart(2, '0')}`;
+            let key = "";
+            // Try dd/mm/yyyy FIRST (before ISO, to avoid US mm/dd/yyyy misparse)
+            const m = r.added_date.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+            if (m) {
+              key = `${m[3]}-${m[2]}-${m[1]}`;
             } else {
-              const m = r.added_date.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
-              if (m) {
-                key = `${m[3]}-${m[2]}-${m[1]}`;
-              } else {
-                key = "";
+              const iso = new Date(r.added_date);
+              if (!isNaN(iso.getTime())) {
+                key = `${iso.getFullYear()}-${String(iso.getMonth() + 1).padStart(2, '0')}-${String(iso.getDate()).padStart(2, '0')}`;
               }
             }
             if (key) dateCountMap[key] = (dateCountMap[key] || 0) + 1;
