@@ -45,7 +45,7 @@ const Index = () => {
       acc[p.category].count += 1;
       return acc;
     }, {} as Record<string, { sales: number; count: number }>)
-  ).map(([name, d]) => ({ name, ...d })).sort((a, b) => b.sales - a.sales);
+  ).map(([name, d]) => ({ name: formatCat(name), slug: name, ...d })).sort((a, b) => b.sales - a.sales);
   const catTotal = catStats.reduce((s, c) => s + c.sales, 0) || 1;
 
   const topProducts = [...products].sort((a, b) => b.score - a.score).slice(0, 6);
