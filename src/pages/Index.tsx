@@ -1,22 +1,18 @@
 import KrakkenSidebar from "@/components/dashboard/KrakkenSidebar";
 import { motion } from "framer-motion";
 import { useProducts } from "@/hooks/useProducts";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import krakkenLogo from "@/assets/krakken-logo.png";
 import { Skeleton } from "@/components/ui/skeleton";
 import EmptyState from "@/components/dashboard/EmptyState";
 
-const dailyData = [
-  { day: "Lun", v: 3 }, { day: "Mar", v: 5 }, { day: "Mer", v: 7 },
-  { day: "Jeu", v: 4 }, { day: "Ven", v: 9 }, { day: "Sam", v: 6 }, { day: "Dim", v: 10 },
-];
-
 const catHues = [
   "174 72% 46%", "262 52% 58%", "188 78% 52%", "38 92% 56%",
   "162 68% 44%", "348 72% 56%", "310 55% 50%", "200 65% 55%", "38 72% 50%",
+  "174 72% 46%", "262 52% 58%", "188 78% 52%", "38 92% 56%",
+  "162 68% 44%", "348 72% 56%", "310 55% 50%", "200 65% 55%", "38 72% 50%",
 ];
-
 const categoryDisplayNames: Record<string, string> = {
   "telephonie": "Téléphonie", "photo-numerique": "Photo Numérique", "informatique": "Informatique",
   "tv-son": "TV & Son", "electromenager": "Électroménager", "gaming": "Gaming", "maison": "Maison",
@@ -37,6 +33,34 @@ const Index = () => {
   const { products, loading } = useProducts();
   const [hoveredCat, setHoveredCat] = useState<string | null>(null);
   const [hoveredProduct, setHoveredProduct] = useState<number | null>(null);
+
+  // Build cumulative chart data from added_date
+  const cumulativeData = useMemo(() => {
+    const dateCountMap: Record<string, number> = {};
+    products.forEach(p => {
+      if (!p.addedDate) return;
+      // Parse added_date (could be ISO or dd/mm/yyyy)
+      let date: Date | null = null;
+      const ddmmyyyy = p.addedDate.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+      if (ddmmyyyy) {
+        date = new Date(Number(ddmmyyyy[3]), Number(ddmmyyyy[2]) - 1, Number(ddmmyyyy[1]));
+      } else {
+        date = new Date(p.addedDate);
+        if (isNaN(date.getTime())) date = null;
+      }
+      if (!date) return;
+      const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+      dateCountMap[key] = (dateCountMap[key] || 0) + 1;
+    });
+    const sortedDays = Object.keys(dateCountMap).sort();
+    let cumul = 0;
+    return sortedDays.map(day => {
+      cumul += dateCountMap[day];
+      const d = new Date(day);
+      const label = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}`;
+      return { day: label, v: cumul, added: dateCountMap[day] };
+    });
+  }, [products]);
 
   const catStats = Object.entries(
     products.reduce((acc, p) => {
@@ -132,24 +156,26 @@ const Index = () => {
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }} className="px-6 lg:px-10 mt-10 relative z-10">
           <div className="flex items-end justify-between mb-6">
             <div>
-              <p className="text-[9px] font-display uppercase tracking-[0.3em] text-foreground/60 mb-1">Ce mois-ci</p>
+              <p className="text-[9px] font-display uppercase tracking-[0.3em] text-foreground/60 mb-1">Évolution</p>
               <div className="flex items-baseline gap-3">
                 <p className="text-4xl font-display font-black tabular-nums" style={{ color: 'hsl(174 72% 56%)', textShadow: '0 0 30px hsl(174 72% 46% / 0.4)' }}>
-                  {dailyData.reduce((s, d) => s + d.v, 0)}
+                  {products.length.toLocaleString("fr-FR")}
                 </p>
                 <p className="text-[10px] font-display text-foreground/55">produits scannés</p>
               </div>
             </div>
-            <div className="flex items-center gap-1.5">
-              <span className="text-[10px] font-display font-bold" style={{ color: 'hsl(162 68% 52%)' }}>
-                +{Math.round(((dailyData[6].v - dailyData[0].v) / dailyData[0].v) * 100)}%
-              </span>
-              <span className="text-[9px] font-display text-foreground/50">vs lun.</span>
-            </div>
+            {cumulativeData.length >= 2 && (
+              <div className="flex items-center gap-1.5">
+                <span className="text-[10px] font-display font-bold" style={{ color: 'hsl(162 68% 52%)' }}>
+                  +{cumulativeData[cumulativeData.length - 1].added}
+                </span>
+                <span className="text-[9px] font-display text-foreground/50">dernier jour</span>
+              </div>
+            )}
           </div>
           <div className="w-full h-52 mt-2">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={dailyData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+              <AreaChart data={cumulativeData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <defs>
                   <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0%" stopColor="hsl(174, 72%, 46%)" stopOpacity={0.35} />

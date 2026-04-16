@@ -64,6 +64,7 @@ export function mapToProduct(p: SupabaseProduct, index: number): Product {
     sellers,
     image: p.image_url || "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=80&h=80&fit=crop",
     url: p.url,
+    addedDate: p.added_date || undefined,
   };
 }
 
