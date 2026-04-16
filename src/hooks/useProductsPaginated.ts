@@ -15,14 +15,19 @@ interface Filters {
   pageSize: number;
 }
 
-// Map client sort keys to DB columns
+// Map client sort keys to DB columns.
+// IMPORTANT: `last_seen` is stored as TEXT (dd/mm/yyyy) in the external DB,
+// so a server-side ORDER BY on it is lexicographic (e.g. "31/12/2025" > "01/02/2026").
+// We use `updated_at` (real timestamptz, refreshed at each scrape) as the
+// chronological proxy for "Dernier vu" sorting/filters. The UI keeps showing
+// the textual `last_seen` value as the business date.
 const sortKeyToColumn: Record<string, string> = {
   name: "title",
   brand: "brand",
   price: "price",
   rating: "rating",
   sellers: "sellers_count",
-  lastSeen: "last_seen",
+  lastSeen: "updated_at",
   recurrences: "recurrences",
 };
 
