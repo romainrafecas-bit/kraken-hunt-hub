@@ -15,6 +15,7 @@ const ITEMS_PER_PAGE = 20;
 
 const datePresets = [
   { label: "Tout", value: "all" },
+  { label: "2026", value: "2026" },
   { label: "24h", value: "24h" },
   { label: "7 jours", value: "7d" },
   { label: "30 jours", value: "30d" },
