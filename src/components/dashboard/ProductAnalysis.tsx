@@ -269,22 +269,19 @@ const ProductAnalysis = ({ externalProducts, externalLoading }: ProductAnalysisP
           </div>
 
           {/* Exclude brands dropdown (multi-select styled) */}
-          <div className="relative">
-            <div className="relative">
-              <button
-                onClick={() => {
-                  const el = document.getElementById('brand-exclude-dropdown');
-                  if (el) el.classList.toggle('hidden');
-                }}
-                className="bg-secondary/60 border border-border/40 rounded-xl px-3 py-2 text-sm text-foreground focus:outline-none focus:border-primary/40 transition-all cursor-pointer pr-8 min-w-[180px] text-left flex items-center gap-2"
-                style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%234dd4ac' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 10px center' }}
-              >
-                <Filter className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
-                <span className="truncate">
-                  {excludedBrands.size === 0 ? "Exclure des marques" : `${excludedBrands.size} marque${excludedBrands.size > 1 ? 's' : ''} exclue${excludedBrands.size > 1 ? 's' : ''}`}
-                </span>
-              </button>
-              <div id="brand-exclude-dropdown" className="hidden absolute z-30 mt-1 w-64 bg-card border border-border/50 rounded-xl p-2 shadow-2xl max-h-56 overflow-auto">
+          <div className="relative" ref={brandDropdownRef}>
+            <button
+              onClick={() => setBrandDropdownOpen(prev => !prev)}
+              className="bg-secondary/60 border border-border/40 rounded-xl px-3 py-2 text-sm text-foreground focus:outline-none focus:border-primary/40 transition-all cursor-pointer pr-8 min-w-[180px] text-left flex items-center gap-2"
+              style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%234dd4ac' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 10px center' }}
+            >
+              <Filter className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
+              <span className="truncate">
+                {excludedBrands.size === 0 ? "Exclure des marques" : `${excludedBrands.size} marque${excludedBrands.size > 1 ? 's' : ''} exclue${excludedBrands.size > 1 ? 's' : ''}`}
+              </span>
+            </button>
+            {brandDropdownOpen && (
+              <div className="absolute z-30 mt-1 w-64 bg-card border border-border/50 rounded-xl p-2 shadow-2xl max-h-56 overflow-auto">
                 {excludedBrands.size > 0 && (
                   <button
                     onClick={() => { setExcludedBrands(new Set()); setPage(0); }}
@@ -309,7 +306,7 @@ const ProductAnalysis = ({ externalProducts, externalLoading }: ProductAnalysisP
                   </button>
                 ))}
               </div>
-            </div>
+            )}
           </div>
 
           {/* Excluded brand pills */}
