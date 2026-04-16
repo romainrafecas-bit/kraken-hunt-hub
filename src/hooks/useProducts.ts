@@ -33,6 +33,11 @@ function formatLastSeen(lastSeen: string | null): string {
 }
 
 export function mapToProduct(p: SupabaseProduct, index: number): Product {
+  // sellers_count: 0 means 1 seller, unless out of stock
+  const sellers = (p.sellers_count === 0 || p.sellers_count === null) 
+    ? (p.in_stock === false ? 0 : 1) 
+    : p.sellers_count;
+
   return {
     id: index + 1,
     name: p.title,
@@ -44,7 +49,7 @@ export function mapToProduct(p: SupabaseProduct, index: number): Product {
     lastSeen: formatLastSeen(p.last_seen),
     rating: Number(p.rating) || 0,
     score: Math.min(100, Math.round((Number(p.rating) || 0) * 20)),
-    sellers: p.sellers_count || 0,
+    sellers,
     image: p.image_url || "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=80&h=80&fit=crop",
     url: p.url,
   };

@@ -368,7 +368,7 @@ const ProductAnalysis = ({ externalProducts, externalLoading }: ProductAnalysisP
                     </span>
                   </td>
                   <td className="px-4 py-3">
-                    <div className="w-10 h-10 rounded-xl overflow-hidden flex-shrink-0 group-hover:scale-105 transition-transform duration-300"
+                    <div className="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 group-hover:scale-105 transition-transform duration-300"
                       style={{ border: '1px solid hsl(225 20% 15%)', boxShadow: '0 2px 8px hsl(228 50% 2% / 0.4)' }}>
                       <img src={product.image} alt={product.name} className="w-full h-full object-cover" loading="lazy" />
                     </div>
