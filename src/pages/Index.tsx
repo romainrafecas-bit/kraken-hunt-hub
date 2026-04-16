@@ -17,6 +17,22 @@ const catHues = [
   "162 68% 44%", "348 72% 56%", "310 55% 50%", "200 65% 55%", "38 72% 50%",
 ];
 
+const categoryDisplayNames: Record<string, string> = {
+  "telephonie": "Téléphonie", "photo-numerique": "Photo Numérique", "informatique": "Informatique",
+  "tv-son": "TV & Son", "electromenager": "Électroménager", "gaming": "Gaming", "maison": "Maison",
+  "jouets": "Jouets", "sport": "Sport", "mode": "Mode", "beaute": "Beauté", "auto": "Auto",
+  "bagages": "Bagages", "juniors": "Juniors", "image-son": "Image & Son", "high-tech": "High-Tech",
+  "bricolage": "Bricolage", "jardin": "Jardin", "animalerie": "Animalerie", "epicerie": "Épicerie",
+  "bebe": "Bébé", "loisirs": "Loisirs", "bijoux": "Bijoux & Montres", "literie": "Literie",
+  "bureau": "Bureau", "vin": "Vin & Spiritueux", "le-sport": "Le Sport", "le-jardin": "Le Jardin",
+};
+
+function formatCat(slug: string): string {
+  if (categoryDisplayNames[slug]) return categoryDisplayNames[slug];
+  if (categoryDisplayNames[slug.toLowerCase()]) return categoryDisplayNames[slug.toLowerCase()];
+  return slug.replace(/[-_]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+}
+
 const Index = () => {
   const { products, loading } = useProducts();
   const [hoveredCat, setHoveredCat] = useState<string | null>(null);
