@@ -156,24 +156,26 @@ const Index = () => {
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }} className="px-6 lg:px-10 mt-10 relative z-10">
           <div className="flex items-end justify-between mb-6">
             <div>
-              <p className="text-[9px] font-display uppercase tracking-[0.3em] text-foreground/60 mb-1">Ce mois-ci</p>
+              <p className="text-[9px] font-display uppercase tracking-[0.3em] text-foreground/60 mb-1">Évolution</p>
               <div className="flex items-baseline gap-3">
                 <p className="text-4xl font-display font-black tabular-nums" style={{ color: 'hsl(174 72% 56%)', textShadow: '0 0 30px hsl(174 72% 46% / 0.4)' }}>
-                  {dailyData.reduce((s, d) => s + d.v, 0)}
+                  {products.length.toLocaleString("fr-FR")}
                 </p>
                 <p className="text-[10px] font-display text-foreground/55">produits scannés</p>
               </div>
             </div>
-            <div className="flex items-center gap-1.5">
-              <span className="text-[10px] font-display font-bold" style={{ color: 'hsl(162 68% 52%)' }}>
-                +{Math.round(((dailyData[6].v - dailyData[0].v) / dailyData[0].v) * 100)}%
-              </span>
-              <span className="text-[9px] font-display text-foreground/50">vs lun.</span>
-            </div>
+            {cumulativeData.length >= 2 && (
+              <div className="flex items-center gap-1.5">
+                <span className="text-[10px] font-display font-bold" style={{ color: 'hsl(162 68% 52%)' }}>
+                  +{cumulativeData[cumulativeData.length - 1].added}
+                </span>
+                <span className="text-[9px] font-display text-foreground/50">dernier jour</span>
+              </div>
+            )}
           </div>
           <div className="w-full h-52 mt-2">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={dailyData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+              <AreaChart data={cumulativeData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <defs>
                   <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0%" stopColor="hsl(174, 72%, 46%)" stopOpacity={0.35} />
