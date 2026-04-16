@@ -267,6 +267,18 @@ const ProductAnalysis = ({ externalProducts, externalLoading }: ProductAnalysisP
             </select>
           </div>
 
+          {/* Stock filter */}
+          <select
+            value={stockFilter}
+            onChange={e => { setStockFilter(e.target.value as any); setPage(0); }}
+            className="bg-secondary/60 border border-border/40 rounded-xl px-3 py-2 text-sm text-foreground focus:outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all appearance-none cursor-pointer pr-8 min-w-[130px]"
+            style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%234dd4ac' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 10px center' }}
+          >
+            <option value="all" className="bg-card text-foreground">Tous les stocks</option>
+            <option value="in_stock" className="bg-card text-foreground">En stock</option>
+            <option value="out_of_stock" className="bg-card text-foreground">En rupture</option>
+          </select>
+
           {/* Exclude brands dropdown (multi-select styled) */}
           <div className="relative" ref={brandDropdownRef}>
             <button
