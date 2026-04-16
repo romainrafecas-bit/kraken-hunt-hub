@@ -192,14 +192,16 @@ const ProductAnalysis = ({ externalProducts, externalLoading }: ProductAnalysisP
             </div>
             <p className="text-xs text-muted-foreground mt-1 ml-7">Données en temps réel</p>
           </div>
-          <div className="flex items-center gap-3">
-            <div className="relative flex items-center gap-2">
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2">
               <CalendarDays className="w-3.5 h-3.5" style={{ color: 'hsl(262 72% 72%)' }} />
-              <select value={selectedMonth} onChange={e => setSelectedMonth(Number(e.target.value))}
-                className="bg-secondary/60 border border-border/40 rounded-xl px-3 py-2 text-sm text-foreground focus:outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all appearance-none cursor-pointer pr-8"
-                style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%234dd4ac' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 10px center' }}>
-                {months.map((m, i) => (<option key={m} value={i} className="bg-card text-foreground">{m} 2026</option>))}
-              </select>
+              {datePresets.map(dp => (
+                <button key={dp.value} onClick={() => { setSelectedDatePreset(dp.value); setPage(0); }}
+                  className={cn("px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all duration-200",
+                    selectedDatePreset === dp.value ? "bio-violet" : "bg-secondary/40 text-muted-foreground hover:text-foreground hover:bg-secondary/70")}>
+                  {dp.label}
+                </button>
+              ))}
             </div>
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
@@ -211,26 +213,42 @@ const ProductAnalysis = ({ externalProducts, externalLoading }: ProductAnalysisP
         </div>
         {/* Filters */}
         <div className="mt-4 space-y-3">
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="soft-label mr-1">Catégorie</span>
-            {dynamicCategories.map(cat => (
-              <button key={cat} onClick={() => { setSelectedCategory(cat); setPage(0); }}
-                className={cn("px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200",
-                  selectedCategory === cat ? "bio-teal" : "bg-secondary/40 text-muted-foreground border border-transparent hover:text-foreground hover:bg-secondary/70")}>
-                {cat}
-              </button>
-            ))}
+          {/* Categories - horizontal scroll */}
+          <div className="flex items-center gap-2">
+            <span className="soft-label mr-1 flex-shrink-0">Catégorie</span>
+            <div ref={catScrollRef} className="flex items-center gap-2 overflow-x-auto scrollbar-hide pb-1" style={{ scrollbarWidth: 'none' }}>
+              {dynamicCategories.map(cat => (
+                <button key={cat} onClick={() => { setSelectedCategory(cat); setPage(0); }}
+                  className={cn("px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 whitespace-nowrap flex-shrink-0",
+                    selectedCategory === cat ? "bio-teal" : "bg-secondary/40 text-muted-foreground border border-transparent hover:text-foreground hover:bg-secondary/70")}>
+                  {cat === "Tous" ? "Tous" : formatCategoryName(cat)}
+                </button>
+              ))}
+            </div>
           </div>
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="soft-label mr-1">Marque</span>
-            {dynamicBrands.slice(0, 10).map(brand => (
-              <button key={brand} onClick={() => { setSelectedBrand(brand); setPage(0); }}
-                className={cn("px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200",
-                  selectedBrand === brand ? "bio-violet" : "bg-secondary/40 text-muted-foreground border border-transparent hover:text-foreground hover:bg-secondary/70")}>
-                {brand}
+          {/* Brands - excludable */}
+          <div className="flex items-center gap-2">
+            <span className="soft-label mr-1 flex-shrink-0 flex items-center gap-1">
+              <Filter className="w-3 h-3" /> Exclure
+            </span>
+            <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide pb-1" style={{ scrollbarWidth: 'none' }}>
+              {dynamicBrands.filter(b => b !== "Toutes").map(brand => (
+                <button key={brand} onClick={() => toggleExcludeBrand(brand)}
+                  className={cn("px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 whitespace-nowrap flex-shrink-0 flex items-center gap-1",
+                    excludedBrands.has(brand)
+                      ? "bg-red-500/15 text-red-400 border border-red-500/30"
+                      : "bg-secondary/40 text-muted-foreground border border-transparent hover:text-foreground hover:bg-secondary/70")}>
+                  {formatCategoryName(brand)}
+                  {excludedBrands.has(brand) && <X className="w-3 h-3" />}
+                </button>
+              ))}
+            </div>
+            {excludedBrands.size > 0 && (
+              <button onClick={() => { setExcludedBrands(new Set()); setPage(0); }}
+                className="text-xs text-muted-foreground hover:text-foreground transition-colors flex-shrink-0 underline">
+                Réinitialiser
               </button>
-            ))}
-            {dynamicBrands.length > 11 && <span className="text-xs text-muted-foreground/40">+{dynamicBrands.length - 11}</span>}
+            )}
           </div>
         </div>
       </div>
