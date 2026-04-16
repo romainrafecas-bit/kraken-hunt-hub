@@ -34,6 +34,34 @@ const Index = () => {
   const [hoveredCat, setHoveredCat] = useState<string | null>(null);
   const [hoveredProduct, setHoveredProduct] = useState<number | null>(null);
 
+  // Build cumulative chart data from added_date
+  const cumulativeData = useMemo(() => {
+    const dateCountMap: Record<string, number> = {};
+    products.forEach(p => {
+      if (!p.addedDate) return;
+      // Parse added_date (could be ISO or dd/mm/yyyy)
+      let date: Date | null = null;
+      const ddmmyyyy = p.addedDate.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+      if (ddmmyyyy) {
+        date = new Date(Number(ddmmyyyy[3]), Number(ddmmyyyy[2]) - 1, Number(ddmmyyyy[1]));
+      } else {
+        date = new Date(p.addedDate);
+        if (isNaN(date.getTime())) date = null;
+      }
+      if (!date) return;
+      const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+      dateCountMap[key] = (dateCountMap[key] || 0) + 1;
+    });
+    const sortedDays = Object.keys(dateCountMap).sort();
+    let cumul = 0;
+    return sortedDays.map(day => {
+      cumul += dateCountMap[day];
+      const d = new Date(day);
+      const label = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}`;
+      return { day: label, v: cumul, added: dateCountMap[day] };
+    });
+  }, [products]);
+
   const catStats = Object.entries(
     products.reduce((acc, p) => {
       if (!acc[p.category]) acc[p.category] = { sales: 0, count: 0 };
