@@ -386,7 +386,7 @@ const ProductAnalysis = ({ externalProducts, externalLoading }: ProductAnalysisP
               return pages.map((p, idx) =>
                 p === 'ellipsis' ? (
                   <span key={`e-${idx}`} className="w-8 h-8 flex items-center justify-center text-muted-foreground/40">
-                    <MoreHorizontal className="w-4 h-4" />
+                    <span className="text-sm">···</span>
                   </span>
                 ) : (
                   <button key={p} onClick={() => setPage(p)}
