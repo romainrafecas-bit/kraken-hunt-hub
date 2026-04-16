@@ -22,23 +22,35 @@ export interface SupabaseProduct {
 }
 
 function parseDate(dateStr: string): Date | null {
-  // Handle dd/mm/yyyy format
-  const ddmmyyyy = dateStr.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
-  if (ddmmyyyy) {
-    return new Date(Number(ddmmyyyy[3]), Number(ddmmyyyy[2]) - 1, Number(ddmmyyyy[1]));
+  // DD/MM/YYYY format
+  const dmy = dateStr.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})$/);
+  if (dmy) {
+    let yearNum = parseInt(dmy[3]);
+    if (yearNum < 100) yearNum += 2000;
+    const dayNum = parseInt(dmy[1]);
+    const monthNum = parseInt(dmy[2]);
+    if (monthNum < 1 || monthNum > 12 || dayNum < 1 || dayNum > 31) return null;
+    const result = new Date(Date.UTC(yearNum, monthNum - 1, dayNum));
+    if (result.getUTCDate() !== dayNum || result.getUTCMonth() !== monthNum - 1) return null;
+    return result;
   }
-  // Fallback to ISO/standard parsing
-  const d = new Date(dateStr);
-  return isNaN(d.getTime()) ? null : d;
+  // ISO format
+  const iso = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (iso) {
+    const result = new Date(Date.UTC(+iso[1], +iso[2] - 1, +iso[3]));
+    if (result.getUTCDate() !== +iso[3] || result.getUTCMonth() !== +iso[2] - 1) return null;
+    return result;
+  }
+  return null;
 }
 
 function formatLastSeen(lastSeen: string | null): string {
   if (!lastSeen) return "Inconnu";
   const date = parseDate(lastSeen);
   if (!date) return "Inconnu";
-  const day = String(date.getDate()).padStart(2, '0');
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const year = date.getFullYear();
+  const day = String(date.getUTCDate()).padStart(2, '0');
+  const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+  const year = date.getUTCFullYear();
   return `${day}/${month}/${year}`;
 }
 
