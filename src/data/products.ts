@@ -11,6 +11,7 @@ export interface Product {
   score: number;
   sellers: number;
   image: string;
+  url?: string;
 }
 
 export const categories = [
