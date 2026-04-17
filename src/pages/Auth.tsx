@@ -53,7 +53,17 @@ const Auth = () => {
       toast.success("Compte créé. Bienvenue à bord !");
       navigate("/dashboard");
     } catch (err: any) {
-      toast.error(err.message ?? "Erreur");
+      const raw = String(err?.message ?? "Erreur");
+      const fr = raw
+        .replace(/Invalid login credentials/i, "Email ou mot de passe incorrect")
+        .replace(/Email not confirmed/i, "Email non confirmé")
+        .replace(/User already registered/i, "Un compte existe déjà avec cet email")
+        .replace(/Password should be at least (\d+) characters?/i, "Le mot de passe doit contenir au moins $1 caractères")
+        .replace(/Signup is disabled/i, "Les inscriptions sont désactivées")
+        .replace(/Email rate limit exceeded/i, "Trop de tentatives, réessaie dans quelques minutes")
+        .replace(/Unable to validate email address: invalid format/i, "Format d'email invalide")
+        .replace(/Network|Failed to fetch/i, "Problème de connexion réseau");
+      toast.error(fr);
     } finally {
       setBusy(false);
     }
