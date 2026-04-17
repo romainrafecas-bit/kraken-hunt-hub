@@ -406,7 +406,18 @@ const ProductAnalysis = () => {
               </span>
             </button>
             {brandDropdownOpen && (
-              <div className="absolute z-30 mt-1 w-64 bg-card border border-border/50 rounded-xl p-2 shadow-2xl max-h-56 overflow-auto">
+              <div className="absolute z-30 mt-1 w-72 bg-card border border-border/50 rounded-xl p-2 shadow-2xl">
+                <div className="relative mb-2">
+                  <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+                  <input
+                    type="text"
+                    autoFocus
+                    placeholder="Rechercher une marque…"
+                    value={brandSearch}
+                    onChange={e => setBrandSearch(e.target.value)}
+                    className="w-full bg-secondary/60 border border-border/40 rounded-lg pl-8 pr-3 py-1.5 text-xs text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:border-primary/40"
+                  />
+                </div>
                 {excludedBrands.size > 0 && (
                   <button
                     onClick={() => { setExcludedBrands(new Set()); setPage(0); }}
@@ -415,21 +426,32 @@ const ProductAnalysis = () => {
                     ✕ Réinitialiser tout
                   </button>
                 )}
-                {dynamicBrands.filter(b => b !== "Toutes").map(brand => (
-                  <button
-                    key={brand}
-                    onClick={() => toggleExcludeBrand(brand)}
-                    className={cn(
-                      "w-full text-left px-3 py-1.5 rounded-lg text-sm transition-colors flex items-center justify-between",
-                      excludedBrands.has(brand)
-                        ? "text-red-400 bg-red-500/10"
-                        : "text-muted-foreground hover:text-foreground hover:bg-secondary/60"
-                    )}
-                  >
-                    <span>{formatCategoryName(brand)}</span>
-                    {excludedBrands.has(brand) && <X className="w-3.5 h-3.5" />}
-                  </button>
-                ))}
+                <div className="max-h-56 overflow-auto">
+                  {(() => {
+                    const q = brandSearch.trim().toLowerCase();
+                    const list = dynamicBrands
+                      .filter(b => b !== "Toutes")
+                      .filter(b => !q || b.toLowerCase().includes(q));
+                    if (list.length === 0) {
+                      return <p className="px-3 py-3 text-xs text-muted-foreground text-center">Aucune marque trouvée</p>;
+                    }
+                    return list.map(brand => (
+                      <button
+                        key={brand}
+                        onClick={() => toggleExcludeBrand(brand)}
+                        className={cn(
+                          "w-full text-left px-3 py-1.5 rounded-lg text-sm transition-colors flex items-center justify-between",
+                          excludedBrands.has(brand)
+                            ? "text-red-400 bg-red-500/10"
+                            : "text-muted-foreground hover:text-foreground hover:bg-secondary/60"
+                        )}
+                      >
+                        <span>{formatCategoryName(brand)}</span>
+                        {excludedBrands.has(brand) && <X className="w-3.5 h-3.5" />}
+                      </button>
+                    ));
+                  })()}
+                </div>
               </div>
             )}
           </div>
