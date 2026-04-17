@@ -505,10 +505,23 @@ const ProductAnalysis = () => {
               const globalRank = page * ITEMS_PER_PAGE + i + 1;
               const ratingColor = getRatingColor(product.rating);
               const isFav = product.url ? favorites.has(product.url) : false;
+              const isSelected = product.url ? selectedUrls.has(product.url) : false;
 
               return (
                 <motion.tr key={product.url || product.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.02 }}
-                  className="border-b border-border/10 hover:bg-primary/[0.03] transition-all duration-200 cursor-pointer group">
+                  className={cn(
+                    "border-b border-border/10 hover:bg-primary/[0.03] transition-all duration-200 cursor-pointer group",
+                    isSelected && "bg-primary/[0.05]"
+                  )}>
+                  <td className="px-3 py-3" onClick={(e) => e.stopPropagation()}>
+                    <input
+                      type="checkbox"
+                      checked={isSelected}
+                      onChange={() => product.url && toggleSelect(product.url)}
+                      className="w-4 h-4 rounded border-border/40 bg-secondary/40 accent-primary cursor-pointer"
+                      aria-label={`Sélectionner ${product.name}`}
+                    />
+                  </td>
                   <td className="px-4 py-3">
                     <span className={cn("font-display text-sm font-black")}
                       style={globalRank <= 3 ? { color: 'hsl(174 72% 56%)', textShadow: '0 0 8px hsl(174 72% 46% / 0.3)' } : { color: 'hsl(210 10% 30%)' }}>
