@@ -84,6 +84,22 @@ export function useProductsPaginated(filters: Filters) {
         query = query.not("brand", "in", `(${excluded.map(b => `"${b}"`).join(",")})`);
       }
 
+      // Price range (ignore -1 = rupture sentinel when bounds are applied)
+      if (filters.priceMin != null && !Number.isNaN(filters.priceMin)) {
+        query = query.gte("price", filters.priceMin);
+      }
+      if (filters.priceMax != null && !Number.isNaN(filters.priceMax)) {
+        query = query.lte("price", filters.priceMax);
+      }
+
+      // Sellers range
+      if (filters.sellersMin != null && !Number.isNaN(filters.sellersMin)) {
+        query = query.gte("sellers_count", filters.sellersMin);
+      }
+      if (filters.sellersMax != null && !Number.isNaN(filters.sellersMax)) {
+        query = query.lte("sellers_count", filters.sellersMax);
+      }
+
       // Sort — primary on requested column, secondary on last_seen desc for stability
       const column = sortKeyToColumn[filters.sortKey] || "last_seen";
       query = query.order(column, { ascending: filters.sortDir === "asc", nullsFirst: false });
