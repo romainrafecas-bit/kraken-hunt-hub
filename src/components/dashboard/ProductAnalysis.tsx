@@ -8,6 +8,7 @@ import { externalSupabase as supabase } from "@/integrations/supabase/external-c
 import * as XLSX from "xlsx";
 import ProductSkeleton from "./ProductSkeleton";
 import EmptyState from "./EmptyState";
+import { useFavorites } from "@/hooks/useFavorites";
 
 type SortKey = "price" | "recurrences" | "rating" | "name" | "brand" | "sellers" | "lastSeen";
 type SortDir = "asc" | "desc";
