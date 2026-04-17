@@ -100,7 +100,11 @@ const ProductAnalysis = () => {
     sortDir,
     page,
     pageSize: ITEMS_PER_PAGE,
-  }), [selectedCategory, excludedBrands, searchQuery, stockFilter, selectedDatePreset, sortKey, sortDir, page]);
+    priceMin: priceMin === "" ? null : Number(priceMin),
+    priceMax: priceMax === "" ? null : Number(priceMax),
+    sellersMin: sellersMin === "" ? null : Number(sellersMin),
+    sellersMax: sellersMax === "" ? null : Number(sellersMax),
+  }), [selectedCategory, excludedBrands, searchQuery, stockFilter, selectedDatePreset, sortKey, sortDir, page, priceMin, priceMax, sellersMin, sellersMax]);
 
   const { products: paged, totalCount, loading: isLoading } = useProductsPaginated(filters);
   const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE);
