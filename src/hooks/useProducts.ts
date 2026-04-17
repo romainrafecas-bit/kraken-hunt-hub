@@ -22,7 +22,14 @@ export interface SupabaseProduct {
 }
 
 function parseDate(dateStr: string): Date | null {
-  // DD/MM/YYYY format
+  // ISO format first (YYYY-MM-DD or full ISO timestamp)
+  const iso = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (iso) {
+    const result = new Date(Date.UTC(+iso[1], +iso[2] - 1, +iso[3]));
+    if (result.getUTCDate() !== +iso[3] || result.getUTCMonth() !== +iso[2] - 1) return null;
+    return result;
+  }
+  // Fallback: DD/MM/YYYY format
   const dmy = dateStr.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})$/);
   if (dmy) {
     let yearNum = parseInt(dmy[3]);
@@ -34,13 +41,9 @@ function parseDate(dateStr: string): Date | null {
     if (result.getUTCDate() !== dayNum || result.getUTCMonth() !== monthNum - 1) return null;
     return result;
   }
-  // ISO format
-  const iso = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})/);
-  if (iso) {
-    const result = new Date(Date.UTC(+iso[1], +iso[2] - 1, +iso[3]));
-    if (result.getUTCDate() !== +iso[3] || result.getUTCMonth() !== +iso[2] - 1) return null;
-    return result;
-  }
+  // Last resort: native Date
+  const d = new Date(dateStr);
+  if (!isNaN(d.getTime())) return d;
   return null;
 }
 
