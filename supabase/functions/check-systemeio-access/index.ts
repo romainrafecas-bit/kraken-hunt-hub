@@ -8,6 +8,9 @@ const corsHeaders = {
 
 const SYSTEMEIO_BASE = "https://api.systeme.io/api";
 
+// Bypass list — these emails are always allowed (owner/admin accounts)
+const OWNER_EMAILS = ["romain.rafecas@gmail.com"];
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
