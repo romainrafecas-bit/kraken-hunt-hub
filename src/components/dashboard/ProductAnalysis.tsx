@@ -54,6 +54,11 @@ const ProductAnalysis = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [userId, setUserId] = useState<string | null>(null);
+  const [priceMin, setPriceMin] = useState<string>("");
+  const [priceMax, setPriceMax] = useState<string>("");
+  const [sellersMin, setSellersMin] = useState<string>("");
+  const [sellersMax, setSellersMax] = useState<string>("");
+  const [selectedUrls, setSelectedUrls] = useState<Set<string>>(new Set());
 
   // Fetch categories list for dropdown
   const [dynamicCategories, setDynamicCategories] = useState<string[]>(["Tous"]);
