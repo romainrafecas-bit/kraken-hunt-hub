@@ -13,6 +13,10 @@ interface Filters {
   sortDir: "asc" | "desc";
   page: number;
   pageSize: number;
+  priceMin?: number | null;
+  priceMax?: number | null;
+  sellersMin?: number | null;
+  sellersMax?: number | null;
 }
 
 // `last_seen` is now a real timestamptz in the external DB, so server-side
