@@ -271,17 +271,10 @@ const Index = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {topProducts.map((p, i) => {
               const isHovered = hoveredProduct === p.id;
-              const productHues = [
-                "174 72% 56%", // teal
-                "188 78% 58%", // cyan
-                "162 68% 52%", // emerald
-                "38 92% 60%",  // amber
-                "348 78% 64%", // rose
-              ];
-              const accentHue = productHues[i % productHues.length];
-              const ratingHue = p.rating >= 4.5 ? "162 68% 52%" : p.rating >= 3.5 ? "174 72% 56%" : p.rating >= 2.5 ? "38 92% 56%" : "210 10% 50%";
-              const stars = p.rating > 0 ? p.rating.toFixed(1) : "—";
               const isTop = i < 3;
+              // Palette océan cohérente : teal dominant, accents cyan pour le top 3
+              const accentHue = isTop ? "188 80% 58%" : "174 72% 52%";
+              const glowHue = isTop ? "188 80% 58%" : "174 72% 46%";
               return (
                 <motion.a
                   key={p.id}
@@ -295,48 +288,60 @@ const Index = () => {
                   onMouseLeave={() => setHoveredProduct(null)}
                   className="group relative flex items-center gap-3 p-3 rounded-2xl no-underline overflow-hidden transition-all duration-300"
                   style={{
-                    background: `linear-gradient(135deg, hsl(225 28% 7%), hsl(225 24% 9%))`,
-                    border: `1px solid hsl(${accentHue} / ${isHovered ? 0.35 : 0.12})`,
+                    background: isHovered
+                      ? `linear-gradient(135deg, hsl(220 40% 9%), hsl(200 45% 11%))`
+                      : `linear-gradient(135deg, hsl(225 32% 7%), hsl(220 36% 8%))`,
+                    border: `1px solid hsl(${glowHue} / ${isHovered ? 0.4 : 0.15})`,
                     boxShadow: isHovered
-                      ? `0 8px 28px -10px hsl(${accentHue} / 0.4), inset 0 1px 0 hsl(${accentHue} / 0.1)`
-                      : `0 2px 10px -4px hsl(228 50% 2% / 0.6), inset 0 1px 0 hsl(${accentHue} / 0.05)`,
+                      ? `0 10px 32px -12px hsl(${glowHue} / 0.45), inset 0 1px 0 hsl(${glowHue} / 0.12), 0 0 0 1px hsl(${glowHue} / 0.08)`
+                      : `0 4px 16px -6px hsl(220 60% 2% / 0.7), inset 0 1px 0 hsl(${glowHue} / 0.06)`,
                     transform: isHovered ? 'translateY(-2px)' : 'translateY(0)',
                   }}
                 >
-                  {/* Glow accent on hover */}
-                  <div className="absolute inset-0 pointer-events-none transition-opacity duration-300"
+                  {/* Vague bioluminescente au survol */}
+                  <div className="absolute inset-0 pointer-events-none transition-opacity duration-500"
                     style={{
-                      background: `radial-gradient(ellipse 200px 100px at 0% 50%, hsl(${accentHue} / 0.08), transparent 70%)`,
+                      background: `radial-gradient(ellipse 280px 140px at 0% 50%, hsl(${glowHue} / 0.12), transparent 70%)`,
                       opacity: isHovered ? 1 : 0,
+                    }} />
+
+                  {/* Liseré gauche lumineux */}
+                  <div className="absolute left-0 top-3 bottom-3 w-[2px] rounded-full transition-all duration-300"
+                    style={{
+                      background: `linear-gradient(180deg, transparent, hsl(${glowHue} / ${isHovered ? 0.8 : 0.4}), transparent)`,
+                      boxShadow: isHovered ? `0 0 8px hsl(${glowHue} / 0.6)` : 'none',
                     }} />
 
                   {/* Rank badge */}
                   <div className="relative flex-shrink-0 w-9 h-9 rounded-xl flex items-center justify-center"
                     style={{
                       background: isTop
-                        ? `linear-gradient(135deg, hsl(${accentHue} / 0.18), hsl(${accentHue} / 0.06))`
-                        : 'hsl(225 22% 11%)',
-                      border: `1px solid hsl(${accentHue} / ${isTop ? 0.3 : 0.1})`,
-                      boxShadow: isTop ? `0 0 14px -4px hsl(${accentHue} / 0.4)` : 'none',
+                        ? `linear-gradient(135deg, hsl(${glowHue} / 0.22), hsl(174 72% 46% / 0.08))`
+                        : `linear-gradient(135deg, hsl(225 28% 11%), hsl(220 30% 9%))`,
+                      border: `1px solid hsl(${glowHue} / ${isTop ? 0.4 : 0.15})`,
+                      boxShadow: isTop ? `0 0 16px -4px hsl(${glowHue} / 0.5), inset 0 1px 0 hsl(${glowHue} / 0.2)` : 'none',
                     }}>
                     <span className="text-sm font-display font-black tabular-nums"
                       style={{
-                        color: isTop ? `hsl(${accentHue})` : 'hsl(210 14% 50%)',
-                        textShadow: isTop ? `0 0 10px hsl(${accentHue} / 0.5)` : 'none',
+                        color: isTop ? `hsl(${glowHue})` : 'hsl(195 14% 55%)',
+                        textShadow: isTop ? `0 0 12px hsl(${glowHue} / 0.6)` : 'none',
                       }}>
                       {String(i + 1).padStart(2, '0')}
                     </span>
                   </div>
 
-                  {/* Product image with subtle ring */}
+                  {/* Product image */}
                   <div className="relative w-14 h-14 rounded-xl overflow-hidden flex-shrink-0"
                     style={{
-                      border: `1px solid hsl(${accentHue} / 0.2)`,
-                      boxShadow: `0 2px 12px -2px hsl(228 50% 2% / 0.6), 0 0 0 1px hsl(225 28% 7%)`,
+                      border: `1px solid hsl(${glowHue} / 0.25)`,
+                      boxShadow: `0 4px 14px -2px hsl(220 60% 2% / 0.7), 0 0 0 1px hsl(225 28% 7%), inset 0 0 0 1px hsl(${glowHue} / 0.05)`,
                     }}>
                     <img src={p.image} alt={p.name}
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                       loading="lazy" />
+                    {/* Overlay océan subtil */}
+                    <div className="absolute inset-0 pointer-events-none"
+                      style={{ background: `linear-gradient(180deg, transparent 60%, hsl(220 60% 4% / 0.4))` }} />
                   </div>
 
                   {/* Title + meta */}
@@ -345,35 +350,35 @@ const Index = () => {
                     <div className="flex items-center gap-1.5 mt-1.5">
                       <span className="text-[9px] font-display font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-md"
                         style={{
-                          color: `hsl(${accentHue})`,
-                          background: `hsl(${accentHue} / 0.1)`,
-                          border: `1px solid hsl(${accentHue} / 0.2)`,
+                          color: `hsl(${glowHue})`,
+                          background: `hsl(${glowHue} / 0.1)`,
+                          border: `1px solid hsl(${glowHue} / 0.2)`,
                         }}>
                         {p.brand}
                       </span>
-                      <span className="text-[9px] font-display text-foreground/45">·</span>
+                      <span className="text-[9px] font-display text-foreground/40">·</span>
                       <span className="text-[9px] font-display text-foreground/55 truncate">{formatCat(p.category)}</span>
                     </div>
-                    <div className="flex items-center gap-2.5 mt-1.5">
-                      <span className="inline-flex items-center gap-0.5 text-[10px] font-display font-bold tabular-nums"
-                        style={{ color: `hsl(${ratingHue})` }}>
-                        <span style={{ textShadow: `0 0 6px hsl(${ratingHue} / 0.5)` }}>★</span>
-                        {stars}
-                      </span>
-                      <span className="text-[9px] font-display text-foreground/40">·</span>
-                      <span className="text-[10px] font-display text-foreground/50 tabular-nums">{p.lastSeen}</span>
+                    <div className="flex items-center gap-1.5 mt-1.5">
+                      <span className="w-1 h-1 rounded-full" style={{ background: `hsl(${glowHue} / 0.6)`, boxShadow: `0 0 4px hsl(${glowHue} / 0.5)` }} />
+                      <span className="text-[10px] font-display text-foreground/55 tabular-nums">Vu le {p.lastSeen}</span>
                     </div>
                   </div>
 
                   {/* Price block */}
-                  <div className="text-right flex-shrink-0 relative">
+                  <div className="text-right flex-shrink-0 relative pr-1">
                     {p.price === -1 ? (
-                      <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-red-500/15 text-red-400 border border-red-500/25">Rupture</span>
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold"
+                        style={{
+                          color: 'hsl(348 75% 68%)',
+                          background: 'hsl(348 72% 56% / 0.12)',
+                          border: '1px solid hsl(348 72% 56% / 0.25)',
+                        }}>Rupture</span>
                     ) : (
                       <p className="text-base font-display font-black tabular-nums leading-none"
                         style={{
-                          color: `hsl(${accentHue})`,
-                          textShadow: `0 0 12px hsl(${accentHue} / 0.35)`,
+                          color: `hsl(${glowHue})`,
+                          textShadow: `0 0 14px hsl(${glowHue} / 0.45)`,
                         }}>
                         {p.price}<span className="text-[10px] text-foreground/55 font-bold ml-0.5">€</span>
                       </p>
