@@ -123,6 +123,15 @@ const KrakkenSidebar = () => {
             boxShadow: '0 0 8px 2px hsl(174 72% 46% / 0.5)'
           }} />
         </div>
+        <button
+          onClick={handleSignOut}
+          className="mt-2 w-full flex items-center justify-center xl:justify-start gap-2 px-3 py-2 rounded-xl text-[12px] font-semibold transition-all hover:bg-destructive/10"
+          style={{ color: 'hsl(var(--muted-foreground))' }}
+          title="Se déconnecter"
+        >
+          <LogOut className="w-4 h-4" />
+          <span className="hidden xl:inline">Se déconnecter</span>
+        </button>
       </div>
     </aside>
   );
