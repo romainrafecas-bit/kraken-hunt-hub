@@ -574,7 +574,7 @@ const ProductAnalysis = () => {
                       {product.name}
                     </a>
                   </td>
-                  <td className="px-4 py-3"><span className="text-xs text-secondary-foreground font-medium">{product.brand}</span></td>
+                  <td className="px-4 py-3"><span className="text-sm font-medium text-foreground/85">{product.brand}</span></td>
                   <td className="px-4 py-3"><span className="bio-badge bio-cyan text-[10px]">{formatCategoryName(product.category)}</span></td>
                   <td className="px-4 py-3">
                     {product.price === -1 ? (
@@ -585,58 +585,51 @@ const ProductAnalysis = () => {
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-1.5">
-                      <Clock className="w-3 h-3" style={{ color: 'hsl(174 72% 56%)', opacity: 0.6 }} />
-                      <span className="text-sm font-medium" style={{ color: 'hsl(174 72% 56%)' }}>{product.lastSeen}</span>
+                      <Clock className="w-3 h-3" style={{ color: 'hsl(174 72% 60%)' }} />
+                      <span className="text-sm font-semibold" style={{ color: 'hsl(174 72% 68%)' }}>{product.lastSeen}</span>
                     </div>
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-1.5">
-                      <span className="text-sm font-bold" style={{ color: ratingColor, textShadow: `0 0 8px ${ratingColor}40` }}>{product.rating}</span>
-                      <div className="flex">
-                        {[1, 2, 3, 4, 5].map(star => (
-                          <span key={star} className="text-[10px]" style={{
-                            color: star <= Math.round(product.rating) ? ratingColor : 'hsl(210 10% 20%)',
-                            textShadow: star <= Math.round(product.rating) ? `0 0 4px ${ratingColor}60` : undefined,
-                          }}>★</span>
-                        ))}
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-1.5">
-                      <Users className="w-3 h-3" style={{ color: 'hsl(262 60% 64%)', opacity: 0.6 }} />
+                      <Users className="w-3.5 h-3.5" style={{ color: 'hsl(188 78% 62%)' }} />
                       <span className="text-sm font-bold" style={{
-                        color: product.sellers >= 25 ? 'hsl(262 72% 72%)' : product.sellers >= 15 ? 'hsl(262 50% 62%)' : 'hsl(210 10% 50%)',
-                        textShadow: product.sellers >= 25 ? '0 0 8px hsl(262 52% 58% / 0.3)' : undefined,
+                        color: product.sellers >= 25 ? 'hsl(188 80% 70%)' : product.sellers >= 15 ? 'hsl(188 70% 65%)' : 'hsl(195 25% 75%)',
+                        textShadow: product.sellers >= 25 ? '0 0 8px hsl(188 78% 52% / 0.35)' : undefined,
                       }}>{product.sellers}</span>
                     </div>
                   </td>
                   <td className="px-4 py-3">
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center justify-end gap-1.5">
                       {product.image && (
                         <a
                           href={googleLensUrl(product.image)}
                           target="_blank"
                           rel="noopener noreferrer"
                           onClick={(e) => e.stopPropagation()}
-                          className="p-1.5 rounded-lg hover:bg-secondary/50 transition-all"
+                          className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-bold transition-all"
+                          style={{
+                            color: 'hsl(188 80% 68%)',
+                            background: 'hsl(188 78% 52% / 0.12)',
+                            border: '1px solid hsl(188 78% 52% / 0.3)',
+                          }}
                           title="Rechercher avec Google Lens"
-                          aria-label="Rechercher avec Google Lens"
                         >
-                          <Camera className="w-4 h-4" style={{
-                            color: 'hsl(174 72% 56%)',
-                            filter: 'drop-shadow(0 0 4px hsl(174 72% 46% / 0.35))',
-                          }} />
+                          <Camera className="w-3.5 h-3.5" />
+                          <span className="hidden xl:inline">Lens</span>
                         </a>
                       )}
-                      <button onClick={(e) => { e.stopPropagation(); toggleFavorite(product); }}
-                        className="p-1.5 rounded-lg hover:bg-secondary/50 transition-all"
-                        title={isFav ? "Retirer des favoris" : "Ajouter aux favoris"}>
-                        <Heart className={cn("w-4 h-4 transition-all", isFav ? "fill-current" : "")}
-                          style={{
-                            color: isFav ? 'hsl(340 75% 55%)' : 'hsl(210 10% 30%)',
-                            filter: isFav ? 'drop-shadow(0 0 6px hsl(340 75% 55% / 0.4))' : undefined,
-                          }} />
+                      <button
+                        onClick={(e) => { e.stopPropagation(); toggleFavorite(product); }}
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-bold transition-all"
+                        style={{
+                          color: isFav ? 'hsl(348 80% 70%)' : 'hsl(174 72% 65%)',
+                          background: isFav ? 'hsl(348 72% 56% / 0.15)' : 'hsl(174 72% 46% / 0.1)',
+                          border: `1px solid ${isFav ? 'hsl(348 72% 56% / 0.35)' : 'hsl(174 72% 46% / 0.28)'}`,
+                        }}
+                        title={isFav ? "Retirer des favoris" : "Ajouter aux favoris"}
+                      >
+                        <Heart className={cn("w-3.5 h-3.5", isFav && "fill-current")} />
+                        <span className="hidden xl:inline">{isFav ? "Favori" : "Favori"}</span>
                       </button>
                     </div>
                   </td>
