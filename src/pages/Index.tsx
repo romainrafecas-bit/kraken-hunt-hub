@@ -234,7 +234,7 @@ const Index = () => {
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
                 <span className="text-2xl font-display font-black text-foreground">{catStats.length}</span>
-                <span className="text-[9px] font-display text-foreground/50 uppercase tracking-wider">zones</span>
+                <span className="text-[9px] font-display text-foreground/50 uppercase tracking-wider">catégories</span>
               </div>
             </div>
             <div className="flex-1 grid grid-cols-2 gap-x-6 gap-y-2 w-full">
