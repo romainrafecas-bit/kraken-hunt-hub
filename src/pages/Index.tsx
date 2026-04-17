@@ -271,7 +271,14 @@ const Index = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {topProducts.map((p, i) => {
               const isHovered = hoveredProduct === p.id;
-              const accentHue = i % 2 === 0 ? "174 72% 56%" : "262 60% 64%";
+              const productHues = [
+                "174 72% 56%", // teal
+                "188 78% 58%", // cyan
+                "162 68% 52%", // emerald
+                "38 92% 60%",  // amber
+                "348 78% 64%", // rose
+              ];
+              const accentHue = productHues[i % productHues.length];
               const ratingHue = p.rating >= 4.5 ? "162 68% 52%" : p.rating >= 3.5 ? "174 72% 56%" : p.rating >= 2.5 ? "38 92% 56%" : "210 10% 50%";
               const stars = p.rating > 0 ? p.rating.toFixed(1) : "—";
               const isTop = i < 3;
