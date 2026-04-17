@@ -20,6 +20,7 @@ interface DashboardStats {
   cumulativeData: DailyCount[];
   categoryStats: CategoryStat[];
   latestProducts: any[];
+  lastUpdate: string | null; // ISO date of latest products batch added
   loading: boolean;
   error: string | null;
 }
