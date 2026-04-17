@@ -138,6 +138,10 @@ export function useProductsPaginated(filters: Filters) {
     filters.pageSize,
     // Convert Set to string for dependency comparison
     [...filters.excludedBrands].sort().join(","),
+    filters.priceMin,
+    filters.priceMax,
+    filters.sellersMin,
+    filters.sellersMax,
   ]);
 
   useEffect(() => {
