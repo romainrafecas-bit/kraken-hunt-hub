@@ -31,7 +31,27 @@ function formatCat(slug: string): string {
 }
 
 const Index = () => {
-  const { totalProducts, totalBrands, totalRecurrences, cumulativeData, categoryStats, latestProducts, loading } = useDashboardStats();
+  const { totalProducts, totalBrands, totalRecurrences, cumulativeData, categoryStats, latestProducts, lastUpdate, loading } = useDashboardStats();
+
+  const lastUpdateLabel = useMemo(() => {
+    if (!lastUpdate) return "—";
+    const d = new Date(lastUpdate);
+    if (isNaN(d.getTime())) return "—";
+    return d.toLocaleDateString("fr-FR", { day: "2-digit", month: "short", year: "numeric" });
+  }, [lastUpdate]);
+
+  const lastUpdateRelative = useMemo(() => {
+    if (!lastUpdate) return null;
+    const d = new Date(lastUpdate);
+    if (isNaN(d.getTime())) return null;
+    const diffMs = Date.now() - d.getTime();
+    const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    if (days <= 0) return "aujourd'hui";
+    if (days === 1) return "hier";
+    if (days < 7) return `il y a ${days} j`;
+    if (days < 30) return `il y a ${Math.floor(days / 7)} sem.`;
+    return `il y a ${Math.floor(days / 30)} mois`;
+  }, [lastUpdate]);
   const [hoveredCat, setHoveredCat] = useState<string | null>(null);
   const [hoveredProduct, setHoveredProduct] = useState<number | null>(null);
 
@@ -110,16 +130,28 @@ const Index = () => {
               </div>
             </div>
             <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
-              className="hidden md:flex items-stretch gap-px rounded-xl overflow-hidden" style={{ border: '1px solid hsl(225 20% 12%)' }}>
-              <div className="px-5 py-3 text-center" style={{ background: 'hsl(225 25% 7%)' }}>
-                <p className="text-[8px] font-display uppercase tracking-[0.2em] text-foreground/50 mb-1">Récurrences</p>
-                <p className="text-xl font-display font-black tabular-nums" style={{ color: 'hsl(174 72% 56%)', textShadow: '0 0 16px hsl(174 72% 46% / 0.3)' }}>
-                  {totalRecurrences.toLocaleString("fr-FR")}
-                </p>
-              </div>
+              className="hidden md:flex items-center gap-3 rounded-xl px-5 py-3 relative overflow-hidden"
+              style={{
+                background: 'linear-gradient(135deg, hsl(225 25% 7%), hsl(225 28% 9%))',
+                border: '1px solid hsl(174 72% 46% / 0.18)',
+                boxShadow: '0 0 24px -8px hsl(174 72% 46% / 0.25), inset 0 1px 0 hsl(174 72% 46% / 0.08)',
+              }}>
               <span className="w-2 h-2 rounded-full flex-shrink-0" style={{
-                backgroundColor: 'hsl(162 68% 44%)', boxShadow: '0 0 8px hsl(162 68% 44% / 0.6)', animation: 'bioluminescence 2s ease-in-out infinite',
+                backgroundColor: 'hsl(162 68% 44%)', boxShadow: '0 0 10px hsl(162 68% 44% / 0.7)', animation: 'bioluminescence 2s ease-in-out infinite',
               }} />
+              <div className="text-left">
+                <p className="text-[8px] font-display uppercase tracking-[0.2em] text-foreground/50 mb-0.5">Dernière mise à jour</p>
+                <div className="flex items-baseline gap-2">
+                  <p className="text-base font-display font-black tabular-nums" style={{ color: 'hsl(174 72% 56%)', textShadow: '0 0 14px hsl(174 72% 46% / 0.35)' }}>
+                    {lastUpdateLabel}
+                  </p>
+                  {lastUpdateRelative && (
+                    <span className="text-[9px] font-display font-bold" style={{ color: 'hsl(162 68% 52%)' }}>
+                      {lastUpdateRelative}
+                    </span>
+                  )}
+                </div>
+              </div>
             </motion.div>
           </div>
         </div>
@@ -174,7 +206,7 @@ const Index = () => {
 
         {/* CATEGORIES */}
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }} className="px-6 lg:px-10 relative z-10">
-          <p className="text-[10px] font-display uppercase tracking-[0.25em] text-foreground/55 font-bold mb-8">Répartition par zone</p>
+          <p className="text-[10px] font-display uppercase tracking-[0.25em] text-foreground/55 font-bold mb-8">Répartition par catégorie</p>
           <div className="flex flex-col lg:flex-row items-center gap-10">
             <div className="relative w-48 h-48 flex-shrink-0">
               <svg viewBox="0 0 100 100" className="w-full h-full -rotate-90">
@@ -202,7 +234,7 @@ const Index = () => {
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
                 <span className="text-2xl font-display font-black text-foreground">{catStats.length}</span>
-                <span className="text-[9px] font-display text-foreground/50 uppercase tracking-wider">zones</span>
+                <span className="text-[9px] font-display text-foreground/50 uppercase tracking-wider">catégories</span>
               </div>
             </div>
             <div className="flex-1 grid grid-cols-2 gap-x-6 gap-y-2 w-full">
@@ -232,43 +264,115 @@ const Index = () => {
 
         {/* DERNIÈRES PRISES */}
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }} className="px-6 lg:px-10 pb-16 relative z-10">
-          <p className="text-[10px] font-display uppercase tracking-[0.25em] text-foreground/55 font-bold mb-8">Dernières prises</p>
-          <div className="space-y-2">
+          <div className="flex items-center justify-between mb-6">
+            <p className="text-[10px] font-display uppercase tracking-[0.25em] text-foreground/55 font-bold">Dernières prises</p>
+            <span className="text-[9px] font-display uppercase tracking-[0.2em] text-foreground/40">Top {topProducts.length}</span>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {topProducts.map((p, i) => {
               const isHovered = hoveredProduct === p.id;
-              const ratingColor = p.rating >= 4.5 ? "162 72% 52%" : p.rating >= 3.5 ? "174 72% 56%" : p.rating >= 2.5 ? "38 92% 56%" : "210 10% 50%";
+              const accentHue = i % 2 === 0 ? "174 72% 56%" : "262 60% 64%";
+              const ratingHue = p.rating >= 4.5 ? "162 68% 52%" : p.rating >= 3.5 ? "174 72% 56%" : p.rating >= 2.5 ? "38 92% 56%" : "210 10% 50%";
               const stars = p.rating > 0 ? p.rating.toFixed(1) : "—";
+              const isTop = i < 3;
               return (
-                <a href={p.url} target="_blank" rel="noopener noreferrer"
-                  onMouseEnter={() => setHoveredProduct(p.id)} onMouseLeave={() => setHoveredProduct(null)}
-                  className="group cursor-pointer relative flex items-center gap-4 p-3 rounded-xl transition-all duration-300 no-underline"
-                  style={{ background: isHovered ? 'hsl(225 25% 8%)' : 'transparent', border: `1px solid ${isHovered ? `hsl(${ratingColor} / 0.15)` : 'transparent'}` }}>
-                  <span className="text-lg font-display font-black w-7 text-center tabular-nums flex-shrink-0"
-                    style={{ color: i === 0 ? 'hsl(38 92% 56%)' : i < 3 ? `hsl(${ratingColor})` : 'hsl(210 14% 50%)', textShadow: i === 0 ? '0 0 14px hsl(38 92% 56% / 0.4)' : 'none' }}>
-                    {i + 1}
-                  </span>
-                  <div className="w-14 h-14 rounded-lg overflow-hidden flex-shrink-0">
-                    <img src={p.image} alt={p.name} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" style={{ filter: 'brightness(0.85) saturate(0.9)' }} />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-display font-bold text-foreground group-hover:text-foreground transition-colors truncate">{p.name}</p>
-                    <p className="text-[10px] font-display text-foreground/50 mt-0.5">{p.brand} · {formatCat(p.category)}</p>
-                  </div>
-                  <div className="text-right flex-shrink-0">
-                    {p.price === -1 ? (
-                      <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-bold bg-red-500/15 text-red-400 border border-red-500/25">Rupture</span>
-                    ) : (
-                      <p className="text-sm font-display font-black text-foreground tabular-nums">{p.price}<span className="text-[10px] text-foreground/50">€</span></p>
-                    )}
-                    <p className="text-[9px] font-display text-foreground/45">{p.lastSeen}</p>
-                  </div>
-                  <div className="flex items-center gap-1 flex-shrink-0">
-                    <span className="text-base" style={{ color: `hsl(${ratingColor})` }}>★</span>
-                    <span className="text-sm font-display font-black tabular-nums" style={{ color: `hsl(${ratingColor})`, textShadow: isHovered ? `0 0 8px hsl(${ratingColor} / 0.4)` : 'none' }}>
-                      {stars}
+                <motion.a
+                  key={p.id}
+                  href={p.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.65 + i * 0.04 }}
+                  onMouseEnter={() => setHoveredProduct(p.id)}
+                  onMouseLeave={() => setHoveredProduct(null)}
+                  className="group relative flex items-center gap-3 p-3 rounded-2xl no-underline overflow-hidden transition-all duration-300"
+                  style={{
+                    background: `linear-gradient(135deg, hsl(225 28% 7%), hsl(225 24% 9%))`,
+                    border: `1px solid hsl(${accentHue} / ${isHovered ? 0.35 : 0.12})`,
+                    boxShadow: isHovered
+                      ? `0 8px 28px -10px hsl(${accentHue} / 0.4), inset 0 1px 0 hsl(${accentHue} / 0.1)`
+                      : `0 2px 10px -4px hsl(228 50% 2% / 0.6), inset 0 1px 0 hsl(${accentHue} / 0.05)`,
+                    transform: isHovered ? 'translateY(-2px)' : 'translateY(0)',
+                  }}
+                >
+                  {/* Glow accent on hover */}
+                  <div className="absolute inset-0 pointer-events-none transition-opacity duration-300"
+                    style={{
+                      background: `radial-gradient(ellipse 200px 100px at 0% 50%, hsl(${accentHue} / 0.08), transparent 70%)`,
+                      opacity: isHovered ? 1 : 0,
+                    }} />
+
+                  {/* Rank badge */}
+                  <div className="relative flex-shrink-0 w-9 h-9 rounded-xl flex items-center justify-center"
+                    style={{
+                      background: isTop
+                        ? `linear-gradient(135deg, hsl(${accentHue} / 0.18), hsl(${accentHue} / 0.06))`
+                        : 'hsl(225 22% 11%)',
+                      border: `1px solid hsl(${accentHue} / ${isTop ? 0.3 : 0.1})`,
+                      boxShadow: isTop ? `0 0 14px -4px hsl(${accentHue} / 0.4)` : 'none',
+                    }}>
+                    <span className="text-sm font-display font-black tabular-nums"
+                      style={{
+                        color: isTop ? `hsl(${accentHue})` : 'hsl(210 14% 50%)',
+                        textShadow: isTop ? `0 0 10px hsl(${accentHue} / 0.5)` : 'none',
+                      }}>
+                      {String(i + 1).padStart(2, '0')}
                     </span>
                   </div>
-                </a>
+
+                  {/* Product image with subtle ring */}
+                  <div className="relative w-14 h-14 rounded-xl overflow-hidden flex-shrink-0"
+                    style={{
+                      border: `1px solid hsl(${accentHue} / 0.2)`,
+                      boxShadow: `0 2px 12px -2px hsl(228 50% 2% / 0.6), 0 0 0 1px hsl(225 28% 7%)`,
+                    }}>
+                    <img src={p.image} alt={p.name}
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                      loading="lazy" />
+                  </div>
+
+                  {/* Title + meta */}
+                  <div className="flex-1 min-w-0 relative">
+                    <p className="text-[13px] font-display font-bold text-foreground/95 truncate leading-tight">{p.name}</p>
+                    <div className="flex items-center gap-1.5 mt-1.5">
+                      <span className="text-[9px] font-display font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-md"
+                        style={{
+                          color: `hsl(${accentHue})`,
+                          background: `hsl(${accentHue} / 0.1)`,
+                          border: `1px solid hsl(${accentHue} / 0.2)`,
+                        }}>
+                        {p.brand}
+                      </span>
+                      <span className="text-[9px] font-display text-foreground/45">·</span>
+                      <span className="text-[9px] font-display text-foreground/55 truncate">{formatCat(p.category)}</span>
+                    </div>
+                    <div className="flex items-center gap-2.5 mt-1.5">
+                      <span className="inline-flex items-center gap-0.5 text-[10px] font-display font-bold tabular-nums"
+                        style={{ color: `hsl(${ratingHue})` }}>
+                        <span style={{ textShadow: `0 0 6px hsl(${ratingHue} / 0.5)` }}>★</span>
+                        {stars}
+                      </span>
+                      <span className="text-[9px] font-display text-foreground/40">·</span>
+                      <span className="text-[10px] font-display text-foreground/50 tabular-nums">{p.lastSeen}</span>
+                    </div>
+                  </div>
+
+                  {/* Price block */}
+                  <div className="text-right flex-shrink-0 relative">
+                    {p.price === -1 ? (
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-red-500/15 text-red-400 border border-red-500/25">Rupture</span>
+                    ) : (
+                      <p className="text-base font-display font-black tabular-nums leading-none"
+                        style={{
+                          color: `hsl(${accentHue})`,
+                          textShadow: `0 0 12px hsl(${accentHue} / 0.35)`,
+                        }}>
+                        {p.price}<span className="text-[10px] text-foreground/55 font-bold ml-0.5">€</span>
+                      </p>
+                    )}
+                  </div>
+                </motion.a>
               );
             })}
           </div>
