@@ -8,6 +8,9 @@ const corsHeaders = {
 
 const SYSTEMEIO_BASE = "https://api.systeme.io/api";
 
+// Bypass list — these emails are always allowed (owner/admin accounts)
+const OWNER_EMAILS = ["romain.rafecas@gmail.com"];
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
@@ -24,6 +27,24 @@ Deno.serve(async (req) => {
     }
 
     const normalizedEmail = email.toLowerCase().trim();
+
+    // Owner bypass
+    if (OWNER_EMAILS.includes(normalizedEmail)) {
+      const supabase = createClient(
+        Deno.env.get("SUPABASE_URL")!,
+        Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+      );
+      await supabase.from("allowed_emails").upsert({
+        email: normalizedEmail,
+        systemeio_contact_id: "owner",
+        synced_at: new Date().toISOString(),
+      });
+      return new Response(JSON.stringify({ allowed: true, owner: true }), {
+        status: 200,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const apiKey = Deno.env.get("SYSTEMEIO_API_KEY");
     const requiredTagId = Deno.env.get("SYSTEMEIO_STUDENT_TAG_ID");
 
