@@ -57,15 +57,7 @@ export type Database = {
           product_url?: string
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "favorites_product_url_fkey"
-            columns: ["product_url"]
-            isOneToOne: false
-            referencedRelation: "products"
-            referencedColumns: ["url"]
-          },
-        ]
+        Relationships: []
       }
       products: {
         Row: {

@@ -1,0 +1,1 @@
+ALTER TABLE public.favorites DROP CONSTRAINT IF EXISTS favorites_product_url_fkey;
