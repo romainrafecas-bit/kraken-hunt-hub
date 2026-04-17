@@ -517,7 +517,7 @@ const ProductAnalysis = () => {
             {paged.map((product, i) => {
               const globalRank = page * ITEMS_PER_PAGE + i + 1;
               const ratingColor = getRatingColor(product.rating);
-              const isFav = product.url ? favorites.has(product.url) : false;
+              const isFav = product.url ? isFavorite(product.url) : false;
               const isSelected = product.url ? selectedUrls.has(product.url) : false;
 
               return (

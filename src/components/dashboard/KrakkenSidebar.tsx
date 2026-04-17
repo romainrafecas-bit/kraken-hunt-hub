@@ -1,7 +1,8 @@
-import { LayoutDashboard, Package, BarChart3, Anchor, User, Heart } from "lucide-react";
+import { LayoutDashboard, Package, BarChart3, Anchor, User, Heart, LogOut } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import krakkenLogo from "@/assets/krakken-logo.png";
+import { useAuth } from "@/contexts/AuthContext";
 
 const navItems = [
   { icon: LayoutDashboard, label: "Dashboard", to: "/dashboard" },
@@ -12,6 +13,12 @@ const navItems = [
 ];
 
 const KrakkenSidebar = () => {
+  const { signOut } = useAuth();
+  const navigate = useNavigate();
+  const handleSignOut = async () => {
+    await signOut();
+    navigate("/auth");
+  };
   return (
     <aside className="w-16 xl:w-56 h-screen bg-sidebar backdrop-blur-xl border-r border-sidebar-border flex flex-col fixed left-0 top-0 z-50 overflow-hidden">
       {/* Atmospheric background */}
