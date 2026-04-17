@@ -312,21 +312,9 @@ const ProductAnalysis = () => {
               className="bg-secondary/60 border border-border/40 rounded-xl px-3 py-2 text-sm text-foreground focus:outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all appearance-none cursor-pointer pr-8 min-w-[140px]"
               style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%234dd4ac' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 10px center' }}
             >
-              <optgroup label="Périodes récentes">
-                {datePresets.filter(dp => !dp.group).map(dp => (
-                  <option key={dp.value} value={dp.value} className="bg-card text-foreground">{dp.label}</option>
-                ))}
-              </optgroup>
-              <optgroup label="Par année">
-                {datePresets.filter(dp => dp.group === "year").map(dp => (
-                  <option key={dp.value} value={dp.value} className="bg-card text-foreground">{dp.label}</option>
-                ))}
-              </optgroup>
-              <optgroup label="Par mois">
-                {datePresets.filter(dp => dp.group === "month").map(dp => (
-                  <option key={dp.value} value={dp.value} className="bg-card text-foreground">{dp.label}</option>
-                ))}
-              </optgroup>
+              {datePresets.map(dp => (
+                <option key={dp.value} value={dp.value} className="bg-card text-foreground">{dp.label}</option>
+              ))}
             </select>
           </div>
 
