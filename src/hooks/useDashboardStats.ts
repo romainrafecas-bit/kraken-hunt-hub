@@ -134,6 +134,14 @@ export function useDashboardStats(): DashboardStats {
 
         const latest = latestRaw || [];
 
+        // 4. Last update = most recent added_date (when products were last ingested)
+        const { data: lastUpdRow } = await supabase
+          .from("products")
+          .select("added_date")
+          .order("added_date", { ascending: false, nullsFirst: false })
+          .limit(1);
+        const lastUpdate = lastUpdRow?.[0]?.added_date || null;
+
         setStats({
           totalProducts: count || rows.length,
           totalBrands: brandSet.size,
@@ -141,6 +149,7 @@ export function useDashboardStats(): DashboardStats {
           cumulativeData,
           categoryStats,
           latestProducts: latest || [],
+          lastUpdate,
           loading: false,
           error: null,
         });
