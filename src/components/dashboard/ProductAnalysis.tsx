@@ -14,31 +14,21 @@ type SortDir = "asc" | "desc";
 
 const ITEMS_PER_PAGE = 20;
 
-const FRENCH_MONTHS = ["Janv.", "Févr.", "Mars", "Avril", "Mai", "Juin", "Juil.", "Août", "Sept.", "Oct.", "Nov.", "Déc."];
+const FRENCH_MONTHS_FULL = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"];
 
 function buildDatePresets() {
-  const presets: { label: string; value: string; group?: string }[] = [
+  const presets: { label: string; value: string }[] = [
     { label: "Tout", value: "all" },
-    { label: "24 heures", value: "24h" },
-    { label: "7 jours", value: "7d" },
-    { label: "30 jours", value: "30d" },
-    { label: "3 mois", value: "3m" },
-    { label: "6 mois", value: "6m" },
   ];
-  // Années entières
   const now = new Date();
-  const currentYear = now.getFullYear();
-  for (let y = currentYear; y >= 2025; y--) {
-    presets.push({ label: `Année ${y}`, value: String(y), group: "year" });
-  }
-  // Mois : du mois courant jusqu'à janvier 2025 (ordre décroissant = récent en premier)
-  const startYear = 2025, startMonth = 1;
-  let y = currentYear;
+  let y = now.getFullYear();
   let m = now.getMonth() + 1; // 1-12
-  while (y > startYear || (y === startYear && m >= startMonth)) {
-    const value = `month-${y}-${String(m).padStart(2, "0")}`;
-    const label = `${FRENCH_MONTHS[m - 1]} ${y}`;
-    presets.push({ label, value, group: "month" });
+  // Du mois courant jusqu'à Janvier 2025 (récent → ancien)
+  while (y > 2025 || (y === 2025 && m >= 1)) {
+    presets.push({
+      label: `${FRENCH_MONTHS_FULL[m - 1]} ${y}`,
+      value: `month-${y}-${String(m).padStart(2, "0")}`,
+    });
     m -= 1;
     if (m === 0) { m = 12; y -= 1; }
   }
