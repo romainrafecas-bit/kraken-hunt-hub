@@ -8,6 +8,7 @@ import { externalSupabase as supabase } from "@/integrations/supabase/external-c
 import * as XLSX from "xlsx";
 import ProductSkeleton from "./ProductSkeleton";
 import EmptyState from "./EmptyState";
+import { useFavorites } from "@/hooks/useFavorites";
 
 type SortKey = "price" | "recurrences" | "rating" | "name" | "brand" | "sellers" | "lastSeen";
 type SortDir = "asc" | "desc";
@@ -65,8 +66,7 @@ const ProductAnalysis = () => {
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [page, setPage] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
-  const [favorites, setFavorites] = useState<Set<string>>(new Set());
-  const [userId, setUserId] = useState<string | null>(null);
+  const { isFavorite, toggleFavorite: toggleFavoriteUrl } = useFavorites();
   const [priceMin, setPriceMin] = useState<string>("");
   const [priceMax, setPriceMax] = useState<string>("");
   const [sellersMin, setSellersMin] = useState<string>("");
@@ -133,32 +133,9 @@ const ProductAnalysis = () => {
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
-  useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
-      if (data.user) {
-        setUserId(data.user.id);
-        supabase.from("favorites").select("product_url").eq("user_id", data.user.id)
-          .then(({ data: favs }) => {
-            if (favs) setFavorites(new Set(favs.map(f => f.product_url)));
-          });
-      }
-    });
-  }, []);
-
-  const toggleFavorite = async (product: Product) => {
-    if (!userId || !product.url) return;
-    const url = product.url;
-    const isFav = favorites.has(url);
-    const next = new Set(favorites);
-    if (isFav) {
-      next.delete(url);
-      setFavorites(next);
-      await supabase.from("favorites").delete().eq("user_id", userId).eq("product_url", url);
-    } else {
-      next.add(url);
-      setFavorites(next);
-      await supabase.from("favorites").insert({ user_id: userId, product_url: url });
-    }
+  const toggleFavorite = (product: Product) => {
+    if (!product.url) return;
+    toggleFavoriteUrl(product.url);
   };
 
   const toggleExcludeBrand = (brand: string) => {
@@ -540,7 +517,7 @@ const ProductAnalysis = () => {
             {paged.map((product, i) => {
               const globalRank = page * ITEMS_PER_PAGE + i + 1;
               const ratingColor = getRatingColor(product.rating);
-              const isFav = product.url ? favorites.has(product.url) : false;
+              const isFav = product.url ? isFavorite(product.url) : false;
               const isSelected = product.url ? selectedUrls.has(product.url) : false;
 
               return (

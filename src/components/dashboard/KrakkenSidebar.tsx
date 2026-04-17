@@ -1,7 +1,8 @@
-import { LayoutDashboard, Package, BarChart3, Anchor, User, Heart } from "lucide-react";
+import { LayoutDashboard, Package, BarChart3, Anchor, User, Heart, LogOut } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import krakkenLogo from "@/assets/krakken-logo.png";
+import { useAuth } from "@/contexts/AuthContext";
 
 const navItems = [
   { icon: LayoutDashboard, label: "Dashboard", to: "/dashboard" },
@@ -12,6 +13,12 @@ const navItems = [
 ];
 
 const KrakkenSidebar = () => {
+  const { signOut } = useAuth();
+  const navigate = useNavigate();
+  const handleSignOut = async () => {
+    await signOut();
+    navigate("/auth");
+  };
   return (
     <aside className="w-16 xl:w-56 h-screen bg-sidebar backdrop-blur-xl border-r border-sidebar-border flex flex-col fixed left-0 top-0 z-50 overflow-hidden">
       {/* Atmospheric background */}
@@ -116,6 +123,15 @@ const KrakkenSidebar = () => {
             boxShadow: '0 0 8px 2px hsl(174 72% 46% / 0.5)'
           }} />
         </div>
+        <button
+          onClick={handleSignOut}
+          className="mt-2 w-full flex items-center justify-center xl:justify-start gap-2 px-3 py-2 rounded-xl text-[12px] font-semibold transition-all hover:bg-destructive/10"
+          style={{ color: 'hsl(var(--muted-foreground))' }}
+          title="Se déconnecter"
+        >
+          <LogOut className="w-4 h-4" />
+          <span className="hidden xl:inline">Se déconnecter</span>
+        </button>
       </div>
     </aside>
   );
