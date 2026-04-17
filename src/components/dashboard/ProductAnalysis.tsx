@@ -607,49 +607,70 @@ const ProductAnalysis = () => {
                       }}>{product.sellers}</span>
                     </div>
                   </td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center justify-center gap-2">
-                      {product.image && (
+                  {/* Sourcer (Google Lens) */}
+                  <td className="px-3 py-3">
+                    <div className="flex items-center justify-center">
+                      {product.image ? (
                         <a
                           href={googleLensUrl(product.image)}
                           target="_blank"
                           rel="noopener noreferrer"
                           onClick={(e) => e.stopPropagation()}
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all hover:-translate-y-px"
+                          className="group/lens relative inline-flex items-center justify-center w-10 h-10 rounded-xl transition-all duration-200 hover:-translate-y-0.5"
                           style={{
-                            color: 'hsl(180 100% 92%)',
-                            background: 'linear-gradient(135deg, hsl(174 72% 42% / 0.85), hsl(188 78% 48% / 0.85))',
-                            border: '1px solid hsl(188 78% 60% / 0.5)',
-                            boxShadow: '0 2px 10px -2px hsl(174 72% 46% / 0.4), inset 0 1px 0 hsl(188 78% 70% / 0.25)',
-                            textShadow: '0 0 8px hsl(188 78% 80% / 0.5)',
+                            background: 'linear-gradient(135deg, hsl(174 72% 42% / 0.18), hsl(188 78% 48% / 0.18))',
+                            border: '1px solid hsl(188 78% 60% / 0.35)',
+                            boxShadow: '0 2px 8px -2px hsl(174 72% 46% / 0.3)',
                           }}
                           title="Chercher par image (Google Lens)"
+                          aria-label="Chercher par image"
                         >
-                          <Camera className="w-3.5 h-3.5" />
-                          <span>Chercher par image</span>
+                          <Camera
+                            className="w-[18px] h-[18px] transition-transform duration-200 group-hover/lens:scale-110"
+                            style={{
+                              color: 'hsl(188 80% 78%)',
+                              filter: 'drop-shadow(0 0 6px hsl(188 78% 52% / 0.55))',
+                            }}
+                          />
                         </a>
+                      ) : (
+                        <span className="text-muted-foreground/40 text-xs">—</span>
                       )}
+                    </div>
+                  </td>
+                  {/* Favoris */}
+                  <td className="px-3 py-3">
+                    <div className="flex items-center justify-center">
                       <button
                         onClick={(e) => { e.stopPropagation(); toggleFavorite(product); }}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all hover:-translate-y-px"
+                        className="group/fav relative inline-flex items-center justify-center w-10 h-10 rounded-xl transition-all duration-200 hover:-translate-y-0.5"
                         style={{
-                          color: isFav ? 'hsl(0 0% 100%)' : 'hsl(348 85% 72%)',
                           background: isFav
-                            ? 'linear-gradient(135deg, hsl(348 80% 55%), hsl(0 75% 58%))'
-                            : 'hsl(348 72% 56% / 0.1)',
-                          border: `1px solid ${isFav ? 'hsl(348 80% 65% / 0.7)' : 'hsl(348 72% 56% / 0.4)'}`,
+                            ? 'linear-gradient(135deg, hsl(348 80% 55% / 0.22), hsl(0 75% 58% / 0.22))'
+                            : 'hsl(225 22% 11%)',
+                          border: `1px solid ${isFav ? 'hsl(348 80% 60% / 0.5)' : 'hsl(225 20% 18%)'}`,
                           boxShadow: isFav
-                            ? '0 2px 12px -2px hsl(348 80% 55% / 0.55), inset 0 1px 0 hsl(348 90% 80% / 0.3)'
-                            : '0 1px 6px -2px hsl(348 80% 55% / 0.25)',
-                          textShadow: isFav ? '0 0 8px hsl(348 90% 90% / 0.5)' : undefined,
+                            ? '0 2px 10px -2px hsl(348 80% 55% / 0.45)'
+                            : '0 2px 6px -2px hsl(228 50% 2% / 0.4)',
                         }}
                         title={isFav ? "Retirer des favoris" : "Ajouter aux favoris"}
+                        aria-label={isFav ? "Retirer des favoris" : "Ajouter aux favoris"}
                       >
                         <Heart
-                          className={cn("w-3.5 h-3.5 transition-all", isFav && "fill-current scale-110")}
-                          style={isFav ? { filter: 'drop-shadow(0 0 4px hsl(0 0% 100% / 0.6))' } : undefined}
+                          className={cn(
+                            "w-[18px] h-[18px] transition-all duration-200",
+                            isFav
+                              ? "fill-current scale-110"
+                              : "group-hover/fav:fill-current group-hover/fav:scale-110"
+                          )}
+                          style={{
+                            color: isFav ? 'hsl(348 85% 65%)' : undefined,
+                            filter: isFav
+                              ? 'drop-shadow(0 0 6px hsl(348 85% 65% / 0.7))'
+                              : undefined,
+                          }}
+                          color={!isFav ? 'hsl(348 75% 62%)' : undefined}
                         />
-                        <span>{isFav ? "Dans les favoris" : "Ajouter aux favoris"}</span>
                       </button>
                     </div>
                   </td>
