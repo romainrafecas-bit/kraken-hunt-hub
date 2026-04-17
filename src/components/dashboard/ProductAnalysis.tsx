@@ -66,8 +66,7 @@ const ProductAnalysis = () => {
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [page, setPage] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
-  const [favorites, setFavorites] = useState<Set<string>>(new Set());
-  const [userId, setUserId] = useState<string | null>(null);
+  const { isFavorite, toggleFavorite: toggleFavoriteUrl } = useFavorites();
   const [priceMin, setPriceMin] = useState<string>("");
   const [priceMax, setPriceMax] = useState<string>("");
   const [sellersMin, setSellersMin] = useState<string>("");
@@ -134,32 +133,9 @@ const ProductAnalysis = () => {
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
-  useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
-      if (data.user) {
-        setUserId(data.user.id);
-        supabase.from("favorites").select("product_url").eq("user_id", data.user.id)
-          .then(({ data: favs }) => {
-            if (favs) setFavorites(new Set(favs.map(f => f.product_url)));
-          });
-      }
-    });
-  }, []);
-
-  const toggleFavorite = async (product: Product) => {
-    if (!userId || !product.url) return;
-    const url = product.url;
-    const isFav = favorites.has(url);
-    const next = new Set(favorites);
-    if (isFav) {
-      next.delete(url);
-      setFavorites(next);
-      await supabase.from("favorites").delete().eq("user_id", userId).eq("product_url", url);
-    } else {
-      next.add(url);
-      setFavorites(next);
-      await supabase.from("favorites").insert({ user_id: userId, product_url: url });
-    }
+  const toggleFavorite = (product: Product) => {
+    if (!product.url) return;
+    toggleFavoriteUrl(product.url);
   };
 
   const toggleExcludeBrand = (brand: string) => {
