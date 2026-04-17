@@ -531,7 +531,8 @@ const ProductAnalysis = () => {
               <SortHeader label="Prix" sortKeyName="price" />
               <SortHeader label="Dernier vu" sortKeyName="lastSeen" />
               <SortHeader label="Vendeurs" sortKeyName="sellers" />
-              <th className="px-4 py-3 text-center"><span className="soft-label">Actions</span></th>
+              <th className="px-3 py-3 text-center"><span className="soft-label">Sourcer</span></th>
+              <th className="px-3 py-3 text-center"><span className="soft-label">Favoris</span></th>
             </tr>
           </thead>
           <tbody>
