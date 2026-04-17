@@ -15,19 +15,15 @@ interface Filters {
   pageSize: number;
 }
 
-// Map client sort keys to DB columns.
-// IMPORTANT: `last_seen` is stored as TEXT (dd/mm/yyyy) in the external DB,
-// so a server-side ORDER BY on it is lexicographic (e.g. "31/12/2025" > "01/02/2026").
-// We use `updated_at` (real timestamptz, refreshed at each scrape) as the
-// chronological proxy for "Dernier vu" sorting/filters. The UI keeps showing
-// the textual `last_seen` value as the business date.
+// `last_seen` is now a real timestamptz in the external DB, so server-side
+// chronological sort/filter works natively.
 const sortKeyToColumn: Record<string, string> = {
   name: "title",
   brand: "brand",
   price: "price",
   rating: "rating",
   sellers: "sellers_count",
-  lastSeen: "updated_at",
+  lastSeen: "last_seen",
   recurrences: "recurrences",
 };
 
@@ -61,13 +57,11 @@ export function useProductsPaginated(filters: Filters) {
         query = query.or("price.eq.-1,in_stock.eq.false");
       }
 
-      // Date filter — applied on `updated_at` (real timestamptz) since
-      // `last_seen` is stored as text dd/mm/yyyy and cannot be filtered
-      // chronologically server-side.
+      // Date filter — applied directly on `last_seen` (real timestamptz).
       if (filters.datePreset === "2026") {
         query = query
-          .gte("updated_at", "2026-01-01T00:00:00Z")
-          .lt("updated_at", "2027-01-01T00:00:00Z");
+          .gte("last_seen", "2026-01-01T00:00:00Z")
+          .lt("last_seen", "2027-01-01T00:00:00Z");
       } else if (filters.datePreset !== "all") {
         const cutoffs: Record<string, number> = {
           "24h": 1, "7d": 7, "30d": 30, "3m": 90, "6m": 180,
@@ -76,7 +70,7 @@ export function useProductsPaginated(filters: Filters) {
         if (days) {
           const cutoff = new Date();
           cutoff.setDate(cutoff.getDate() - days);
-          query = query.gte("updated_at", cutoff.toISOString());
+          query = query.gte("last_seen", cutoff.toISOString());
         }
       }
 
@@ -86,11 +80,11 @@ export function useProductsPaginated(filters: Filters) {
         query = query.not("brand", "in", `(${excluded.map(b => `"${b}"`).join(",")})`);
       }
 
-      // Sort — primary on requested column, secondary on updated_at desc for stability
-      const column = sortKeyToColumn[filters.sortKey] || "updated_at";
-      query = query.order(column, { ascending: filters.sortDir === "asc" });
-      if (column !== "updated_at") {
-        query = query.order("updated_at", { ascending: false });
+      // Sort — primary on requested column, secondary on last_seen desc for stability
+      const column = sortKeyToColumn[filters.sortKey] || "last_seen";
+      query = query.order(column, { ascending: filters.sortDir === "asc", nullsFirst: false });
+      if (column !== "last_seen") {
+        query = query.order("last_seen", { ascending: false, nullsFirst: false });
       }
 
       // Pagination

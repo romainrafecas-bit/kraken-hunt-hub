@@ -77,17 +77,21 @@ export function useDashboardStats(): DashboardStats {
         let totalRec = 0;
 
         for (const r of rows) {
-          // Date
+          // Date — accept ISO first (YYYY-MM-DD or full ISO), fallback to dd/mm/yyyy
           if (r.added_date) {
             let key = "";
-            // Try dd/mm/yyyy FIRST (before ISO, to avoid US mm/dd/yyyy misparse)
-            const m = r.added_date.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
-            if (m) {
-              key = `${m[3]}-${m[2]}-${m[1]}`;
+            const iso = r.added_date.match(/^(\d{4})-(\d{2})-(\d{2})/);
+            if (iso) {
+              key = `${iso[1]}-${iso[2]}-${iso[3]}`;
             } else {
-              const iso = new Date(r.added_date);
-              if (!isNaN(iso.getTime())) {
-                key = `${iso.getFullYear()}-${String(iso.getMonth() + 1).padStart(2, '0')}-${String(iso.getDate()).padStart(2, '0')}`;
+              const m = r.added_date.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+              if (m) {
+                key = `${m[3]}-${m[2]}-${m[1]}`;
+              } else {
+                const d = new Date(r.added_date);
+                if (!isNaN(d.getTime())) {
+                  key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+                }
               }
             }
             if (key) dateCountMap[key] = (dateCountMap[key] || 0) + 1;
@@ -119,13 +123,11 @@ export function useDashboardStats(): DashboardStats {
           .map(([name, d]) => ({ name, ...d }))
           .sort((a, b) => b.recurrences - a.recurrences);
 
-        // 3. Latest products — server-side sort on `updated_at` (real timestamptz),
-        // since `last_seen` and `added_date` are stored as text dd/mm/yyyy and
-        // would yield a lexicographic order (e.g. "31/12/2025" before "01/02/2026").
+        // 3. Latest products — server-side sort on `last_seen` (real timestamptz)
         const { data: latestRaw } = await supabase
           .from("products")
           .select("*")
-          .order("updated_at", { ascending: false })
+          .order("last_seen", { ascending: false, nullsFirst: false })
           .limit(8);
 
         const latest = latestRaw || [];
