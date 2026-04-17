@@ -94,9 +94,9 @@ const Abonnement = () => {
               )}
 
               {plan.tag && (
-                <div className="absolute top-3 right-3">
-                  <span className="bio-badge bio-teal text-[10px]">
-                    <Zap className="w-3 h-3 mr-1" />
+                <div className="absolute top-3 right-3 z-10">
+                  <span className="bio-badge bio-teal text-[10px] inline-flex items-center gap-1 whitespace-nowrap">
+                    <Zap className="w-3 h-3" />
                     {plan.tag}
                   </span>
                 </div>
