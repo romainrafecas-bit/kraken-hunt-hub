@@ -1,8 +1,9 @@
-import { LayoutDashboard, Package, BarChart3, Anchor, User, Heart, LogOut } from "lucide-react";
+import { LayoutDashboard, Package, BarChart3, Anchor, User, Heart, LogOut, Crown, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { NavLink, useNavigate } from "react-router-dom";
 import krakkenLogo from "@/assets/krakken-logo.png";
 import { useAuth } from "@/contexts/AuthContext";
+import { useSubscription } from "@/hooks/useSubscription";
 
 const navItems = [
   { icon: LayoutDashboard, label: "Dashboard", to: "/dashboard" },
@@ -10,11 +11,13 @@ const navItems = [
   { icon: BarChart3, label: "Analytics", to: "/analytics" },
   { icon: Heart, label: "Favoris", to: "/favoris" },
   { icon: User, label: "Mon profil", to: "/profil" },
+  { icon: Crown, label: "Abonnement", to: "/abonnement" },
 ];
 
 const KrakkenSidebar = () => {
   const { signOut } = useAuth();
   const navigate = useNavigate();
+  const { isTrialing, isActive, daysLeft } = useSubscription();
   const handleSignOut = async () => {
     await signOut();
     navigate("/auth");
@@ -100,23 +103,42 @@ const KrakkenSidebar = () => {
 
       {/* Status */}
       <div className="p-3 xl:p-4 relative z-10">
-        <div className="hidden xl:flex items-center gap-2 p-3 rounded-xl relative overflow-hidden" style={{
-          background: 'linear-gradient(135deg, hsl(225 32% 8% / 0.9), hsl(225 28% 10% / 0.6))',
-          border: '1px solid hsl(174 72% 46% / 0.1)',
-          boxShadow: '0 0 20px -8px hsl(174 72% 46% / 0.1)'
-        }}>
-          <Anchor className="w-4 h-4 text-primary flex-shrink-0" style={{
-            filter: 'drop-shadow(0 0 4px hsl(174 72% 46% / 0.4))'
-          }} />
-          <div className="min-w-0">
-            <p className="text-[11px] text-foreground font-semibold">10 traqués</p>
-            <p className="text-[10px] text-primary/70 font-mono">8 en surface</p>
+        {isTrialing && daysLeft !== null && (
+          <button
+            onClick={() => navigate("/abonnement")}
+            className="hidden xl:flex w-full items-center gap-2 p-3 rounded-xl relative overflow-hidden text-left hover:border-primary/40 transition-all"
+            style={{
+              background: 'linear-gradient(135deg, hsl(225 32% 8% / 0.9), hsl(225 28% 10% / 0.6))',
+              border: '1px solid hsl(174 72% 46% / 0.2)',
+              boxShadow: '0 0 20px -8px hsl(174 72% 46% / 0.15)'
+            }}
+            title="Gérer mon abonnement"
+          >
+            <Sparkles className="w-4 h-4 text-primary flex-shrink-0" style={{
+              filter: 'drop-shadow(0 0 4px hsl(174 72% 46% / 0.4))'
+            }} />
+            <div className="min-w-0">
+              <p className="text-[11px] text-foreground font-semibold">Essai gratuit</p>
+              <p className="text-[10px] text-primary/80 font-mono">
+                {daysLeft} j restant{daysLeft > 1 ? 's' : ''}
+              </p>
+            </div>
+          </button>
+        )}
+        {isActive && (
+          <div className="hidden xl:flex items-center gap-2 p-3 rounded-xl relative overflow-hidden" style={{
+            background: 'linear-gradient(135deg, hsl(225 32% 8% / 0.9), hsl(225 28% 10% / 0.6))',
+            border: '1px solid hsl(174 72% 46% / 0.15)',
+          }}>
+            <Crown className="w-4 h-4 text-primary flex-shrink-0" style={{
+              filter: 'drop-shadow(0 0 4px hsl(174 72% 46% / 0.4))'
+            }} />
+            <div className="min-w-0">
+              <p className="text-[11px] text-foreground font-semibold">Krakken Pro</p>
+              <p className="text-[10px] text-primary/70 font-mono">Actif</p>
+            </div>
           </div>
-          <span className="w-2 h-2 rounded-full bg-primary ml-auto flex-shrink-0" style={{
-            animation: 'bioluminescence 3s ease-in-out infinite',
-            boxShadow: '0 0 8px 2px hsl(174 72% 46% / 0.5)'
-          }} />
-        </div>
+        )}
         <div className="xl:hidden flex justify-center">
           <span className="w-2 h-2 rounded-full bg-primary" style={{
             animation: 'bioluminescence 3s ease-in-out infinite',
