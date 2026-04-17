@@ -14,6 +14,24 @@ export type Database = {
   }
   public: {
     Tables: {
+      allowed_emails: {
+        Row: {
+          email: string
+          synced_at: string
+          systemeio_contact_id: string | null
+        }
+        Insert: {
+          email: string
+          synced_at?: string
+          systemeio_contact_id?: string | null
+        }
+        Update: {
+          email?: string
+          synced_at?: string
+          systemeio_contact_id?: string | null
+        }
+        Relationships: []
+      }
       favorites: {
         Row: {
           collection: string | null
@@ -103,6 +121,30 @@ export type Database = {
           title?: string
           updated_at?: string | null
           url?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          display_name: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
