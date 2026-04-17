@@ -162,6 +162,74 @@ const ProductAnalysis = () => {
     setPage(0);
   };
 
+  const toggleSelect = (url: string) => {
+    setSelectedUrls(prev => {
+      const next = new Set(prev);
+      if (next.has(url)) next.delete(url); else next.add(url);
+      return next;
+    });
+  };
+
+  const allPageSelected = paged.length > 0 && paged.every(p => p.url && selectedUrls.has(p.url));
+  const togglePageSelectAll = () => {
+    setSelectedUrls(prev => {
+      const next = new Set(prev);
+      if (allPageSelected) {
+        paged.forEach(p => p.url && next.delete(p.url));
+      } else {
+        paged.forEach(p => p.url && next.add(p.url));
+      }
+      return next;
+    });
+  };
+
+  const googleLensUrl = (imageUrl: string) =>
+    `https://lens.google.com/uploadbyurl?url=${encodeURIComponent(imageUrl)}`;
+
+  const exportSelectedToExcel = async () => {
+    if (selectedUrls.size === 0) return;
+    const urls = [...selectedUrls];
+    // Fetch full data for selected products from the server (in chunks to stay under URL limits)
+    const chunkSize = 100;
+    const rows: any[] = [];
+    for (let i = 0; i < urls.length; i += chunkSize) {
+      const chunk = urls.slice(i, i + chunkSize);
+      const { data } = await supabase
+        .from("products")
+        .select("title,brand,category,price,rating,review_count,sellers_count,in_stock,recurrences,last_seen,added_date,url,image_url")
+        .in("url", chunk);
+      if (data) rows.push(...data);
+    }
+    const exportRows = rows.map((p: any) => ({
+      "Produit": p.title,
+      "Marque": p.brand || "",
+      "Catégorie": formatCategoryName(p.category || ""),
+      "Prix (€)": p.price === -1 ? "Rupture" : (p.price ?? ""),
+      "En stock": p.in_stock === false ? "Non" : "Oui",
+      "Note": p.rating ?? "",
+      "Avis": p.review_count ?? "",
+      "Vendeurs": p.sellers_count ?? "",
+      "Récurrences": p.recurrences ?? "",
+      "Dernier vu": p.last_seen ? new Date(p.last_seen).toLocaleDateString("fr-FR") : "",
+      "Ajouté le": p.added_date ? new Date(p.added_date).toLocaleDateString("fr-FR") : "",
+      "URL produit": p.url,
+      "Image": p.image_url || "",
+      "Google Lens": p.image_url ? googleLensUrl(p.image_url) : "",
+    }));
+    const ws = XLSX.utils.json_to_sheet(exportRows);
+    ws["!cols"] = [
+      { wch: 50 }, { wch: 18 }, { wch: 18 }, { wch: 12 }, { wch: 10 },
+      { wch: 8 }, { wch: 10 }, { wch: 10 }, { wch: 12 }, { wch: 14 },
+      { wch: 14 }, { wch: 60 }, { wch: 60 }, { wch: 60 },
+    ];
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Produits Kraken");
+    const date = new Date().toISOString().slice(0, 10);
+    XLSX.writeFile(wb, `kraken-produits-${date}.xlsx`);
+  };
+
+  const clearSelection = () => setSelectedUrls(new Set());
+
   const SortHeader = ({ label, sortKeyName, className: headerClass }: { label: string; sortKeyName: SortKey; className?: string }) => (
     <th className={cn("text-left px-4 py-3 cursor-pointer group/sort select-none", headerClass)} onClick={() => toggleSort(sortKeyName)}>
       <div className="flex items-center gap-1.5">
