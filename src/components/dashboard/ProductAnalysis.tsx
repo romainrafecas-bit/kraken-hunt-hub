@@ -444,6 +444,31 @@ const ProductAnalysis = () => {
         </div>
       </div>
 
+      {/* Selection toolbar */}
+      {selectedUrls.size > 0 && (
+        <div className="px-5 py-2.5 border-b border-border/30 bg-primary/[0.04] flex items-center justify-between flex-wrap gap-2">
+          <span className="text-xs text-foreground">
+            <span className="font-bold text-primary">{selectedUrls.size}</span> produit{selectedUrls.size > 1 ? 's' : ''} sélectionné{selectedUrls.size > 1 ? 's' : ''}
+          </span>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={exportSelectedToExcel}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary/15 border border-primary/30 text-primary hover:bg-primary/25 transition-all text-xs font-bold"
+            >
+              <Download className="w-3.5 h-3.5" />
+              Exporter en Excel
+            </button>
+            <button
+              onClick={clearSelection}
+              className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-secondary/40 border border-border/30 text-muted-foreground hover:text-foreground transition-all text-xs"
+            >
+              <X className="w-3.5 h-3.5" />
+              Effacer
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Table */}
       <div className="overflow-x-auto relative">
         {isLoading && (
@@ -454,6 +479,15 @@ const ProductAnalysis = () => {
         <table className="w-full">
           <thead>
             <tr className="border-b border-border/30">
+              <th className="text-left px-3 py-3">
+                <input
+                  type="checkbox"
+                  checked={allPageSelected}
+                  onChange={togglePageSelectAll}
+                  className="w-4 h-4 rounded border-border/40 bg-secondary/40 accent-primary cursor-pointer"
+                  aria-label="Tout sélectionner"
+                />
+              </th>
               <th className="text-left px-4 py-3"><span className="soft-label">#</span></th>
               <th className="text-left px-4 py-3"><span className="soft-label">Image</span></th>
               <SortHeader label="Produit" sortKeyName="name" />
