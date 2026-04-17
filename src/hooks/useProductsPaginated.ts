@@ -66,6 +66,19 @@ export function useProductsPaginated(filters: Filters) {
         query = query
           .gte("last_seen", "2026-01-01T00:00:00Z")
           .lt("last_seen", "2027-01-01T00:00:00Z");
+      } else if (filters.datePreset === "2025") {
+        query = query
+          .gte("last_seen", "2025-01-01T00:00:00Z")
+          .lt("last_seen", "2026-01-01T00:00:00Z");
+      } else if (filters.datePreset.startsWith("month-")) {
+        const [, y, m] = filters.datePreset.split("-");
+        const year = parseInt(y, 10);
+        const month = parseInt(m, 10);
+        if (!isNaN(year) && !isNaN(month)) {
+          const start = new Date(Date.UTC(year, month - 1, 1)).toISOString();
+          const end = new Date(Date.UTC(month === 12 ? year + 1 : year, month === 12 ? 0 : month, 1)).toISOString();
+          query = query.gte("last_seen", start).lt("last_seen", end);
+        }
       } else if (filters.datePreset !== "all") {
         const cutoffs: Record<string, number> = {
           "24h": 1, "7d": 7, "30d": 30, "3m": 90, "6m": 180,

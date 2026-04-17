@@ -14,15 +14,38 @@ type SortDir = "asc" | "desc";
 
 const ITEMS_PER_PAGE = 20;
 
-const datePresets = [
-  { label: "Tout", value: "all" },
-  { label: "2026", value: "2026" },
-  { label: "24h", value: "24h" },
-  { label: "7 jours", value: "7d" },
-  { label: "30 jours", value: "30d" },
-  { label: "3 mois", value: "3m" },
-  { label: "6 mois", value: "6m" },
-];
+const FRENCH_MONTHS = ["Janv.", "Févr.", "Mars", "Avril", "Mai", "Juin", "Juil.", "Août", "Sept.", "Oct.", "Nov.", "Déc."];
+
+function buildDatePresets() {
+  const presets: { label: string; value: string; group?: string }[] = [
+    { label: "Tout", value: "all" },
+    { label: "24 heures", value: "24h" },
+    { label: "7 jours", value: "7d" },
+    { label: "30 jours", value: "30d" },
+    { label: "3 mois", value: "3m" },
+    { label: "6 mois", value: "6m" },
+  ];
+  // Années entières
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  for (let y = currentYear; y >= 2025; y--) {
+    presets.push({ label: `Année ${y}`, value: String(y), group: "year" });
+  }
+  // Mois : du mois courant jusqu'à janvier 2025 (ordre décroissant = récent en premier)
+  const startYear = 2025, startMonth = 1;
+  let y = currentYear;
+  let m = now.getMonth() + 1; // 1-12
+  while (y > startYear || (y === startYear && m >= startMonth)) {
+    const value = `month-${y}-${String(m).padStart(2, "0")}`;
+    const label = `${FRENCH_MONTHS[m - 1]} ${y}`;
+    presets.push({ label, value, group: "month" });
+    m -= 1;
+    if (m === 0) { m = 12; y -= 1; }
+  }
+  return presets;
+}
+
+const datePresets = buildDatePresets();
 
 const categoryDisplayNames: Record<string, string> = {
   "Tous": "Tous",
@@ -292,16 +315,28 @@ const ProductAnalysis = () => {
 
           {/* Date preset dropdown */}
           <div className="relative flex items-center gap-2">
-            <CalendarDays className="w-3.5 h-3.5 flex-shrink-0" style={{ color: 'hsl(262 72% 72%)' }} />
+            <CalendarDays className="w-3.5 h-3.5 flex-shrink-0" style={{ color: 'hsl(174 72% 60%)' }} />
             <select
               value={selectedDatePreset}
               onChange={e => { setSelectedDatePreset(e.target.value); setPage(0); }}
-              className="bg-secondary/60 border border-border/40 rounded-xl px-3 py-2 text-sm text-foreground focus:outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all appearance-none cursor-pointer pr-8 min-w-[120px]"
+              className="bg-secondary/60 border border-border/40 rounded-xl px-3 py-2 text-sm text-foreground focus:outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all appearance-none cursor-pointer pr-8 min-w-[140px]"
               style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%234dd4ac' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 10px center' }}
             >
-              {datePresets.map(dp => (
-                <option key={dp.value} value={dp.value} className="bg-card text-foreground">{dp.label}</option>
-              ))}
+              <optgroup label="Périodes récentes">
+                {datePresets.filter(dp => !dp.group).map(dp => (
+                  <option key={dp.value} value={dp.value} className="bg-card text-foreground">{dp.label}</option>
+                ))}
+              </optgroup>
+              <optgroup label="Par année">
+                {datePresets.filter(dp => dp.group === "year").map(dp => (
+                  <option key={dp.value} value={dp.value} className="bg-card text-foreground">{dp.label}</option>
+                ))}
+              </optgroup>
+              <optgroup label="Par mois">
+                {datePresets.filter(dp => dp.group === "month").map(dp => (
+                  <option key={dp.value} value={dp.value} className="bg-card text-foreground">{dp.label}</option>
+                ))}
+              </optgroup>
             </select>
           </div>
 
@@ -495,9 +530,8 @@ const ProductAnalysis = () => {
               <th className="text-left px-4 py-3"><span className="soft-label">Catégorie</span></th>
               <SortHeader label="Prix" sortKeyName="price" />
               <SortHeader label="Dernier vu" sortKeyName="lastSeen" />
-              <SortHeader label="Note" sortKeyName="rating" />
               <SortHeader label="Vendeurs" sortKeyName="sellers" />
-              <th className="text-left px-4 py-3"><span className="soft-label"></span></th>
+              <th className="text-right px-4 py-3"><span className="soft-label">Actions</span></th>
             </tr>
           </thead>
           <tbody>
@@ -540,7 +574,7 @@ const ProductAnalysis = () => {
                       {product.name}
                     </a>
                   </td>
-                  <td className="px-4 py-3"><span className="text-xs text-secondary-foreground font-medium">{product.brand}</span></td>
+                  <td className="px-4 py-3"><span className="text-sm font-medium text-foreground/85">{product.brand}</span></td>
                   <td className="px-4 py-3"><span className="bio-badge bio-cyan text-[10px]">{formatCategoryName(product.category)}</span></td>
                   <td className="px-4 py-3">
                     {product.price === -1 ? (
@@ -551,58 +585,51 @@ const ProductAnalysis = () => {
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-1.5">
-                      <Clock className="w-3 h-3" style={{ color: 'hsl(174 72% 56%)', opacity: 0.6 }} />
-                      <span className="text-sm font-medium" style={{ color: 'hsl(174 72% 56%)' }}>{product.lastSeen}</span>
+                      <Clock className="w-3 h-3" style={{ color: 'hsl(174 72% 60%)' }} />
+                      <span className="text-sm font-semibold" style={{ color: 'hsl(174 72% 68%)' }}>{product.lastSeen}</span>
                     </div>
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-1.5">
-                      <span className="text-sm font-bold" style={{ color: ratingColor, textShadow: `0 0 8px ${ratingColor}40` }}>{product.rating}</span>
-                      <div className="flex">
-                        {[1, 2, 3, 4, 5].map(star => (
-                          <span key={star} className="text-[10px]" style={{
-                            color: star <= Math.round(product.rating) ? ratingColor : 'hsl(210 10% 20%)',
-                            textShadow: star <= Math.round(product.rating) ? `0 0 4px ${ratingColor}60` : undefined,
-                          }}>★</span>
-                        ))}
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-1.5">
-                      <Users className="w-3 h-3" style={{ color: 'hsl(262 60% 64%)', opacity: 0.6 }} />
+                      <Users className="w-3.5 h-3.5" style={{ color: 'hsl(188 78% 62%)' }} />
                       <span className="text-sm font-bold" style={{
-                        color: product.sellers >= 25 ? 'hsl(262 72% 72%)' : product.sellers >= 15 ? 'hsl(262 50% 62%)' : 'hsl(210 10% 50%)',
-                        textShadow: product.sellers >= 25 ? '0 0 8px hsl(262 52% 58% / 0.3)' : undefined,
+                        color: product.sellers >= 25 ? 'hsl(188 80% 70%)' : product.sellers >= 15 ? 'hsl(188 70% 65%)' : 'hsl(195 25% 75%)',
+                        textShadow: product.sellers >= 25 ? '0 0 8px hsl(188 78% 52% / 0.35)' : undefined,
                       }}>{product.sellers}</span>
                     </div>
                   </td>
                   <td className="px-4 py-3">
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center justify-end gap-1.5">
                       {product.image && (
                         <a
                           href={googleLensUrl(product.image)}
                           target="_blank"
                           rel="noopener noreferrer"
                           onClick={(e) => e.stopPropagation()}
-                          className="p-1.5 rounded-lg hover:bg-secondary/50 transition-all"
+                          className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-bold transition-all"
+                          style={{
+                            color: 'hsl(188 80% 68%)',
+                            background: 'hsl(188 78% 52% / 0.12)',
+                            border: '1px solid hsl(188 78% 52% / 0.3)',
+                          }}
                           title="Rechercher avec Google Lens"
-                          aria-label="Rechercher avec Google Lens"
                         >
-                          <Camera className="w-4 h-4" style={{
-                            color: 'hsl(174 72% 56%)',
-                            filter: 'drop-shadow(0 0 4px hsl(174 72% 46% / 0.35))',
-                          }} />
+                          <Camera className="w-3.5 h-3.5" />
+                          <span className="hidden xl:inline">Lens</span>
                         </a>
                       )}
-                      <button onClick={(e) => { e.stopPropagation(); toggleFavorite(product); }}
-                        className="p-1.5 rounded-lg hover:bg-secondary/50 transition-all"
-                        title={isFav ? "Retirer des favoris" : "Ajouter aux favoris"}>
-                        <Heart className={cn("w-4 h-4 transition-all", isFav ? "fill-current" : "")}
-                          style={{
-                            color: isFav ? 'hsl(340 75% 55%)' : 'hsl(210 10% 30%)',
-                            filter: isFav ? 'drop-shadow(0 0 6px hsl(340 75% 55% / 0.4))' : undefined,
-                          }} />
+                      <button
+                        onClick={(e) => { e.stopPropagation(); toggleFavorite(product); }}
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-bold transition-all"
+                        style={{
+                          color: isFav ? 'hsl(348 80% 70%)' : 'hsl(174 72% 65%)',
+                          background: isFav ? 'hsl(348 72% 56% / 0.15)' : 'hsl(174 72% 46% / 0.1)',
+                          border: `1px solid ${isFav ? 'hsl(348 72% 56% / 0.35)' : 'hsl(174 72% 46% / 0.28)'}`,
+                        }}
+                        title={isFav ? "Retirer des favoris" : "Ajouter aux favoris"}
+                      >
+                        <Heart className={cn("w-3.5 h-3.5", isFav && "fill-current")} />
+                        <span className="hidden xl:inline">{isFav ? "Favori" : "Favori"}</span>
                       </button>
                     </div>
                   </td>
