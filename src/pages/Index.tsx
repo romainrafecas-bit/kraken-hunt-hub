@@ -130,16 +130,28 @@ const Index = () => {
               </div>
             </div>
             <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
-              className="hidden md:flex items-stretch gap-px rounded-xl overflow-hidden" style={{ border: '1px solid hsl(225 20% 12%)' }}>
-              <div className="px-5 py-3 text-center" style={{ background: 'hsl(225 25% 7%)' }}>
-                <p className="text-[8px] font-display uppercase tracking-[0.2em] text-foreground/50 mb-1">Récurrences</p>
-                <p className="text-xl font-display font-black tabular-nums" style={{ color: 'hsl(174 72% 56%)', textShadow: '0 0 16px hsl(174 72% 46% / 0.3)' }}>
-                  {totalRecurrences.toLocaleString("fr-FR")}
-                </p>
-              </div>
+              className="hidden md:flex items-center gap-3 rounded-xl px-5 py-3 relative overflow-hidden"
+              style={{
+                background: 'linear-gradient(135deg, hsl(225 25% 7%), hsl(225 28% 9%))',
+                border: '1px solid hsl(174 72% 46% / 0.18)',
+                boxShadow: '0 0 24px -8px hsl(174 72% 46% / 0.25), inset 0 1px 0 hsl(174 72% 46% / 0.08)',
+              }}>
               <span className="w-2 h-2 rounded-full flex-shrink-0" style={{
-                backgroundColor: 'hsl(162 68% 44%)', boxShadow: '0 0 8px hsl(162 68% 44% / 0.6)', animation: 'bioluminescence 2s ease-in-out infinite',
+                backgroundColor: 'hsl(162 68% 44%)', boxShadow: '0 0 10px hsl(162 68% 44% / 0.7)', animation: 'bioluminescence 2s ease-in-out infinite',
               }} />
+              <div className="text-left">
+                <p className="text-[8px] font-display uppercase tracking-[0.2em] text-foreground/50 mb-0.5">Dernière mise à jour</p>
+                <div className="flex items-baseline gap-2">
+                  <p className="text-base font-display font-black tabular-nums" style={{ color: 'hsl(174 72% 56%)', textShadow: '0 0 14px hsl(174 72% 46% / 0.35)' }}>
+                    {lastUpdateLabel}
+                  </p>
+                  {lastUpdateRelative && (
+                    <span className="text-[9px] font-display font-bold" style={{ color: 'hsl(162 68% 52%)' }}>
+                      {lastUpdateRelative}
+                    </span>
+                  )}
+                </div>
+              </div>
             </motion.div>
           </div>
         </div>
