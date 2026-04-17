@@ -530,9 +530,8 @@ const ProductAnalysis = () => {
               <th className="text-left px-4 py-3"><span className="soft-label">Catégorie</span></th>
               <SortHeader label="Prix" sortKeyName="price" />
               <SortHeader label="Dernier vu" sortKeyName="lastSeen" />
-              <SortHeader label="Note" sortKeyName="rating" />
               <SortHeader label="Vendeurs" sortKeyName="sellers" />
-              <th className="text-left px-4 py-3"><span className="soft-label"></span></th>
+              <th className="text-right px-4 py-3"><span className="soft-label">Actions</span></th>
             </tr>
           </thead>
           <tbody>
