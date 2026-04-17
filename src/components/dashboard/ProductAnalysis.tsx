@@ -557,14 +557,22 @@ const ProductAnalysis = () => {
                     />
                   </td>
                   <td className="px-4 py-3">
-                    <span className={cn("font-display text-sm font-black")}
-                      style={globalRank <= 3 ? { color: 'hsl(174 72% 56%)', textShadow: '0 0 8px hsl(174 72% 46% / 0.3)' } : { color: 'hsl(210 10% 30%)' }}>
+                    <span
+                      className="font-display text-sm font-black"
+                      style={{
+                        color: 'hsl(174 72% 62%)',
+                        textShadow: globalRank <= 3
+                          ? '0 0 10px hsl(174 72% 46% / 0.5)'
+                          : '0 0 6px hsl(174 72% 46% / 0.25)',
+                        opacity: globalRank <= 3 ? 1 : 0.85,
+                      }}
+                    >
                       {String(globalRank).padStart(2, '0')}
                     </span>
                   </td>
                   <td className="px-4 py-3">
-                    <div className="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 group-hover:scale-105 transition-transform duration-300"
-                      style={{ border: '1px solid hsl(225 20% 15%)', boxShadow: '0 2px 8px hsl(228 50% 2% / 0.4)' }}>
+                    <div className="w-20 h-20 rounded-xl overflow-hidden flex-shrink-0 group-hover:scale-105 transition-transform duration-300"
+                      style={{ border: '1px solid hsl(174 72% 46% / 0.18)', boxShadow: '0 2px 12px hsl(228 50% 2% / 0.5), inset 0 0 0 1px hsl(174 72% 46% / 0.06)' }}>
                       <img src={product.image} alt={product.name} className="w-full h-full object-cover" loading="lazy" />
                     </div>
                   </td>
