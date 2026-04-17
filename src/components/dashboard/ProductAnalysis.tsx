@@ -1,10 +1,11 @@
 import { useState, useMemo, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
-import { ArrowUpDown, ArrowUp, ArrowDown, ChevronLeft, ChevronRight, Search, Users, CalendarDays, Crosshair, Clock, Heart, X, Filter } from "lucide-react";
+import { ArrowUpDown, ArrowUp, ArrowDown, ChevronLeft, ChevronRight, Search, Users, CalendarDays, Crosshair, Clock, Heart, X, Filter, Euro, Camera, Download } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Product } from "@/data/products";
 import { useProductsPaginated } from "@/hooks/useProductsPaginated";
 import { externalSupabase as supabase } from "@/integrations/supabase/external-client";
+import * as XLSX from "xlsx";
 import ProductSkeleton from "./ProductSkeleton";
 import EmptyState from "./EmptyState";
 
@@ -53,6 +54,11 @@ const ProductAnalysis = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [userId, setUserId] = useState<string | null>(null);
+  const [priceMin, setPriceMin] = useState<string>("");
+  const [priceMax, setPriceMax] = useState<string>("");
+  const [sellersMin, setSellersMin] = useState<string>("");
+  const [sellersMax, setSellersMax] = useState<string>("");
+  const [selectedUrls, setSelectedUrls] = useState<Set<string>>(new Set());
 
   // Fetch categories list for dropdown
   const [dynamicCategories, setDynamicCategories] = useState<string[]>(["Tous"]);
@@ -94,7 +100,11 @@ const ProductAnalysis = () => {
     sortDir,
     page,
     pageSize: ITEMS_PER_PAGE,
-  }), [selectedCategory, excludedBrands, searchQuery, stockFilter, selectedDatePreset, sortKey, sortDir, page]);
+    priceMin: priceMin === "" ? null : Number(priceMin),
+    priceMax: priceMax === "" ? null : Number(priceMax),
+    sellersMin: sellersMin === "" ? null : Number(sellersMin),
+    sellersMax: sellersMax === "" ? null : Number(sellersMax),
+  }), [selectedCategory, excludedBrands, searchQuery, stockFilter, selectedDatePreset, sortKey, sortDir, page, priceMin, priceMax, sellersMin, sellersMax]);
 
   const { products: paged, totalCount, loading: isLoading } = useProductsPaginated(filters);
   const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE);
@@ -151,6 +161,74 @@ const ProductAnalysis = () => {
     else { setSortKey(key); setSortDir("desc"); }
     setPage(0);
   };
+
+  const toggleSelect = (url: string) => {
+    setSelectedUrls(prev => {
+      const next = new Set(prev);
+      if (next.has(url)) next.delete(url); else next.add(url);
+      return next;
+    });
+  };
+
+  const allPageSelected = paged.length > 0 && paged.every(p => p.url && selectedUrls.has(p.url));
+  const togglePageSelectAll = () => {
+    setSelectedUrls(prev => {
+      const next = new Set(prev);
+      if (allPageSelected) {
+        paged.forEach(p => p.url && next.delete(p.url));
+      } else {
+        paged.forEach(p => p.url && next.add(p.url));
+      }
+      return next;
+    });
+  };
+
+  const googleLensUrl = (imageUrl: string) =>
+    `https://lens.google.com/uploadbyurl?url=${encodeURIComponent(imageUrl)}`;
+
+  const exportSelectedToExcel = async () => {
+    if (selectedUrls.size === 0) return;
+    const urls = [...selectedUrls];
+    // Fetch full data for selected products from the server (in chunks to stay under URL limits)
+    const chunkSize = 100;
+    const rows: any[] = [];
+    for (let i = 0; i < urls.length; i += chunkSize) {
+      const chunk = urls.slice(i, i + chunkSize);
+      const { data } = await supabase
+        .from("products")
+        .select("title,brand,category,price,rating,review_count,sellers_count,in_stock,recurrences,last_seen,added_date,url,image_url")
+        .in("url", chunk);
+      if (data) rows.push(...data);
+    }
+    const exportRows = rows.map((p: any) => ({
+      "Produit": p.title,
+      "Marque": p.brand || "",
+      "Catégorie": formatCategoryName(p.category || ""),
+      "Prix (€)": p.price === -1 ? "Rupture" : (p.price ?? ""),
+      "En stock": p.in_stock === false ? "Non" : "Oui",
+      "Note": p.rating ?? "",
+      "Avis": p.review_count ?? "",
+      "Vendeurs": p.sellers_count ?? "",
+      "Récurrences": p.recurrences ?? "",
+      "Dernier vu": p.last_seen ? new Date(p.last_seen).toLocaleDateString("fr-FR") : "",
+      "Ajouté le": p.added_date ? new Date(p.added_date).toLocaleDateString("fr-FR") : "",
+      "URL produit": p.url,
+      "Image": p.image_url || "",
+      "Google Lens": p.image_url ? googleLensUrl(p.image_url) : "",
+    }));
+    const ws = XLSX.utils.json_to_sheet(exportRows);
+    ws["!cols"] = [
+      { wch: 50 }, { wch: 18 }, { wch: 18 }, { wch: 12 }, { wch: 10 },
+      { wch: 8 }, { wch: 10 }, { wch: 10 }, { wch: 12 }, { wch: 14 },
+      { wch: 14 }, { wch: 60 }, { wch: 60 }, { wch: 60 },
+    ];
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Produits Kraken");
+    const date = new Date().toISOString().slice(0, 10);
+    XLSX.writeFile(wb, `kraken-produits-${date}.xlsx`);
+  };
+
+  const clearSelection = () => setSelectedUrls(new Set());
 
   const SortHeader = ({ label, sortKeyName, className: headerClass }: { label: string; sortKeyName: SortKey; className?: string }) => (
     <th className={cn("text-left px-4 py-3 cursor-pointer group/sort select-none", headerClass)} onClick={() => toggleSort(sortKeyName)}>
@@ -239,6 +317,68 @@ const ProductAnalysis = () => {
             <option value="out_of_stock" className="bg-card text-foreground">En rupture</option>
           </select>
 
+          {/* Price range */}
+          <div className="flex items-center gap-1.5 bg-secondary/60 border border-border/40 rounded-xl px-3 py-1.5">
+            <Euro className="w-3.5 h-3.5 flex-shrink-0" style={{ color: 'hsl(174 72% 56%)' }} />
+            <input
+              type="number"
+              min={0}
+              placeholder="Min"
+              value={priceMin}
+              onChange={e => { setPriceMin(e.target.value); setPage(0); }}
+              className="bg-transparent w-16 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none"
+            />
+            <span className="text-muted-foreground/50 text-xs">–</span>
+            <input
+              type="number"
+              min={0}
+              placeholder="Max"
+              value={priceMax}
+              onChange={e => { setPriceMax(e.target.value); setPage(0); }}
+              className="bg-transparent w-16 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none"
+            />
+            {(priceMin !== "" || priceMax !== "") && (
+              <button
+                onClick={() => { setPriceMin(""); setPriceMax(""); setPage(0); }}
+                className="text-muted-foreground hover:text-foreground transition-colors"
+                aria-label="Réinitialiser le prix"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            )}
+          </div>
+
+          {/* Sellers range */}
+          <div className="flex items-center gap-1.5 bg-secondary/60 border border-border/40 rounded-xl px-3 py-1.5">
+            <Users className="w-3.5 h-3.5 flex-shrink-0" style={{ color: 'hsl(262 72% 72%)' }} />
+            <input
+              type="number"
+              min={0}
+              placeholder="Min"
+              value={sellersMin}
+              onChange={e => { setSellersMin(e.target.value); setPage(0); }}
+              className="bg-transparent w-14 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none"
+            />
+            <span className="text-muted-foreground/50 text-xs">–</span>
+            <input
+              type="number"
+              min={0}
+              placeholder="Max"
+              value={sellersMax}
+              onChange={e => { setSellersMax(e.target.value); setPage(0); }}
+              className="bg-transparent w-14 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none"
+            />
+            {(sellersMin !== "" || sellersMax !== "") && (
+              <button
+                onClick={() => { setSellersMin(""); setSellersMax(""); setPage(0); }}
+                className="text-muted-foreground hover:text-foreground transition-colors"
+                aria-label="Réinitialiser les vendeurs"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            )}
+          </div>
+
           {/* Exclude brands dropdown */}
           <div className="relative" ref={brandDropdownRef}>
             <button
@@ -304,6 +444,31 @@ const ProductAnalysis = () => {
         </div>
       </div>
 
+      {/* Selection toolbar */}
+      {selectedUrls.size > 0 && (
+        <div className="px-5 py-2.5 border-b border-border/30 bg-primary/[0.04] flex items-center justify-between flex-wrap gap-2">
+          <span className="text-xs text-foreground">
+            <span className="font-bold text-primary">{selectedUrls.size}</span> produit{selectedUrls.size > 1 ? 's' : ''} sélectionné{selectedUrls.size > 1 ? 's' : ''}
+          </span>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={exportSelectedToExcel}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary/15 border border-primary/30 text-primary hover:bg-primary/25 transition-all text-xs font-bold"
+            >
+              <Download className="w-3.5 h-3.5" />
+              Exporter en Excel
+            </button>
+            <button
+              onClick={clearSelection}
+              className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-secondary/40 border border-border/30 text-muted-foreground hover:text-foreground transition-all text-xs"
+            >
+              <X className="w-3.5 h-3.5" />
+              Effacer
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Table */}
       <div className="overflow-x-auto relative">
         {isLoading && (
@@ -314,6 +479,15 @@ const ProductAnalysis = () => {
         <table className="w-full">
           <thead>
             <tr className="border-b border-border/30">
+              <th className="text-left px-3 py-3">
+                <input
+                  type="checkbox"
+                  checked={allPageSelected}
+                  onChange={togglePageSelectAll}
+                  className="w-4 h-4 rounded border-border/40 bg-secondary/40 accent-primary cursor-pointer"
+                  aria-label="Tout sélectionner"
+                />
+              </th>
               <th className="text-left px-4 py-3"><span className="soft-label">#</span></th>
               <th className="text-left px-4 py-3"><span className="soft-label">Image</span></th>
               <SortHeader label="Produit" sortKeyName="name" />
@@ -331,10 +505,23 @@ const ProductAnalysis = () => {
               const globalRank = page * ITEMS_PER_PAGE + i + 1;
               const ratingColor = getRatingColor(product.rating);
               const isFav = product.url ? favorites.has(product.url) : false;
+              const isSelected = product.url ? selectedUrls.has(product.url) : false;
 
               return (
                 <motion.tr key={product.url || product.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.02 }}
-                  className="border-b border-border/10 hover:bg-primary/[0.03] transition-all duration-200 cursor-pointer group">
+                  className={cn(
+                    "border-b border-border/10 hover:bg-primary/[0.03] transition-all duration-200 cursor-pointer group",
+                    isSelected && "bg-primary/[0.05]"
+                  )}>
+                  <td className="px-3 py-3" onClick={(e) => e.stopPropagation()}>
+                    <input
+                      type="checkbox"
+                      checked={isSelected}
+                      onChange={() => product.url && toggleSelect(product.url)}
+                      className="w-4 h-4 rounded border-border/40 bg-secondary/40 accent-primary cursor-pointer"
+                      aria-label={`Sélectionner ${product.name}`}
+                    />
+                  </td>
                   <td className="px-4 py-3">
                     <span className={cn("font-display text-sm font-black")}
                       style={globalRank <= 3 ? { color: 'hsl(174 72% 56%)', textShadow: '0 0 8px hsl(174 72% 46% / 0.3)' } : { color: 'hsl(210 10% 30%)' }}>
@@ -391,14 +578,33 @@ const ProductAnalysis = () => {
                     </div>
                   </td>
                   <td className="px-4 py-3">
-                    <button onClick={(e) => { e.stopPropagation(); toggleFavorite(product); }}
-                      className="p-1.5 rounded-lg hover:bg-secondary/50 transition-all">
-                      <Heart className={cn("w-4 h-4 transition-all", isFav ? "fill-current" : "")}
-                        style={{
-                          color: isFav ? 'hsl(340 75% 55%)' : 'hsl(210 10% 30%)',
-                          filter: isFav ? 'drop-shadow(0 0 6px hsl(340 75% 55% / 0.4))' : undefined,
-                        }} />
-                    </button>
+                    <div className="flex items-center gap-1">
+                      {product.image && (
+                        <a
+                          href={googleLensUrl(product.image)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={(e) => e.stopPropagation()}
+                          className="p-1.5 rounded-lg hover:bg-secondary/50 transition-all"
+                          title="Rechercher avec Google Lens"
+                          aria-label="Rechercher avec Google Lens"
+                        >
+                          <Camera className="w-4 h-4" style={{
+                            color: 'hsl(174 72% 56%)',
+                            filter: 'drop-shadow(0 0 4px hsl(174 72% 46% / 0.35))',
+                          }} />
+                        </a>
+                      )}
+                      <button onClick={(e) => { e.stopPropagation(); toggleFavorite(product); }}
+                        className="p-1.5 rounded-lg hover:bg-secondary/50 transition-all"
+                        title={isFav ? "Retirer des favoris" : "Ajouter aux favoris"}>
+                        <Heart className={cn("w-4 h-4 transition-all", isFav ? "fill-current" : "")}
+                          style={{
+                            color: isFav ? 'hsl(340 75% 55%)' : 'hsl(210 10% 30%)',
+                            filter: isFav ? 'drop-shadow(0 0 6px hsl(340 75% 55% / 0.4))' : undefined,
+                          }} />
+                      </button>
+                    </div>
                   </td>
                 </motion.tr>
               );
