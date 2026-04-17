@@ -79,8 +79,8 @@ export const useSubscription = (): SubscriptionState => {
   // Realtime updates
   useEffect(() => {
     if (!user) return;
-    const channel = supabase
-      .channel(`sub-${user.id}`)
+    const channel = supabase.channel(`sub-${user.id}-${Date.now()}`);
+    channel
       .on(
         "postgres_changes",
         {
@@ -95,7 +95,7 @@ export const useSubscription = (): SubscriptionState => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user, fetchSub]);
+  }, [user?.id, fetchSub]);
 
   const { hasAccess, daysLeft } = computeAccess(row);
 
