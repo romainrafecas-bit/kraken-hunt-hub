@@ -14,31 +14,21 @@ type SortDir = "asc" | "desc";
 
 const ITEMS_PER_PAGE = 20;
 
-const FRENCH_MONTHS = ["Janv.", "Févr.", "Mars", "Avril", "Mai", "Juin", "Juil.", "Août", "Sept.", "Oct.", "Nov.", "Déc."];
+const FRENCH_MONTHS_FULL = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"];
 
 function buildDatePresets() {
-  const presets: { label: string; value: string; group?: string }[] = [
+  const presets: { label: string; value: string }[] = [
     { label: "Tout", value: "all" },
-    { label: "24 heures", value: "24h" },
-    { label: "7 jours", value: "7d" },
-    { label: "30 jours", value: "30d" },
-    { label: "3 mois", value: "3m" },
-    { label: "6 mois", value: "6m" },
   ];
-  // Années entières
   const now = new Date();
-  const currentYear = now.getFullYear();
-  for (let y = currentYear; y >= 2025; y--) {
-    presets.push({ label: `Année ${y}`, value: String(y), group: "year" });
-  }
-  // Mois : du mois courant jusqu'à janvier 2025 (ordre décroissant = récent en premier)
-  const startYear = 2025, startMonth = 1;
-  let y = currentYear;
+  let y = now.getFullYear();
   let m = now.getMonth() + 1; // 1-12
-  while (y > startYear || (y === startYear && m >= startMonth)) {
-    const value = `month-${y}-${String(m).padStart(2, "0")}`;
-    const label = `${FRENCH_MONTHS[m - 1]} ${y}`;
-    presets.push({ label, value, group: "month" });
+  // Du mois courant jusqu'à Janvier 2025 (récent → ancien)
+  while (y > 2025 || (y === 2025 && m >= 1)) {
+    presets.push({
+      label: `${FRENCH_MONTHS_FULL[m - 1]} ${y}`,
+      value: `month-${y}-${String(m).padStart(2, "0")}`,
+    });
     m -= 1;
     if (m === 0) { m = 12; y -= 1; }
   }
@@ -82,6 +72,7 @@ const ProductAnalysis = () => {
   const [sellersMin, setSellersMin] = useState<string>("");
   const [sellersMax, setSellersMax] = useState<string>("");
   const [selectedUrls, setSelectedUrls] = useState<Set<string>>(new Set());
+  const [brandSearch, setBrandSearch] = useState("");
 
   // Fetch categories list for dropdown
   const [dynamicCategories, setDynamicCategories] = useState<string[]>(["Tous"]);
@@ -322,21 +313,9 @@ const ProductAnalysis = () => {
               className="bg-secondary/60 border border-border/40 rounded-xl px-3 py-2 text-sm text-foreground focus:outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all appearance-none cursor-pointer pr-8 min-w-[140px]"
               style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%234dd4ac' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 10px center' }}
             >
-              <optgroup label="Périodes récentes">
-                {datePresets.filter(dp => !dp.group).map(dp => (
-                  <option key={dp.value} value={dp.value} className="bg-card text-foreground">{dp.label}</option>
-                ))}
-              </optgroup>
-              <optgroup label="Par année">
-                {datePresets.filter(dp => dp.group === "year").map(dp => (
-                  <option key={dp.value} value={dp.value} className="bg-card text-foreground">{dp.label}</option>
-                ))}
-              </optgroup>
-              <optgroup label="Par mois">
-                {datePresets.filter(dp => dp.group === "month").map(dp => (
-                  <option key={dp.value} value={dp.value} className="bg-card text-foreground">{dp.label}</option>
-                ))}
-              </optgroup>
+              {datePresets.map(dp => (
+                <option key={dp.value} value={dp.value} className="bg-card text-foreground">{dp.label}</option>
+              ))}
             </select>
           </div>
 
@@ -427,7 +406,18 @@ const ProductAnalysis = () => {
               </span>
             </button>
             {brandDropdownOpen && (
-              <div className="absolute z-30 mt-1 w-64 bg-card border border-border/50 rounded-xl p-2 shadow-2xl max-h-56 overflow-auto">
+              <div className="absolute z-30 mt-1 w-72 bg-card border border-border/50 rounded-xl p-2 shadow-2xl">
+                <div className="relative mb-2">
+                  <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+                  <input
+                    type="text"
+                    autoFocus
+                    placeholder="Rechercher une marque…"
+                    value={brandSearch}
+                    onChange={e => setBrandSearch(e.target.value)}
+                    className="w-full bg-secondary/60 border border-border/40 rounded-lg pl-8 pr-3 py-1.5 text-xs text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:border-primary/40"
+                  />
+                </div>
                 {excludedBrands.size > 0 && (
                   <button
                     onClick={() => { setExcludedBrands(new Set()); setPage(0); }}
@@ -436,21 +426,32 @@ const ProductAnalysis = () => {
                     ✕ Réinitialiser tout
                   </button>
                 )}
-                {dynamicBrands.filter(b => b !== "Toutes").map(brand => (
-                  <button
-                    key={brand}
-                    onClick={() => toggleExcludeBrand(brand)}
-                    className={cn(
-                      "w-full text-left px-3 py-1.5 rounded-lg text-sm transition-colors flex items-center justify-between",
-                      excludedBrands.has(brand)
-                        ? "text-red-400 bg-red-500/10"
-                        : "text-muted-foreground hover:text-foreground hover:bg-secondary/60"
-                    )}
-                  >
-                    <span>{formatCategoryName(brand)}</span>
-                    {excludedBrands.has(brand) && <X className="w-3.5 h-3.5" />}
-                  </button>
-                ))}
+                <div className="max-h-56 overflow-auto">
+                  {(() => {
+                    const q = brandSearch.trim().toLowerCase();
+                    const list = dynamicBrands
+                      .filter(b => b !== "Toutes")
+                      .filter(b => !q || b.toLowerCase().includes(q));
+                    if (list.length === 0) {
+                      return <p className="px-3 py-3 text-xs text-muted-foreground text-center">Aucune marque trouvée</p>;
+                    }
+                    return list.map(brand => (
+                      <button
+                        key={brand}
+                        onClick={() => toggleExcludeBrand(brand)}
+                        className={cn(
+                          "w-full text-left px-3 py-1.5 rounded-lg text-sm transition-colors flex items-center justify-between",
+                          excludedBrands.has(brand)
+                            ? "text-red-400 bg-red-500/10"
+                            : "text-muted-foreground hover:text-foreground hover:bg-secondary/60"
+                        )}
+                      >
+                        <span>{formatCategoryName(brand)}</span>
+                        {excludedBrands.has(brand) && <X className="w-3.5 h-3.5" />}
+                      </button>
+                    ));
+                  })()}
+                </div>
               </div>
             )}
           </div>
