@@ -578,14 +578,33 @@ const ProductAnalysis = () => {
                     </div>
                   </td>
                   <td className="px-4 py-3">
-                    <button onClick={(e) => { e.stopPropagation(); toggleFavorite(product); }}
-                      className="p-1.5 rounded-lg hover:bg-secondary/50 transition-all">
-                      <Heart className={cn("w-4 h-4 transition-all", isFav ? "fill-current" : "")}
-                        style={{
-                          color: isFav ? 'hsl(340 75% 55%)' : 'hsl(210 10% 30%)',
-                          filter: isFav ? 'drop-shadow(0 0 6px hsl(340 75% 55% / 0.4))' : undefined,
-                        }} />
-                    </button>
+                    <div className="flex items-center gap-1">
+                      {product.image && (
+                        <a
+                          href={googleLensUrl(product.image)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={(e) => e.stopPropagation()}
+                          className="p-1.5 rounded-lg hover:bg-secondary/50 transition-all"
+                          title="Rechercher avec Google Lens"
+                          aria-label="Rechercher avec Google Lens"
+                        >
+                          <Camera className="w-4 h-4" style={{
+                            color: 'hsl(174 72% 56%)',
+                            filter: 'drop-shadow(0 0 4px hsl(174 72% 46% / 0.35))',
+                          }} />
+                        </a>
+                      )}
+                      <button onClick={(e) => { e.stopPropagation(); toggleFavorite(product); }}
+                        className="p-1.5 rounded-lg hover:bg-secondary/50 transition-all"
+                        title={isFav ? "Retirer des favoris" : "Ajouter aux favoris"}>
+                        <Heart className={cn("w-4 h-4 transition-all", isFav ? "fill-current" : "")}
+                          style={{
+                            color: isFav ? 'hsl(340 75% 55%)' : 'hsl(210 10% 30%)',
+                            filter: isFav ? 'drop-shadow(0 0 6px hsl(340 75% 55% / 0.4))' : undefined,
+                          }} />
+                      </button>
+                    </div>
                   </td>
                 </motion.tr>
               );
