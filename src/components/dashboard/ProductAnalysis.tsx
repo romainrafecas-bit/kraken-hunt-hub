@@ -317,6 +317,68 @@ const ProductAnalysis = () => {
             <option value="out_of_stock" className="bg-card text-foreground">En rupture</option>
           </select>
 
+          {/* Price range */}
+          <div className="flex items-center gap-1.5 bg-secondary/60 border border-border/40 rounded-xl px-3 py-1.5">
+            <Euro className="w-3.5 h-3.5 flex-shrink-0" style={{ color: 'hsl(174 72% 56%)' }} />
+            <input
+              type="number"
+              min={0}
+              placeholder="Min"
+              value={priceMin}
+              onChange={e => { setPriceMin(e.target.value); setPage(0); }}
+              className="bg-transparent w-16 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none"
+            />
+            <span className="text-muted-foreground/50 text-xs">–</span>
+            <input
+              type="number"
+              min={0}
+              placeholder="Max"
+              value={priceMax}
+              onChange={e => { setPriceMax(e.target.value); setPage(0); }}
+              className="bg-transparent w-16 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none"
+            />
+            {(priceMin !== "" || priceMax !== "") && (
+              <button
+                onClick={() => { setPriceMin(""); setPriceMax(""); setPage(0); }}
+                className="text-muted-foreground hover:text-foreground transition-colors"
+                aria-label="Réinitialiser le prix"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            )}
+          </div>
+
+          {/* Sellers range */}
+          <div className="flex items-center gap-1.5 bg-secondary/60 border border-border/40 rounded-xl px-3 py-1.5">
+            <Users className="w-3.5 h-3.5 flex-shrink-0" style={{ color: 'hsl(262 72% 72%)' }} />
+            <input
+              type="number"
+              min={0}
+              placeholder="Min"
+              value={sellersMin}
+              onChange={e => { setSellersMin(e.target.value); setPage(0); }}
+              className="bg-transparent w-14 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none"
+            />
+            <span className="text-muted-foreground/50 text-xs">–</span>
+            <input
+              type="number"
+              min={0}
+              placeholder="Max"
+              value={sellersMax}
+              onChange={e => { setSellersMax(e.target.value); setPage(0); }}
+              className="bg-transparent w-14 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none"
+            />
+            {(sellersMin !== "" || sellersMax !== "") && (
+              <button
+                onClick={() => { setSellersMin(""); setSellersMax(""); setPage(0); }}
+                className="text-muted-foreground hover:text-foreground transition-colors"
+                aria-label="Réinitialiser les vendeurs"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            )}
+          </div>
+
           {/* Exclude brands dropdown */}
           <div className="relative" ref={brandDropdownRef}>
             <button
