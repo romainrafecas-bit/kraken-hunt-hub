@@ -51,6 +51,7 @@ export function useDashboardStats(): DashboardStats {
     cumulativeData: [],
     categoryStats: [],
     latestProducts: [],
+    lastUpdate: null,
     loading: true,
     error: null,
   });
