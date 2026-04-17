@@ -599,37 +599,48 @@ const ProductAnalysis = () => {
                     </div>
                   </td>
                   <td className="px-4 py-3">
-                    <div className="flex items-center justify-end gap-1.5">
+                    <div className="flex items-center justify-center gap-2">
                       {product.image && (
                         <a
                           href={googleLensUrl(product.image)}
                           target="_blank"
                           rel="noopener noreferrer"
                           onClick={(e) => e.stopPropagation()}
-                          className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-bold transition-all"
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all hover:-translate-y-px"
                           style={{
-                            color: 'hsl(188 80% 68%)',
-                            background: 'hsl(188 78% 52% / 0.12)',
-                            border: '1px solid hsl(188 78% 52% / 0.3)',
+                            color: 'hsl(180 100% 92%)',
+                            background: 'linear-gradient(135deg, hsl(174 72% 42% / 0.85), hsl(188 78% 48% / 0.85))',
+                            border: '1px solid hsl(188 78% 60% / 0.5)',
+                            boxShadow: '0 2px 10px -2px hsl(174 72% 46% / 0.4), inset 0 1px 0 hsl(188 78% 70% / 0.25)',
+                            textShadow: '0 0 8px hsl(188 78% 80% / 0.5)',
                           }}
-                          title="Rechercher avec Google Lens"
+                          title="Chercher par image (Google Lens)"
                         >
                           <Camera className="w-3.5 h-3.5" />
-                          <span className="hidden xl:inline">Lens</span>
+                          <span>Chercher par image</span>
                         </a>
                       )}
                       <button
                         onClick={(e) => { e.stopPropagation(); toggleFavorite(product); }}
-                        className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-bold transition-all"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all hover:-translate-y-px"
                         style={{
-                          color: isFav ? 'hsl(348 80% 70%)' : 'hsl(174 72% 65%)',
-                          background: isFav ? 'hsl(348 72% 56% / 0.15)' : 'hsl(174 72% 46% / 0.1)',
-                          border: `1px solid ${isFav ? 'hsl(348 72% 56% / 0.35)' : 'hsl(174 72% 46% / 0.28)'}`,
+                          color: isFav ? 'hsl(0 0% 100%)' : 'hsl(348 85% 72%)',
+                          background: isFav
+                            ? 'linear-gradient(135deg, hsl(348 80% 55%), hsl(0 75% 58%))'
+                            : 'hsl(348 72% 56% / 0.1)',
+                          border: `1px solid ${isFav ? 'hsl(348 80% 65% / 0.7)' : 'hsl(348 72% 56% / 0.4)'}`,
+                          boxShadow: isFav
+                            ? '0 2px 12px -2px hsl(348 80% 55% / 0.55), inset 0 1px 0 hsl(348 90% 80% / 0.3)'
+                            : '0 1px 6px -2px hsl(348 80% 55% / 0.25)',
+                          textShadow: isFav ? '0 0 8px hsl(348 90% 90% / 0.5)' : undefined,
                         }}
                         title={isFav ? "Retirer des favoris" : "Ajouter aux favoris"}
                       >
-                        <Heart className={cn("w-3.5 h-3.5", isFav && "fill-current")} />
-                        <span className="hidden xl:inline">{isFav ? "Favori" : "Favori"}</span>
+                        <Heart
+                          className={cn("w-3.5 h-3.5 transition-all", isFav && "fill-current scale-110")}
+                          style={isFav ? { filter: 'drop-shadow(0 0 4px hsl(0 0% 100% / 0.6))' } : undefined}
+                        />
+                        <span>{isFav ? "Dans les favoris" : "Ajouter aux favoris"}</span>
                       </button>
                     </div>
                   </td>
