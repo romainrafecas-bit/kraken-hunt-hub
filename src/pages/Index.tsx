@@ -206,7 +206,7 @@ const Index = () => {
 
         {/* CATEGORIES */}
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }} className="px-6 lg:px-10 relative z-10">
-          <p className="text-[10px] font-display uppercase tracking-[0.25em] text-foreground/55 font-bold mb-8">Répartition par zone</p>
+          <p className="text-[10px] font-display uppercase tracking-[0.25em] text-foreground/55 font-bold mb-8">Répartition par catégorie</p>
           <div className="flex flex-col lg:flex-row items-center gap-10">
             <div className="relative w-48 h-48 flex-shrink-0">
               <svg viewBox="0 0 100 100" className="w-full h-full -rotate-90">
