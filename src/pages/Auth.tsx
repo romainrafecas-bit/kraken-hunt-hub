@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Mail, Lock, LogIn, UserPlus, Loader2 } from "lucide-react";
+import { Mail, Lock, LogIn, UserPlus, Loader2, Check, Circle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
@@ -58,6 +58,11 @@ const Auth = () => {
         .replace(/Invalid login credentials/i, "Email ou mot de passe incorrect")
         .replace(/Email not confirmed/i, "Email non confirmé")
         .replace(/User already registered/i, "Un compte existe déjà avec cet email")
+        .replace(/Password should contain at least one character of each.*/i, "Le mot de passe doit contenir une lettre, un chiffre et un caractère spécial")
+        .replace(/Password.*at least one letter/i, "Le mot de passe doit contenir au moins une lettre")
+        .replace(/Password.*at least one (number|digit)/i, "Le mot de passe doit contenir au moins un chiffre")
+        .replace(/Password.*at least one (special character|symbol)/i, "Le mot de passe doit contenir au moins un caractère spécial (!@#$%^&*...)")
+        .replace(/Password.*at least one (lower|upper)case/i, "Le mot de passe doit contenir des majuscules et minuscules")
         .replace(/Password should be at least (\d+) characters?/i, "Le mot de passe doit contenir au moins $1 caractères")
         .replace(/Signup is disabled/i, "Les inscriptions sont désactivées")
         .replace(/Email rate limit exceeded/i, "Trop de tentatives, réessaie dans quelques minutes")
@@ -124,7 +129,19 @@ const Auth = () => {
               placeholder="••••••••"
             />
             {mode === "signup" && (
-              <p className="text-[11px] text-muted-foreground/70">8 caractères minimum.</p>
+              <ul className="space-y-1 mt-2">
+                {[
+                  { ok: password.length >= 8, label: "8 caractères minimum" },
+                  { ok: /[a-zA-Z]/.test(password), label: "Au moins une lettre" },
+                  { ok: /[0-9]/.test(password), label: "Au moins un chiffre" },
+                  { ok: /[!@#$%^&*(),.?":{}|<>_\-+=/\\[\];'`~]/.test(password), label: "Au moins un caractère spécial" },
+                ].map((c) => (
+                  <li key={c.label} className={`flex items-center gap-1.5 text-[11px] transition-colors ${c.ok ? "text-primary" : "text-muted-foreground/70"}`}>
+                    {c.ok ? <Check className="w-3 h-3" /> : <Circle className="w-3 h-3" />}
+                    {c.label}
+                  </li>
+                ))}
+              </ul>
             )}
           </div>
 
