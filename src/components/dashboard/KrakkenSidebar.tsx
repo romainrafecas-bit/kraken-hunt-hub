@@ -1,4 +1,4 @@
-import { LayoutDashboard, Package, BarChart3, Anchor, User, Heart, LogOut, Crown, Sparkles } from "lucide-react";
+import { LayoutDashboard, Package, Calculator, Anchor, User, Heart, LogOut, Crown, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { NavLink, useNavigate } from "react-router-dom";
 import krakkenLogo from "@/assets/krakken-logo.png";
@@ -8,10 +8,10 @@ import { useSubscription } from "@/hooks/useSubscription";
 const navItems = [
   { icon: LayoutDashboard, label: "Dashboard", to: "/dashboard" },
   { icon: Package, label: "Produits", to: "/produits" },
-  { icon: BarChart3, label: "Analytics", to: "/analytics" },
   { icon: Heart, label: "Favoris", to: "/favoris" },
   { icon: User, label: "Mon profil", to: "/profil" },
   { icon: Crown, label: "Abonnement", to: "/abonnement" },
+  { icon: Calculator, label: "Calculateur", to: "/calculateur" },
 ];
 
 const KrakkenSidebar = () => {
