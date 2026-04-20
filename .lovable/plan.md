@@ -1,46 +1,77 @@
 
 
-User veut:
-1. Créer une route `/connexion` qui pointe vers la même page que `/auth` (alias) — pour partager l'URL à 2-3 testeurs sans toucher au bouton de la landing page.
-2. Donner un accès spécial à `bouska1@outlook.fr` — probablement un accès gratuit (whitelisté + abonnement actif à vie, comme pour le owner).
+## Remplacement page Analytics → Calculateur de marge
 
-Pour le #2, deux options:
-- L'ajouter à `allowed_emails` (table whitelist systeme.io) → il pourra créer son compte, aura 14j d'essai puis devra payer.
-- L'ajouter à `allowed_emails` ET lui donner un statut `active` à vie (lifetime, comme `romain.rafecas@gmail.com`).
-
-Je pense que l'intent est "lifetime gratuit" puisque c'est un accès "spécial" pour tester sans limite. Mais à confirmer car ambigu.
-
-Plan:
+Tu remplaces une page peu utile par un outil métier concret pour tes utilisateurs : un calculateur de marge marketplace inspiré de marketplace-mastery.com, accessible via la sidebar après "Abonnement".
 
 ## Ce que je vais faire
 
-### 1. Alias `/connexion` → page Auth
-Dans `src/App.tsx`, ajouter une route supplémentaire :
-```tsx
-<Route path="/connexion" element={<Auth />} />
+### 1. Récupérer le modèle de calcul
+J'ouvre `https://marketplace-mastery.com/calculateur-marge-marketplace.html` pour relever exactement les champs, formules et marketplaces couverts (Cdiscount, Amazon, Fnac, Rakuten, ManoMano…). Je m'inspire du fonctionnement, pas du design — l'UI restera 100% Krakken (Deep Abyssal, glass-panel, Nunito).
+
+### 2. Nouvelle page `/calculateur`
+Création de `src/pages/Calculateur.tsx` avec :
+
+**Bloc Entrées** (gauche, sticky) :
+- Prix de vente TTC (€)
+- Prix d'achat HT (€)
+- TVA (20% par défaut, sélecteur 5,5 / 10 / 20)
+- Marketplace (select : Cdiscount, Amazon, Fnac, Rakuten, ManoMano, Autre)
+- Catégorie produit (select dynamique selon marketplace, impacte la commission)
+- Frais de port facturés au client (€)
+- Coût d'expédition réel (€)
+- Coût d'emballage / picking (€)
+- Frais publicitaires unitaires (€, optionnel)
+
+**Bloc Résultats** (droite, live update) :
+- CA HT
+- Commission marketplace (€ + %)
+- Frais fixes éventuels (selon MP)
+- Coût total (achat + logistique + pub + commission)
+- **Marge brute** (€ et %) — gros chiffre, code couleur (vert > 20%, ambre 10-20%, rouge < 10%)
+- **Marge nette** après TVA reversée
+- Coefficient multiplicateur
+- Seuil de rentabilité (prix de vente min)
+
+**Bloc bonus** :
+- Bouton "Sauvegarder ce calcul" → enregistre dans table `margin_calculations` (lié au user)
+- Bouton "Réinitialiser"
+- Liste des 5 derniers calculs sauvegardés (sous le calculateur)
+
+### 3. Données commissions marketplaces
+Fichier `src/data/marketplaceFees.ts` avec table des taux par MP × catégorie. Source : grilles publiques 2025 (je récupère depuis le site cible + docs officielles si besoin). Exemple structure :
+```ts
+{ cdiscount: { high_tech: 0.12, maison: 0.15, mode: 0.16, ... }, amazon: {...} }
 ```
-Même composant, deux chemins. Tu peux partager `https://kraken-hunt-hub.lovable.app/connexion` à tes testeurs. Le bouton de la landing reste inchangé.
 
-### 2. Accès spécial pour `bouska1@outlook.fr`
-Deux opérations SQL :
-- **Whitelist** : insert dans `allowed_emails` pour qu'il puisse créer son compte (la signup vérifie cette table via `check-systemeio-access`).
-- **Lifetime** : modifier la fonction `handle_new_user` pour traiter `bouska1@outlook.fr` comme owner (status `active`, période 100 ans, pas de fin d'essai). Comme il n'a pas encore de compte, ça s'appliquera automatiquement à son inscription.
+### 4. Routing & navigation
+- `src/App.tsx` : route `<Route path="/calculateur" element={<Protected><Calculateur /></Protected>} />`, suppression de la route `/analytics`.
+- `src/components/dashboard/KrakkenSidebar.tsx` : remplace l'entrée "Analytics" par "Calculateur" (icône `Calculator` de Lucide), positionnée sous "Abonnement".
+- Suppression de `src/pages/Analytics.tsx`.
 
-Alternative si tu veux qu'il ait juste les 14 jours d'essai normaux : on l'ajoute uniquement à `allowed_emails` et on ne touche pas au trigger.
+### 5. Persistance (optionnelle mais recommandée)
+Nouvelle table `public.margin_calculations` :
+- `id`, `user_id`, `label` (text, ex "iPhone 15 Cdiscount"), `inputs` (jsonb), `results` (jsonb), `created_at`
+- RLS : user CRUD sur ses propres lignes uniquement.
 
-## Question
+Permet à l'utilisateur de retrouver ses simulations entre sessions, et plus tard d'exporter en CSV.
 
-**Quel niveau d'accès pour `bouska1@outlook.fr` ?**
-- **A** : Accès à vie gratuit (comme toi, jamais besoin de payer) — recommandé pour un testeur de confiance.
-- **B** : Accès normal (14 jours gratuits, puis 9,90€/mois) — comme un élève standard.
+## Question avant de coder
 
-Je pars sur **A** par défaut car tu parles d'un "accès spécial". Dis-moi si tu préfères B.
+**Sur la persistance des calculs**, tu veux :
+- **A** : Calculateur "live" uniquement, pas de sauvegarde (plus simple, 0 backend, 30 min de dev).
+- **B** : Avec sauvegarde + historique des calculs en base (recommandé, +20 min, vraie valeur produit).
+
+Je pars sur **B** par défaut. Réponds A si tu préfères ne pas créer de table.
 
 ## Étapes d'exécution
 
-1. Édit `src/App.tsx` : ajouter route `/connexion`.
-2. Migration SQL : 
-   - `INSERT INTO allowed_emails (email) VALUES ('bouska1@outlook.fr')` (via tool insert).
-   - `CREATE OR REPLACE FUNCTION handle_new_user` avec liste d'owners élargie `('romain.rafecas@gmail.com', 'bouska1@outlook.fr')`.
-3. Tu partages `/connexion` à tes testeurs, ils créent leur compte avec leur email whitelisté.
+1. Fetch `marketplace-mastery.com/calculateur-marge-marketplace.html` pour aligner formules et grille de commissions.
+2. Migration SQL : table `margin_calculations` + RLS (si option B).
+3. Créer `src/data/marketplaceFees.ts`.
+4. Créer `src/pages/Calculateur.tsx` (formulaire réactif + résultats live + sauvegarde).
+5. Hook `useMarginCalculations` (CRUD calculs) si option B.
+6. Update `src/App.tsx` (route swap) et `KrakkenSidebar.tsx` (item nav).
+7. Delete `src/pages/Analytics.tsx`.
+8. Mémoire projet : ajouter feature `margin-calculator` dans `mem://features/`.
 
