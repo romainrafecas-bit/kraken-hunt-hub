@@ -1,49 +1,93 @@
 
 
-## Réactiver paiement et gestion d'abonnement
+## Audit — ce qu'il manque pour que ce soit nickel
 
-La page `/abonnement` n'a plus aucun bouton actionnable depuis qu'on a retiré la carte promo. Il faut une UI minimale, sobre (pas un argumentaire de vente) qui permette à l'utilisateur de **payer** s'il n'a pas d'abonnement actif, et de **gérer/annuler** s'il en a un.
+Le paiement est OK. Voici les vrais manques, classés par ordre d'impact.
 
-## Ce que je vais faire
+---
 
-### 1. Bloc d'action principal sur `/abonnement` (`src/pages/Abonnement.tsx`)
+### 🔴 Priorité 1 — Bloquants production
 
-Logique conditionnelle selon l'état de l'abonnement :
+**1. Passer Stripe en live**
+Tu es encore en sandbox. Tant que tu n'as pas complété le go-live (claim account + vérif Stripe + activation), personne ne peut vraiment payer. Action côté onglet Payments — je peux checker le statut avec `get_go_live_status` mais c'est toi qui valides.
 
-**Cas A — Trial actif OU essai expiré OU pas d'abo (`!isActive`)** :
-- Carte sobre "Krakken Pro — 9,90 €/mois", liste compacte des features, bouton **"Activer mon abonnement"**.
-- Au clic : `setShowCheckout(true)` → le checkout embarqué s'affiche (déjà branché).
+**2. Emails transactionnels**
+Aujourd'hui l'utilisateur ne reçoit **aucun email** :
+- Pas de confirmation d'inscription (Supabase envoie un mail par défaut, mais template brut en anglais)
+- Pas de mail "bienvenue Pro" après paiement
+- Pas d'alerte "ton essai finit dans 3 jours"
+- Pas de mail d'annulation confirmée
 
-**Cas B — Abonnement actif (`isActive`)** :
-- Carte "Abonnement actif" avec :
-  - Date du prochain renouvellement (`currentPeriodEnd`)
-  - Si `cancelAtPeriodEnd` : badge "Annulation programmée le X"
-  - Bouton **"Gérer mon abonnement"** → ouvre le portail Stripe (changer carte, voir factures, annuler). Loader pendant l'appel.
-- Petit bouton secondaire **"Annuler mon abonnement"** qui ouvre aussi le portail (raccourci, mêmes appel).
+**3. Reset mot de passe**
+La page `/auth` n'a pas de lien "Mot de passe oublié ?". Bloquant dès qu'un user oublie son mdp.
 
-### 2. Retour de paiement
-Quand Stripe redirige vers `/abonnement?session_id=...` après paiement réussi :
-- Détecter `session_id` dans l'URL
-- Toast succès "Bienvenue dans l'équipage Pro 🎉"
-- Nettoyer l'URL + `refetch()` du hook `useSubscription` (le webhook a déjà mis à jour la base, mais on force le refresh)
+**4. Relance trial expirant**
+Un user en essai qui ne revient pas les 14 jours perd l'accès sans prévenir. Il faut au minimum une bannière J-3 dans le dashboard + idéalement un email.
 
-### 3. Vérifier le produit Stripe
-Créer (si absent) le produit `krakken_pro` avec le prix `krakken_pro_monthly` à 9,90 € EUR/mois via `payments--create_product`. Sans ça le checkout plante avec "Price not found".
+---
 
-### 4. Garde-fous
-- Bouton "Activer" désactivé pendant le chargement (`loading`).
-- Si checkout déjà ouvert, masquer le bloc d'action principal pour éviter le doublon.
-- Le portail Stripe s'ouvre dans un nouvel onglet (`window.open`, déjà en place).
+### 🟠 Priorité 2 — Expérience & conversion
 
-## Ce qui ne change pas
-- Edge functions backend : déjà correctes, rien à toucher.
-- Webhook : déjà branché, met à jour la table `subscriptions` automatiquement.
-- Sidebar, route, garde d'accès (`hasAccess`) : inchangés.
+**5. Landing page → tunnel d'inscription**
+Actuellement la landing pousse vers une **waitlist** (`waitlist` table). Mais ton produit est lancé, l'abonnement est actif. Il faut retirer la waitlist et envoyer direct vers `/auth` (signup → 14j d'essai).
 
-## Fichiers touchés
-- `src/pages/Abonnement.tsx` (refonte du contenu, ~80 lignes ajoutées)
-- Création produit/prix Stripe via outil `payments--create_product` (idempotent — pas d'effet si déjà existant)
+**6. Page tarifs publique**
+Pas de page `/tarifs` ou section pricing sur la landing. Un visiteur ne sait pas que c'est 9,90 €/mois avec 14j d'essai avant de créer un compte.
 
-## Note importante sur le mode test
-Tu es toujours en **sandbox Stripe**. Le checkout fonctionnera avec la carte test `4242 4242 4242 4242`. Pour encaisser de vrais paiements en prod, il faut compléter le go-live Stripe (claim account + activation + app live) côté onglet Payments — ça je ne peux pas le faire à ta place.
+**7. Onboarding premier login**
+Après signup, l'user arrive sur `/dashboard` sans guidage. Un mini tour (3 étapes : Produits → Favoris → Calculateur) augmente la rétention.
+
+**8. État "past_due" géré dans l'UI**
+Si une carte expire et que le paiement échoue, le statut passe `past_due`. Aujourd'hui l'user a encore accès mais ne le sait pas → il faut une bannière rouge "Ton paiement a échoué, mets à jour ta carte".
+
+---
+
+### 🟡 Priorité 3 — Qualité & confiance
+
+**9. Pages légales**
+- CGU / CGV (obligatoire en France pour vendre un abo)
+- Politique de confidentialité (RGPD)
+- Mentions légales
+Footer avec liens vers ces pages.
+
+**10. Gestion des erreurs globale**
+Pas de page d'erreur propre (500, network down). Un `ErrorBoundary` React + page de fallback.
+
+**11. Analytics produit**
+Tu n'as aucune visibilité sur : combien de signups, combien convertissent en payant, quelles features sont utilisées. Au choix : Plausible, PostHog, ou simple table `events` Supabase.
+
+**12. Support client**
+Pas de moyen pour l'user de te contacter. Un simple lien mailto dans la sidebar + page `/aide` avec FAQ.
+
+---
+
+### 🟢 Priorité 4 — Nice to have
+
+**13. Plan annuel** (ex: 99 €/an = -17%) → boost LTV
+**14. Parrainage** (1 mois offert par filleul)
+**15. Export CSV** des favoris et calculs de marge
+**16. Mode sombre/clair** (tu es dark-only)
+**17. Mobile app wrapper** (PWA installable)
+
+---
+
+## Ma reco : par où commencer
+
+Dans cet ordre, sur 1-2 semaines :
+
+```text
+Semaine 1 (production-ready)
+├── Go-live Stripe
+├── Reset mot de passe
+├── Emails transactionnels (bienvenue, trial J-3, paiement échoué)
+└── Pages légales + footer
+
+Semaine 2 (conversion)
+├── Retirer waitlist, brancher landing → /auth
+├── Section pricing sur landing
+├── Bannière trial/past_due dans le dashboard
+└── Analytics (Plausible ou PostHog)
+```
+
+Dis-moi par quoi tu veux attaquer et je te fais un plan détaillé pour ce chantier précis.
 
