@@ -9,9 +9,9 @@ const navItems = [
   { icon: LayoutDashboard, label: "Dashboard", to: "/dashboard" },
   { icon: Package, label: "Produits", to: "/produits" },
   { icon: Heart, label: "Favoris", to: "/favoris" },
+  { icon: Calculator, label: "Calculateur", to: "/calculateur" },
   { icon: User, label: "Mon profil", to: "/profil" },
   { icon: Crown, label: "Abonnement", to: "/abonnement" },
-  { icon: Calculator, label: "Calculateur", to: "/calculateur" },
 ];
 
 const KrakkenSidebar = () => {
