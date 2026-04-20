@@ -39,8 +39,8 @@ export const useMarginCalculations = () => {
       const { error } = await supabase.from("margin_calculations").insert({
         user_id: user.id,
         label: label.trim() || "Sans titre",
-        inputs,
-        results,
+        inputs: inputs as never,
+        results: results as never,
       });
       if (!error) await refresh();
       return { error };

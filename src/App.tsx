@@ -11,7 +11,7 @@ import Landing from "./pages/Landing";
 const Auth = lazy(() => import("./pages/Auth"));
 const Index = lazy(() => import("./pages/Index"));
 const Produits = lazy(() => import("./pages/Produits"));
-const Analytics = lazy(() => import("./pages/Analytics"));
+const Calculateur = lazy(() => import("./pages/Calculateur"));
 const Profil = lazy(() => import("./pages/Profil"));
 const Favoris = lazy(() => import("./pages/Favoris"));
 const Abonnement = lazy(() => import("./pages/Abonnement"));
@@ -42,7 +42,8 @@ const App = () => (
               <Route path="/connexion" element={<Auth />} />
               <Route path="/dashboard" element={<Protected><Index /></Protected>} />
               <Route path="/produits" element={<Protected><Produits /></Protected>} />
-              <Route path="/analytics" element={<Protected><Analytics /></Protected>} />
+              <Route path="/calculateur" element={<Protected><Calculateur /></Protected>} />
+              <Route path="/analytics" element={<Navigate to="/calculateur" replace />} />
               <Route path="/profil" element={<Protected><Profil /></Protected>} />
               <Route path="/favoris" element={<Protected><Favoris /></Protected>} />
               <Route path="/abonnement" element={<Protected><Abonnement /></Protected>} />
