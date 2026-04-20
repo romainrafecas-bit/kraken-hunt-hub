@@ -59,6 +59,36 @@ export type Database = {
         }
         Relationships: []
       }
+      margin_calculations: {
+        Row: {
+          created_at: string
+          id: string
+          inputs: Json
+          label: string
+          results: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          inputs?: Json
+          label?: string
+          results?: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          inputs?: Json
+          label?: string
+          results?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       products: {
         Row: {
           added_date: string | null
