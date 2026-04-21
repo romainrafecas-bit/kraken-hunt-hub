@@ -1,93 +1,109 @@
 
 
-## Audit — ce qu'il manque pour que ce soit nickel
+## Production-ready : reset mot de passe + bannières + pages légales + landing
 
-Le paiement est OK. Voici les vrais manques, classés par ordre d'impact.
-
----
-
-### 🔴 Priorité 1 — Bloquants production
-
-**1. Passer Stripe en live**
-Tu es encore en sandbox. Tant que tu n'as pas complété le go-live (claim account + vérif Stripe + activation), personne ne peut vraiment payer. Action côté onglet Payments — je peux checker le statut avec `get_go_live_status` mais c'est toi qui valides.
-
-**2. Emails transactionnels**
-Aujourd'hui l'utilisateur ne reçoit **aucun email** :
-- Pas de confirmation d'inscription (Supabase envoie un mail par défaut, mais template brut en anglais)
-- Pas de mail "bienvenue Pro" après paiement
-- Pas d'alerte "ton essai finit dans 3 jours"
-- Pas de mail d'annulation confirmée
-
-**3. Reset mot de passe**
-La page `/auth` n'a pas de lien "Mot de passe oublié ?". Bloquant dès qu'un user oublie son mdp.
-
-**4. Relance trial expirant**
-Un user en essai qui ne revient pas les 14 jours perd l'accès sans prévenir. Il faut au minimum une bannière J-3 dans le dashboard + idéalement un email.
+J'attaque tout ce qui est faisable directement dans le code, dans cet ordre.
 
 ---
 
-### 🟠 Priorité 2 — Expérience & conversion
+### 1. Reset mot de passe
 
-**5. Landing page → tunnel d'inscription**
-Actuellement la landing pousse vers une **waitlist** (`waitlist` table). Mais ton produit est lancé, l'abonnement est actif. Il faut retirer la waitlist et envoyer direct vers `/auth` (signup → 14j d'essai).
+**Sur `/auth`** : ajouter un lien "Mot de passe oublié ?" sous le bouton de connexion (visible uniquement en mode login).
 
-**6. Page tarifs publique**
-Pas de page `/tarifs` ou section pricing sur la landing. Un visiteur ne sait pas que c'est 9,90 €/mois avec 14j d'essai avant de créer un compte.
-
-**7. Onboarding premier login**
-Après signup, l'user arrive sur `/dashboard` sans guidage. Un mini tour (3 étapes : Produits → Favoris → Calculateur) augmente la rétention.
-
-**8. État "past_due" géré dans l'UI**
-Si une carte expire et que le paiement échoue, le statut passe `past_due`. Aujourd'hui l'user a encore accès mais ne le sait pas → il faut une bannière rouge "Ton paiement a échoué, mets à jour ta carte".
-
----
-
-### 🟡 Priorité 3 — Qualité & confiance
-
-**9. Pages légales**
-- CGU / CGV (obligatoire en France pour vendre un abo)
-- Politique de confidentialité (RGPD)
-- Mentions légales
-Footer avec liens vers ces pages.
-
-**10. Gestion des erreurs globale**
-Pas de page d'erreur propre (500, network down). Un `ErrorBoundary` React + page de fallback.
-
-**11. Analytics produit**
-Tu n'as aucune visibilité sur : combien de signups, combien convertissent en payant, quelles features sont utilisées. Au choix : Plausible, PostHog, ou simple table `events` Supabase.
-
-**12. Support client**
-Pas de moyen pour l'user de te contacter. Un simple lien mailto dans la sidebar + page `/aide` avec FAQ.
-
----
-
-### 🟢 Priorité 4 — Nice to have
-
-**13. Plan annuel** (ex: 99 €/an = -17%) → boost LTV
-**14. Parrainage** (1 mois offert par filleul)
-**15. Export CSV** des favoris et calculs de marge
-**16. Mode sombre/clair** (tu es dark-only)
-**17. Mobile app wrapper** (PWA installable)
-
----
-
-## Ma reco : par où commencer
-
-Dans cet ordre, sur 1-2 semaines :
-
-```text
-Semaine 1 (production-ready)
-├── Go-live Stripe
-├── Reset mot de passe
-├── Emails transactionnels (bienvenue, trial J-3, paiement échoué)
-└── Pages légales + footer
-
-Semaine 2 (conversion)
-├── Retirer waitlist, brancher landing → /auth
-├── Section pricing sur landing
-├── Bannière trial/past_due dans le dashboard
-└── Analytics (Plausible ou PostHog)
+Au clic → mini-modal/écran qui demande l'email et appelle :
+```ts
+supabase.auth.resetPasswordForEmail(email, {
+  redirectTo: `${window.location.origin}/reset-password`
+})
 ```
 
-Dis-moi par quoi tu veux attaquer et je te fais un plan détaillé pour ce chantier précis.
+**Nouvelle page `/reset-password`** (route publique, hors `Protected`) :
+- Détecte le `type=recovery` dans l'URL hash
+- Formulaire nouveau mot de passe + confirmation
+- Mêmes critères de validation que le signup (8 car / lettre / chiffre / spécial)
+- Appelle `supabase.auth.updateUser({ password })`
+- Redirige vers `/dashboard` avec toast succès
+
+> Note : Lovable enverra l'email de reset avec son template par défaut (en anglais). Pour avoir un email en français brandé Krakken, il faut configurer un domaine email — chantier séparé que je listerai à la fin.
+
+---
+
+### 2. Bannières d'état abonnement (dashboard)
+
+**Nouveau composant `SubscriptionBanner`** monté en haut de `/dashboard`, `/produits`, `/calculateur`, `/favoris` (via wrapper ou directement dans `Protected`).
+
+Logique :
+- **`status === 'past_due'`** → bandeau rouge : "Ton paiement a échoué. Mets à jour ta carte avant le [date]" + bouton "Mettre à jour" (ouvre portail Stripe)
+- **`status === 'trialing'` && `daysLeft <= 3`** → bandeau orange : "Ton essai se termine dans X jours. Active ton abonnement pour continuer" + bouton "Activer" (→ `/abonnement`)
+- **`cancelAtPeriodEnd === true`** → bandeau bleu info : "Ton abonnement sera annulé le [date]. Réactive-le quand tu veux" + bouton "Réactiver"
+- Sinon → rien
+
+Bandeau dismissible par session (sessionStorage) sauf `past_due` qui reste collé.
+
+---
+
+### 3. Pages légales + footer
+
+**3 nouvelles pages publiques** (routes hors `Protected`) :
+- `/cgv` — Conditions Générales de Vente (abo 9,90€/mois, 14j d'essai, droit de rétractation, modalités annulation)
+- `/confidentialite` — Politique de confidentialité RGPD (données collectées, base légale, durée de conservation, droits user, contact DPO)
+- `/mentions-legales` — Éditeur, hébergeur (Lovable Cloud), contact
+
+Contenu rédigé en français, ton direct, adapté à un SaaS d'abo individuel. Les infos perso de l'éditeur (nom, adresse, SIREN) seront en placeholders `[À COMPLÉTER]` avec une note dans le chat te demandant de les remplir.
+
+**Nouveau composant `Footer`** ajouté sur :
+- Landing (`/`)
+- `/auth`, `/reset-password`
+- Toutes les pages légales
+
+Liens : CGV · Confidentialité · Mentions légales · Contact (mailto)
+
+---
+
+### 4. Landing → signup direct (retrait waitlist)
+
+Dans `Landing.tsx` :
+- Remplacer tous les CTA "Rejoins l'équipage" qui ouvrent la modal waitlist par des liens directs vers `/auth?mode=signup`
+- Garder le copy/storytelling existant
+- Ajouter une **section pricing** avant le CTA final :
+  - Card unique "Krakken Pro — 9,90 €/mois"
+  - Mention "14 jours d'essai gratuit, sans carte requise au départ" *(à confirmer : actuellement le trial est créé au signup sans carte → OK)*
+  - Liste compacte des features (Produits, Calculateur, Favoris, Stats temps réel)
+  - Bouton "Commencer mon essai" → `/auth`
+
+Le composant `Auth.tsx` lira `?mode=signup` dans l'URL pour pré-sélectionner le mode signup.
+
+> Je **ne supprime pas** la table `waitlist` ni le composant modal pour l'instant — au cas où tu voudrais revenir en arrière. Je débranche juste les CTA.
+
+---
+
+## Détails techniques
+
+**Fichiers créés :**
+- `src/pages/ResetPassword.tsx`
+- `src/pages/CGV.tsx`
+- `src/pages/Confidentialite.tsx`
+- `src/pages/MentionsLegales.tsx`
+- `src/components/SubscriptionBanner.tsx`
+- `src/components/Footer.tsx`
+- `src/components/ForgotPasswordDialog.tsx`
+
+**Fichiers modifiés :**
+- `src/App.tsx` — ajout des 4 nouvelles routes publiques
+- `src/pages/Auth.tsx` — lien "mot de passe oublié" + lecture `?mode=signup`
+- `src/pages/Landing.tsx` — débranchement waitlist + section pricing + footer
+- `src/components/ProtectedRoute.tsx` ou layout commun — montage du `SubscriptionBanner`
+
+**Aucun changement DB / edge function / Stripe.**
+
+---
+
+## Ce que je ne peux PAS faire dans ce chantier (action de ta part requise)
+
+1. **Go-live Stripe** — à compléter dans l'onglet Payments (claim account + vérification + activation)
+2. **Emails transactionnels brandés** (bienvenue Pro, trial J-3, paiement échoué, reset mdp en français) — nécessite de configurer un **domaine email** (DNS sur ton domaine `krakken.io`). Si tu veux, on lance ce chantier ensuite.
+3. **Analytics** — choix du provider à faire (Plausible, PostHog, ou table custom)
+4. **Compléter les infos légales** dans les pages CGV/Mentions (nom, adresse, SIREN si tu en as un)
+
+Je m'occupe de ce qui est codable maintenant. Une fois fait, on enchaîne sur les emails brandés si tu veux.
 
