@@ -10,7 +10,7 @@ import {
 import krakkenLogo from "@/assets/krakken-logo.png";
 import { Tentacle, DeepKraken, Particles, InkClouds } from "@/components/landing/KrakenAnimations";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { supabase } from "@/integrations/supabase/client";
+import Footer from "@/components/Footer";
 
 // Animated counter hook
 const useCountUp = (end: number, duration = 2000, startOnView = true) => {
@@ -57,80 +57,26 @@ const GlowIcon = ({ icon: Icon, color, size = 20 }: { icon: React.ElementType; c
   </motion.div>
 );
 
-// Waitlist email form component
-const WaitlistForm = ({ variant = "default" }: { variant?: "default" | "compact" | "large" }) => {
-  const [email, setEmail] = useState("");
-  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
-  const [errorMsg, setErrorMsg] = useState("");
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const trimmed = email.trim();
-    if (!trimmed || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
-      setErrorMsg("Entre une adresse email valide");
-      setStatus("error");
-      return;
-    }
-    setStatus("loading");
-    const { error } = await supabase.from("waitlist").insert({ email: trimmed });
-    if (error) {
-      if (error.code === "23505") {
-        setStatus("success"); // already registered, show success anyway
-      } else {
-        setErrorMsg("Une erreur est survenue, réessaie.");
-        setStatus("error");
-      }
-    } else {
-      setStatus("success");
-    }
-  };
-
-  if (status === "success") {
-    return (
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        className="flex items-center gap-2.5 justify-center"
-      >
-        <CheckCircle2 className="w-5 h-5 text-primary" style={{ filter: 'drop-shadow(0 0 8px hsl(174 72% 46% / 0.5))' }} />
-        <span className="text-sm font-semibold text-primary">Tu es sur la liste ! 🎉</span>
-      </motion.div>
-    );
-  }
-
+// Primary CTA → signup
+const SignupCTA = ({ variant = "default", label = "Commencer mon essai gratuit" }: { variant?: "default" | "large"; label?: string }) => {
   const isLarge = variant === "large";
-
   return (
-    <form onSubmit={handleSubmit} className={`flex ${isLarge ? "flex-col sm:flex-row" : ""} items-center gap-3 w-full max-w-md mx-auto`}>
-      <input
-        type="email"
-        value={email}
-        onChange={(e) => { setEmail(e.target.value); setStatus("idle"); }}
-        placeholder="ton@email.com"
-        className={`flex-1 w-full px-5 ${isLarge ? "py-4" : "py-3"} rounded-xl text-sm font-medium text-foreground placeholder:text-foreground/30 outline-none transition-all duration-300 focus:ring-2 focus:ring-primary/30`}
-        style={{
-          background: 'hsl(225 30% 6%)',
-          border: '1px solid hsl(225 20% 10%)',
-        }}
-      />
-      <button
-        type="submit"
-        disabled={status === "loading"}
-        className={`${isLarge ? "w-full sm:w-auto" : ""} px-7 ${isLarge ? "py-4" : "py-3"} rounded-xl text-sm font-bold tracking-wide transition-all duration-300 hover:brightness-110 hover:scale-[1.02] disabled:opacity-60 flex items-center justify-center gap-2 whitespace-nowrap`}
+    <div className="flex flex-col items-center gap-2.5 w-full">
+      <Link
+        to="/auth?mode=signup"
+        className={`${isLarge ? "px-9 py-4 text-base" : "px-7 py-3 text-sm"} rounded-full font-bold tracking-wide transition-all duration-300 hover:brightness-110 hover:scale-[1.02] inline-flex items-center justify-center gap-2 whitespace-nowrap`}
         style={{
           background: 'linear-gradient(135deg, hsl(174 72% 46%), hsl(188 78% 48%))',
           color: 'hsl(230 50% 3%)',
-          boxShadow: '0 0 30px -6px hsl(174 72% 46% / 0.4)',
+          boxShadow: '0 0 30px -6px hsl(174 72% 46% / 0.5)',
         }}
       >
-        {status === "loading" ? <Loader2 className="w-4 h-4 animate-spin" /> : "Rejoins l'équipage"}
-      </button>
-      {status === "error" && (
-        <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-xs text-destructive absolute -bottom-6 left-0">
-          {errorMsg}
-        </motion.p>
-      )}
-    </form>
+        {label} <ChevronRight className="w-4 h-4" />
+      </Link>
+      <Link to="/auth" className="text-[11px] text-foreground/45 hover:text-primary transition-colors">
+        Déjà un compte ? Se connecter
+      </Link>
+    </div>
   );
 };
 
@@ -163,13 +109,13 @@ const Landing = () => {
           <div className="flex items-center gap-8">
             <a href="#fonctionnalites" className="text-[11px] text-foreground/60 hover:text-primary transition-colors hidden sm:block tracking-widest uppercase">Fonctionnalités</a>
             <a href="#acces" className="text-[11px] text-foreground/60 hover:text-primary transition-colors hidden sm:block tracking-widest uppercase">Accès</a>
-            <a href="#acces" className="px-7 py-3 rounded-full text-xs font-bold tracking-widest uppercase transition-all duration-500 hover:scale-105 hover:shadow-[0_0_40px_-8px_hsl(174_72%_46%_/_0.6)]" style={{
+            <Link to="/auth?mode=signup" className="px-7 py-3 rounded-full text-xs font-bold tracking-widest uppercase transition-all duration-500 hover:scale-105 hover:shadow-[0_0_40px_-8px_hsl(174_72%_46%_/_0.6)]" style={{
               background: 'linear-gradient(135deg, hsl(174 72% 46%), hsl(188 78% 48%))',
               color: 'hsl(230 50% 3%)',
               boxShadow: '0 0 30px -6px hsl(174 72% 46% / 0.5)',
             }}>
-              Rejoins l'équipage
-            </a>
+              Commencer
+            </Link>
           </div>
         </div>
       </nav>
@@ -232,10 +178,10 @@ const Landing = () => {
             transition={{ duration: 0.6, delay: 1 }}
             className="flex flex-col items-center gap-6 w-full"
           >
-            <WaitlistForm variant="large" />
+            <SignupCTA variant="large" />
             <div className="flex items-center gap-3">
               <div className="w-1.5 h-1.5 rounded-full bg-kraken-emerald animate-pulse-glow" />
-              <span className="text-[11px] text-foreground/50 tracking-wide">9,90€/mois · Exclusif membres de la formation</span>
+              <span className="text-[11px] text-foreground/50 tracking-wide">14 jours d'essai gratuit · Puis 9,90€/mois · Sans engagement</span>
             </div>
           </motion.div>
         </motion.div>
@@ -824,8 +770,8 @@ const Landing = () => {
               ))}
             </div>
 
-            <WaitlistForm variant="large" />
-            <p className="text-[10px] text-foreground/40 text-center mt-4 tracking-wide">Sans engagement · Annulation à tout moment</p>
+            <SignupCTA variant="large" label="Démarrer mon essai gratuit" />
+            <p className="text-[10px] text-foreground/40 text-center mt-4 tracking-wide">14 jours offerts · Sans carte requise · Annulation à tout moment</p>
           </motion.div>
         </div>
       </section>
@@ -924,22 +870,11 @@ const Landing = () => {
           <p className="text-sm text-foreground/50 mb-12 max-w-md mx-auto">
             Pendant que tu cherches, d'autres vendent.
           </p>
-          <WaitlistForm variant="large" />
+          <SignupCTA variant="large" />
         </motion.div>
       </section>
 
-      {/* ═══ FOOTER ═══ */}
-      <footer className="py-8 px-6 md:px-8" style={{
-        borderTop: '1px solid hsl(225 20% 5%)',
-        background: 'hsl(230 50% 3%)',
-      }}>
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <img src={krakkenLogo} alt="" className="w-5 h-5 object-contain" style={{ opacity: 0.25, filter: 'drop-shadow(0 0 4px hsl(174 72% 46% / 0.3))' }} />
-            <span className="text-[11px] text-foreground/40">© 2026 Krakken</span>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 };

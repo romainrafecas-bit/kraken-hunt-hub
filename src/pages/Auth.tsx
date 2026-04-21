@@ -1,16 +1,21 @@
 import { useState } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
+import { Navigate, useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Mail, Lock, LogIn, UserPlus, Loader2, Check, Circle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import krakkenLogo from "@/assets/krakken-logo.png";
+import ForgotPasswordDialog from "@/components/ForgotPasswordDialog";
+import Footer from "@/components/Footer";
 
 const Auth = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
-  const [mode, setMode] = useState<"login" | "signup">("login");
+  const [searchParams] = useSearchParams();
+  const initialMode = searchParams.get("mode") === "signup" ? "signup" : "login";
+  const [mode, setMode] = useState<"login" | "signup">(initialMode);
+  const [forgotOpen, setForgotOpen] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
@@ -75,113 +80,128 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen abyss-gradient flex items-center justify-center p-4">
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-        className="glass-panel-glow w-full max-w-md p-8"
-      >
-        <div className="flex flex-col items-center mb-6">
-          <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-3 overflow-hidden" style={{
-            background: 'linear-gradient(145deg, hsl(228 42% 7%), hsl(225 35% 5%))',
-            border: '1px solid hsl(174 72% 46% / 0.25)',
-            boxShadow: '0 0 24px -4px hsl(174 72% 46% / 0.3)',
-          }}>
-            <img src={krakkenLogo} alt="Krakken" className="w-12 h-12 object-contain" style={{
-              filter: 'drop-shadow(0 0 6px hsl(174 72% 46% / 0.5))',
-            }} />
+    <div className="min-h-screen abyss-gradient flex flex-col">
+      <div className="flex-1 flex items-center justify-center p-4">
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="glass-panel-glow w-full max-w-md p-8"
+        >
+          <div className="flex flex-col items-center mb-6">
+            <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-3 overflow-hidden" style={{
+              background: 'linear-gradient(145deg, hsl(228 42% 7%), hsl(225 35% 5%))',
+              border: '1px solid hsl(174 72% 46% / 0.25)',
+              boxShadow: '0 0 24px -4px hsl(174 72% 46% / 0.3)',
+            }}>
+              <img src={krakkenLogo} alt="Krakken" className="w-12 h-12 object-contain" style={{
+                filter: 'drop-shadow(0 0 6px hsl(174 72% 46% / 0.5))',
+              }} />
+            </div>
+            <h1 className="kraken-title text-2xl">KRAKKEN</h1>
+            <p className="text-xs text-muted-foreground mt-1">
+              {mode === "login" ? "Rejoins l'équipage" : "Première connexion"}
+            </p>
           </div>
-          <h1 className="kraken-title text-2xl">KRAKKEN</h1>
-          <p className="text-xs text-muted-foreground mt-1">
-            {mode === "login" ? "Rejoins l'équipage" : "Première connexion"}
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-1.5">
+              <label className="soft-label flex items-center gap-1.5">
+                <Mail className="w-3.5 h-3.5" /> Email
+              </label>
+              <input
+                type="email"
+                required
+                autoComplete="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full bg-secondary/60 border border-border/40 rounded-xl px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/40 transition-all"
+                placeholder="ton@email.com"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <label className="soft-label flex items-center gap-1.5">
+                  <Lock className="w-3.5 h-3.5" /> Mot de passe
+                </label>
+                {mode === "login" && (
+                  <button
+                    type="button"
+                    onClick={() => setForgotOpen(true)}
+                    className="text-[11px] text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    Mot de passe oublié ?
+                  </button>
+                )}
+              </div>
+              <input
+                type="password"
+                required
+                minLength={8}
+                autoComplete={mode === "login" ? "current-password" : "new-password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full bg-secondary/60 border border-border/40 rounded-xl px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/40 transition-all"
+                placeholder="••••••••"
+              />
+              {mode === "signup" && (
+                <ul className="space-y-1 mt-2">
+                  {[
+                    { ok: password.length >= 8, label: "8 caractères minimum" },
+                    { ok: /[a-zA-Z]/.test(password), label: "Au moins une lettre" },
+                    { ok: /[0-9]/.test(password), label: "Au moins un chiffre" },
+                    { ok: /[!@#$%^&*(),.?":{}|<>_\-+=/\\[\];'`~]/.test(password), label: "Au moins un caractère spécial" },
+                  ].map((c) => (
+                    <li key={c.label} className={`flex items-center gap-1.5 text-[11px] transition-colors ${c.ok ? "text-primary" : "text-muted-foreground/70"}`}>
+                      {c.ok ? <Check className="w-3 h-3" /> : <Circle className="w-3 h-3" />}
+                      {c.label}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+
+            <button
+              type="submit"
+              disabled={busy}
+              className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold text-primary-foreground transition-all disabled:opacity-50"
+              style={{
+                background: 'linear-gradient(135deg, hsl(174 72% 46%), hsl(174 72% 38%))',
+                boxShadow: '0 4px 16px -4px hsl(174 72% 46% / 0.4)',
+              }}
+            >
+              {busy ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : mode === "login" ? (
+                <><LogIn className="w-4 h-4" /> Se connecter</>
+              ) : (
+                <><UserPlus className="w-4 h-4" /> Créer mon compte</>
+              )}
+            </button>
+          </form>
+
+          <div className="mt-5 pt-5 border-t border-border/40 text-center">
+            <button
+              type="button"
+              onClick={() => setMode(mode === "login" ? "signup" : "login")}
+              className="text-xs text-muted-foreground hover:text-primary transition-colors"
+            >
+              {mode === "login" ? (
+                <>Première connexion ? <span className="text-primary font-semibold">Créer mon compte</span></>
+              ) : (
+                <>Déjà un compte ? <span className="text-primary font-semibold">Se connecter</span></>
+              )}
+            </button>
+          </div>
+
+          <p className="text-[10px] text-center text-muted-foreground/60 mt-4">
+            Accès réservé aux élèves inscrits via systeme.io.
           </p>
-        </div>
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-1.5">
-            <label className="soft-label flex items-center gap-1.5">
-              <Mail className="w-3.5 h-3.5" /> Email
-            </label>
-            <input
-              type="email"
-              required
-              autoComplete="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full bg-secondary/60 border border-border/40 rounded-xl px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/40 transition-all"
-              placeholder="ton@email.com"
-            />
-          </div>
-
-          <div className="space-y-1.5">
-            <label className="soft-label flex items-center gap-1.5">
-              <Lock className="w-3.5 h-3.5" /> Mot de passe
-            </label>
-            <input
-              type="password"
-              required
-              minLength={8}
-              autoComplete={mode === "login" ? "current-password" : "new-password"}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full bg-secondary/60 border border-border/40 rounded-xl px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/40 transition-all"
-              placeholder="••••••••"
-            />
-            {mode === "signup" && (
-              <ul className="space-y-1 mt-2">
-                {[
-                  { ok: password.length >= 8, label: "8 caractères minimum" },
-                  { ok: /[a-zA-Z]/.test(password), label: "Au moins une lettre" },
-                  { ok: /[0-9]/.test(password), label: "Au moins un chiffre" },
-                  { ok: /[!@#$%^&*(),.?":{}|<>_\-+=/\\[\];'`~]/.test(password), label: "Au moins un caractère spécial" },
-                ].map((c) => (
-                  <li key={c.label} className={`flex items-center gap-1.5 text-[11px] transition-colors ${c.ok ? "text-primary" : "text-muted-foreground/70"}`}>
-                    {c.ok ? <Check className="w-3 h-3" /> : <Circle className="w-3 h-3" />}
-                    {c.label}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-
-          <button
-            type="submit"
-            disabled={busy}
-            className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold text-primary-foreground transition-all disabled:opacity-50"
-            style={{
-              background: 'linear-gradient(135deg, hsl(174 72% 46%), hsl(174 72% 38%))',
-              boxShadow: '0 4px 16px -4px hsl(174 72% 46% / 0.4)',
-            }}
-          >
-            {busy ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
-            ) : mode === "login" ? (
-              <><LogIn className="w-4 h-4" /> Se connecter</>
-            ) : (
-              <><UserPlus className="w-4 h-4" /> Créer mon compte</>
-            )}
-          </button>
-        </form>
-
-        <div className="mt-5 pt-5 border-t border-border/40 text-center">
-          <button
-            type="button"
-            onClick={() => setMode(mode === "login" ? "signup" : "login")}
-            className="text-xs text-muted-foreground hover:text-primary transition-colors"
-          >
-            {mode === "login" ? (
-              <>Première connexion ? <span className="text-primary font-semibold">Créer mon compte</span></>
-            ) : (
-              <>Déjà un compte ? <span className="text-primary font-semibold">Se connecter</span></>
-            )}
-          </button>
-        </div>
-
-        <p className="text-[10px] text-center text-muted-foreground/60 mt-4">
-          Accès réservé aux élèves inscrits via systeme.io.
-        </p>
-      </motion.div>
+        </motion.div>
+      </div>
+      <Footer />
+      <ForgotPasswordDialog open={forgotOpen} onOpenChange={setForgotOpen} defaultEmail={email} />
     </div>
   );
 };

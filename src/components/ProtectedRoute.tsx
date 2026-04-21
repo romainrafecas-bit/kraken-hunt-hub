@@ -1,6 +1,7 @@
 import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useSubscription } from "@/hooks/useSubscription";
+import SubscriptionBanner from "@/components/SubscriptionBanner";
 
 const LoadingScreen = () => (
   <div
@@ -27,7 +28,17 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     return <Navigate to="/abonnement" replace />;
   }
 
-  return <>{children}</>;
+  return (
+    <>
+      {children}
+      {/* Banner injected via portal-like wrapper at top of viewport, inside scroll flow of main pages */}
+      <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 w-[calc(100%-2rem)] max-w-2xl pointer-events-none">
+        <div className="pointer-events-auto">
+          <SubscriptionBanner />
+        </div>
+      </div>
+    </>
+  );
 };
 
 export default ProtectedRoute;

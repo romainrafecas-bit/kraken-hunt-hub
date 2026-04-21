@@ -9,12 +9,16 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import Landing from "./pages/Landing";
 
 const Auth = lazy(() => import("./pages/Auth"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const Index = lazy(() => import("./pages/Index"));
 const Produits = lazy(() => import("./pages/Produits"));
 const Calculateur = lazy(() => import("./pages/Calculateur"));
 const Profil = lazy(() => import("./pages/Profil"));
 const Favoris = lazy(() => import("./pages/Favoris"));
 const Abonnement = lazy(() => import("./pages/Abonnement"));
+const CGV = lazy(() => import("./pages/CGV"));
+const Confidentialite = lazy(() => import("./pages/Confidentialite"));
+const MentionsLegales = lazy(() => import("./pages/MentionsLegales"));
 
 const queryClient = new QueryClient();
 
@@ -40,6 +44,10 @@ const App = () => (
               <Route path="/" element={<Landing />} />
               <Route path="/auth" element={<Auth />} />
               <Route path="/connexion" element={<Auth />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
+              <Route path="/cgv" element={<CGV />} />
+              <Route path="/confidentialite" element={<Confidentialite />} />
+              <Route path="/mentions-legales" element={<MentionsLegales />} />
               <Route path="/dashboard" element={<Protected><Index /></Protected>} />
               <Route path="/produits" element={<Protected><Produits /></Protected>} />
               <Route path="/calculateur" element={<Protected><Calculateur /></Protected>} />
