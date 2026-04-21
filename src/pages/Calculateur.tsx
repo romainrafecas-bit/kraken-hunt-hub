@@ -74,9 +74,11 @@ const Calculateur = () => {
 
   const results = useMemo(() => {
     const totalRevenue = inputs.sellPrice + inputs.shippingCharged;
-    const vatAmount = totalRevenue - totalRevenue / (1 + inputs.vatRate / 100);
+    const hasRevenue = totalRevenue > 0;
+    const vatAmount = hasRevenue ? totalRevenue - totalRevenue / (1 + inputs.vatRate / 100) : 0;
     const revenueHT = totalRevenue - vatAmount;
-    const commission = totalRevenue * category.rate + marketplace.fixedFee;
+    // Pas de commission si pas de vente (évite -0,30€ avec frais fixes)
+    const commission = hasRevenue ? totalRevenue * category.rate + marketplace.fixedFee : 0;
     const totalCost =
       inputs.buyPrice +
       inputs.shippingCost +

@@ -76,11 +76,11 @@ export const useSubscription = (): SubscriptionState => {
     fetchSub();
   }, [fetchSub]);
 
-  // Realtime updates
+  // Realtime updates — build channel only when user.id changes; avoid re-subscribing on fetchSub identity changes
   useEffect(() => {
-    if (!user) return;
-    const channel = supabase.channel(`sub-${user.id}-${Date.now()}`);
-    channel
+    if (!user?.id) return;
+    const channel = supabase
+      .channel(`sub-${user.id}-${Math.random().toString(36).slice(2)}`)
       .on(
         "postgres_changes",
         {
@@ -89,13 +89,16 @@ export const useSubscription = (): SubscriptionState => {
           table: "subscriptions",
           filter: `user_id=eq.${user.id}`,
         },
-        () => fetchSub(),
+        () => {
+          fetchSub();
+        },
       )
       .subscribe();
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user?.id, fetchSub]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
 
   const { hasAccess, daysLeft } = computeAccess(row);
 
