@@ -36,18 +36,7 @@ const Auth = () => {
         return;
       }
 
-      // Signup: vérifier que l'email est dans la whitelist systeme.io
-      const { data: check, error: checkErr } = await supabase.functions.invoke(
-        "check-systemeio-access",
-        { body: { email } },
-      );
-      if (checkErr) throw new Error("Vérification d'accès impossible");
-      if (!check?.allowed) {
-        const reason = check?.reason === "no_tag"
-          ? "Cet email existe mais n'est pas autorisé. Contacte-moi si tu penses que c'est une erreur."
-          : "Cet email n'est pas dans la liste des élèves. Inscris-toi d'abord à la formation.";
-        throw new Error(reason);
-      }
+      // Inscription ouverte à tous
 
       const { error } = await supabase.auth.signUp({
         email,
@@ -195,9 +184,6 @@ const Auth = () => {
             </button>
           </div>
 
-          <p className="text-[10px] text-center text-muted-foreground/60 mt-4">
-            Accès réservé aux élèves inscrits via systeme.io.
-          </p>
         </motion.div>
       </div>
       <Footer />
