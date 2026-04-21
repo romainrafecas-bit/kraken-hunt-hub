@@ -4,7 +4,7 @@ const CGV = () => (
   <LegalLayout title="Conditions Générales de Vente" updated="21/04/2026">
     <p>
       Les présentes Conditions Générales de Vente (« CGV ») régissent l'accès et l'utilisation du
-      service Krakken, un outil de veille produit en ligne, fourni par <strong>[À COMPLÉTER — Nom de l'éditeur]</strong> (ci-après « l'Éditeur »).
+      service Krakken, un outil de veille produit en ligne, fourni par <strong>LEARNING LABS OÜ</strong> (registre estonien 17440453, TVA EE102956560), siège social : Harju maakond, Tallinn, Kesklinna linnaosa, Sakala tn 7-2, 10141, Estonie (ci-après « l'Éditeur »).
     </p>
 
     <h2>1. Service</h2>
@@ -84,7 +84,7 @@ const CGV = () => (
 
     <h2>11. Contact</h2>
     <p>
-      Pour toute question relative aux présentes CGV : <a href="mailto:contact@krakken.io">contact@krakken.io</a>.
+      Pour toute question relative aux présentes CGV : <a href="mailto:learning.labs.ou@gmail.com">learning.labs.ou@gmail.com</a>.
     </p>
   </LegalLayout>
 );

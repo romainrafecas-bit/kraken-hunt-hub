@@ -10,9 +10,11 @@ const Confidentialite = () => (
 
     <h2>1. Responsable de traitement</h2>
     <p>
-      <strong>[À COMPLÉTER — Nom, raison sociale, adresse de l'éditeur]</strong>
+      <strong>LEARNING LABS OÜ</strong> — registre estonien 17440453, TVA EE102956560
       <br />
-      Contact : <a href="mailto:contact@krakken.io">contact@krakken.io</a>
+      Siège social : Harju maakond, Tallinn, Kesklinna linnaosa, Sakala tn 7-2, 10141, Estonie
+      <br />
+      Contact : <a href="mailto:learning.labs.ou@gmail.com">learning.labs.ou@gmail.com</a>
     </p>
 
     <h2>2. Données collectées</h2>
@@ -53,8 +55,8 @@ const Confidentialite = () => (
     <p>
       Conformément au RGPD, vous disposez des droits suivants : accès, rectification, effacement,
       limitation, portabilité, opposition. Pour les exercer, contactez-nous à
-      <a href="mailto:contact@krakken.io"> contact@krakken.io</a>. Vous pouvez également introduire
-      une réclamation auprès de la <a href="https://www.cnil.fr" target="_blank" rel="noreferrer">CNIL</a>.
+      <a href="mailto:learning.labs.ou@gmail.com"> learning.labs.ou@gmail.com</a>. Vous pouvez également introduire
+      une réclamation auprès de la <a href="https://www.aki.ee" target="_blank" rel="noreferrer">Autorité estonienne de protection des données (AKI)</a>.
     </p>
 
     <h2>7. Cookies et stockage local</h2>

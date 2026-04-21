@@ -4,21 +4,21 @@ const MentionsLegales = () => (
   <LegalLayout title="Mentions légales" updated="21/04/2026">
     <h2>Éditeur du site</h2>
     <p>
-      <strong>[À COMPLÉTER — Nom ou raison sociale]</strong>
+      <strong>LEARNING LABS OÜ</strong>
       <br />
-      <strong>[À COMPLÉTER — Statut juridique (auto-entrepreneur, SARL, etc.)]</strong>
+      <strong>Société à responsabilité limitée (OÜ — Osaühing)</strong>
       <br />
-      <strong>[À COMPLÉTER — Adresse complète]</strong>
+      <strong>Harju maakond, Tallinn, Kesklinna linnaosa, Sakala tn 7-2, 10141, Estonie</strong>
       <br />
-      SIREN/SIRET : <strong>[À COMPLÉTER]</strong>
+      Registre de commerce (Estonie) : <strong>17440453</strong>
       <br />
-      Numéro de TVA intracommunautaire : <strong>[À COMPLÉTER si applicable]</strong>
+      Numéro de TVA intracommunautaire : <strong>EE102956560</strong>
       <br />
-      Email : <a href="mailto:contact@krakken.io">contact@krakken.io</a>
+      Email : <a href="mailto:learning.labs.ou@gmail.com">learning.labs.ou@gmail.com</a>
     </p>
 
     <h2>Directeur de la publication</h2>
-    <p><strong>[À COMPLÉTER — Nom du responsable]</strong></p>
+    <p><strong>LEARNING LABS OÜ</strong> — représenté par son gérant</p>
 
     <h2>Hébergement</h2>
     <p>
@@ -44,7 +44,7 @@ const MentionsLegales = () => (
 
     <h2>Contact</h2>
     <p>
-      Pour toute question : <a href="mailto:contact@krakken.io">contact@krakken.io</a>
+      Pour toute question : <a href="mailto:learning.labs.ou@gmail.com">learning.labs.ou@gmail.com</a>
     </p>
   </LegalLayout>
 );
