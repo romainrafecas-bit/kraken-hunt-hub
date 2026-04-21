@@ -30,13 +30,13 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <>
-      {/* Floating banner above sidebar layout — positioned via container in pages, but we render inline so pages without sidebar still get it */}
-      <div className="fixed top-0 left-0 right-0 z-40 pl-16 xl:pl-56 px-4 lg:px-6 pt-3 pointer-events-none">
+      {children}
+      {/* Banner injected via portal-like wrapper at top of viewport, inside scroll flow of main pages */}
+      <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 w-[calc(100%-2rem)] max-w-2xl pointer-events-none">
         <div className="pointer-events-auto">
           <SubscriptionBanner />
         </div>
       </div>
-      {children}
     </>
   );
 };
