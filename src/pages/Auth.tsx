@@ -184,9 +184,6 @@ const Auth = () => {
             </button>
           </div>
 
-          <p className="text-[10px] text-center text-muted-foreground/60 mt-4">
-            Accès réservé aux élèves inscrits via systeme.io.
-          </p>
         </motion.div>
       </div>
       <Footer />
