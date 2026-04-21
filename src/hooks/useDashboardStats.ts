@@ -110,15 +110,24 @@ export function useDashboardStats(): DashboardStats {
           totalRec += r.recurrences || 0;
         }
 
-        // Cumulative
+        // Cumulative — fill missing days up to today so the curve reaches the current date
         const sortedDays = Object.keys(dateCountMap).sort();
-        let cumul = 0;
-        const cumulativeData: DailyCount[] = sortedDays.map(day => {
-          cumul += dateCountMap[day];
-          const d = new Date(day);
-          const label = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}`;
-          return { day: label, v: cumul, added: dateCountMap[day] };
-        });
+        const cumulativeData: DailyCount[] = [];
+        if (sortedDays.length > 0) {
+          const start = new Date(sortedDays[0]);
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+          let cumul = 0;
+          const cursor = new Date(start);
+          while (cursor.getTime() <= today.getTime()) {
+            const key = `${cursor.getFullYear()}-${String(cursor.getMonth() + 1).padStart(2, '0')}-${String(cursor.getDate()).padStart(2, '0')}`;
+            const added = dateCountMap[key] || 0;
+            cumul += added;
+            const label = `${String(cursor.getDate()).padStart(2, '0')}/${String(cursor.getMonth() + 1).padStart(2, '0')}`;
+            cumulativeData.push({ day: label, v: cumul, added });
+            cursor.setDate(cursor.getDate() + 1);
+          }
+        }
 
         // Categories
         const categoryStats = Object.entries(catMap)
