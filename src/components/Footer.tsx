@@ -27,7 +27,7 @@ const Footer = () => {
           <span className="text-foreground/15">·</span>
           <Link to="/mentions-legales" className="hover:text-primary transition-colors">Mentions légales</Link>
           <span className="text-foreground/15">·</span>
-          <a href="mailto:contact@krakken.io" className="hover:text-primary transition-colors">Contact</a>
+          <a href="mailto:learning.labs.ou@gmail.com" className="hover:text-primary transition-colors">Contact</a>
         </nav>
       </div>
     </footer>
