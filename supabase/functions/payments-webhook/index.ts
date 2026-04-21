@@ -30,6 +30,9 @@ serve(async (req) => {
       case "checkout.session.completed":
         console.log("Checkout completed:", event.data.object.id);
         break;
+      case "invoice.payment_failed":
+        await handlePaymentFailed(event.data.object);
+        break;
       default:
         console.log("Unhandled event:", event.type);
     }
@@ -85,3 +88,40 @@ async function markCanceled(subscription: any, env: StripeEnv) {
     .eq("stripe_subscription_id", subscription.id)
     .eq("environment", env);
 }
+
+async function handlePaymentFailed(invoice: any) {
+  const customerId = invoice.customer;
+  const customerEmail = invoice.customer_email;
+  const amountDue = invoice.amount_due ? (invoice.amount_due / 100).toFixed(2) : null;
+  const currency = (invoice.currency || "eur").toUpperCase();
+
+  // Look up user by stripe_customer_id
+  const { data: sub } = await supabase
+    .from("subscriptions")
+    .select("user_id")
+    .eq("stripe_customer_id", customerId)
+    .maybeSingle();
+
+  const recipientEmail = customerEmail;
+  if (!recipientEmail) {
+    console.error("No recipient email for failed payment", invoice.id);
+    return;
+  }
+
+  const amountStr = amountDue ? `${amountDue} ${currency === "EUR" ? "€" : currency}` : undefined;
+
+  await supabase.functions.invoke("send-transactional-email", {
+    body: {
+      templateName: "payment-failed",
+      recipientEmail,
+      idempotencyKey: `payment-failed-${invoice.id}`,
+      templateData: {
+        name: recipientEmail.split("@")[0],
+        amount: amountStr,
+      },
+    },
+  });
+
+  console.log("Payment failed email queued for:", recipientEmail, "user:", sub?.user_id);
+}
+
