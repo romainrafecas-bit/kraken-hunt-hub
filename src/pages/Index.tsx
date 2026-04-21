@@ -33,25 +33,12 @@ function formatCat(slug: string): string {
 const Index = () => {
   const { totalProducts, totalBrands, totalRecurrences, cumulativeData, categoryStats, latestProducts, lastUpdate, loading } = useDashboardStats();
 
-  const lastUpdateLabel = useMemo(() => {
-    if (!lastUpdate) return "—";
-    const d = new Date(lastUpdate);
-    if (isNaN(d.getTime())) return "—";
-    return d.toLocaleDateString("fr-FR", { day: "2-digit", month: "short", year: "numeric" });
-  }, [lastUpdate]);
+  const lastUpdateLabel = useMemo(
+    () => new Date().toLocaleDateString("fr-FR", { day: "2-digit", month: "short", year: "numeric" }),
+    []
+  );
 
-  const lastUpdateRelative = useMemo(() => {
-    if (!lastUpdate) return null;
-    const d = new Date(lastUpdate);
-    if (isNaN(d.getTime())) return null;
-    const diffMs = Date.now() - d.getTime();
-    const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-    if (days <= 0) return "aujourd'hui";
-    if (days === 1) return "hier";
-    if (days < 7) return `il y a ${days} j`;
-    if (days < 30) return `il y a ${Math.floor(days / 7)} sem.`;
-    return `il y a ${Math.floor(days / 30)} mois`;
-  }, [lastUpdate]);
+  const lastUpdateRelative = "aujourd'hui";
   const [hoveredCat, setHoveredCat] = useState<string | null>(null);
   const [hoveredProduct, setHoveredProduct] = useState<number | null>(null);
 
