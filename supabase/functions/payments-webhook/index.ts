@@ -30,6 +30,9 @@ serve(async (req) => {
       case "checkout.session.completed":
         console.log("Checkout completed:", event.data.object.id);
         break;
+      case "invoice.payment_failed":
+        await handlePaymentFailed(event.data.object);
+        break;
       default:
         console.log("Unhandled event:", event.type);
     }

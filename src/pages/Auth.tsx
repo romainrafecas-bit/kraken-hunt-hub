@@ -38,12 +38,25 @@ const Auth = () => {
 
       // Inscription ouverte à tous
 
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: { emailRedirectTo: `${window.location.origin}/dashboard` },
       });
       if (error) throw error;
+
+      // Welcome email — fire-and-forget (won't block signup)
+      if (data.user) {
+        supabase.functions.invoke("send-transactional-email", {
+          body: {
+            templateName: "welcome-pro",
+            recipientEmail: email,
+            idempotencyKey: `welcome-${data.user.id}`,
+            templateData: { name: email.split("@")[0] },
+          },
+        }).catch((e) => console.warn("welcome email failed", e));
+      }
+
       toast.success("Compte créé. Bienvenue à bord !");
       navigate("/dashboard");
     } catch (err: any) {
