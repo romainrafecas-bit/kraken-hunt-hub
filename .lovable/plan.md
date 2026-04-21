@@ -1,109 +1,102 @@
 
 
-## Production-ready : reset mot de passe + bannières + pages légales + landing
+## Plug l'envoi d'emails brandés Krakken
 
-J'attaque tout ce qui est faisable directement dans le code, dans cet ordre.
-
----
-
-### 1. Reset mot de passe
-
-**Sur `/auth`** : ajouter un lien "Mot de passe oublié ?" sous le bouton de connexion (visible uniquement en mode login).
-
-Au clic → mini-modal/écran qui demande l'email et appelle :
-```ts
-supabase.auth.resetPasswordForEmail(email, {
-  redirectTo: `${window.location.origin}/reset-password`
-})
-```
-
-**Nouvelle page `/reset-password`** (route publique, hors `Protected`) :
-- Détecte le `type=recovery` dans l'URL hash
-- Formulaire nouveau mot de passe + confirmation
-- Mêmes critères de validation que le signup (8 car / lettre / chiffre / spécial)
-- Appelle `supabase.auth.updateUser({ password })`
-- Redirige vers `/dashboard` avec toast succès
-
-> Note : Lovable enverra l'email de reset avec son template par défaut (en anglais). Pour avoir un email en français brandé Krakken, il faut configurer un domaine email — chantier séparé que je listerai à la fin.
+Tu as un domaine custom (`krakken.io`) déjà connecté au projet. On va l'utiliser pour envoyer tous les emails depuis `notify@krakken.io` (ou similaire) au lieu des templates anglais par défaut.
 
 ---
 
-### 2. Bannières d'état abonnement (dashboard)
+### Étape 1 — Configurer le domaine d'envoi (action de ta part, 2 min)
 
-**Nouveau composant `SubscriptionBanner`** monté en haut de `/dashboard`, `/produits`, `/calculateur`, `/favoris` (via wrapper ou directement dans `Protected`).
+Je vais te présenter un dialogue de configuration où tu choisiras le sous-domaine d'envoi (par défaut `notify.krakken.io`). Lovable ajoute automatiquement les enregistrements DNS nécessaires (SPF, DKIM, MX) — pas besoin de toucher à ta zone DNS manuellement.
 
-Logique :
-- **`status === 'past_due'`** → bandeau rouge : "Ton paiement a échoué. Mets à jour ta carte avant le [date]" + bouton "Mettre à jour" (ouvre portail Stripe)
-- **`status === 'trialing'` && `daysLeft <= 3`** → bandeau orange : "Ton essai se termine dans X jours. Active ton abonnement pour continuer" + bouton "Activer" (→ `/abonnement`)
-- **`cancelAtPeriodEnd === true`** → bandeau bleu info : "Ton abonnement sera annulé le [date]. Réactive-le quand tu veux" + bouton "Réactiver"
-- Sinon → rien
-
-Bandeau dismissible par session (sessionStorage) sauf `past_due` qui reste collé.
+> La vérification DNS peut prendre jusqu'à 72h, mais on peut continuer à scaffolder pendant ce temps. Les emails partiront automatiquement dès que la vérif est OK.
 
 ---
 
-### 3. Pages légales + footer
+### Étape 2 — Emails d'authentification brandés (auth)
 
-**3 nouvelles pages publiques** (routes hors `Protected`) :
-- `/cgv` — Conditions Générales de Vente (abo 9,90€/mois, 14j d'essai, droit de rétractation, modalités annulation)
-- `/confidentialite` — Politique de confidentialité RGPD (données collectées, base légale, durée de conservation, droits user, contact DPO)
-- `/mentions-legales` — Éditeur, hébergeur (Lovable Cloud), contact
+Une fois le domaine configuré, je scaffold les **6 templates d'auth en français**, brandés Krakken :
 
-Contenu rédigé en français, ton direct, adapté à un SaaS d'abo individuel. Les infos perso de l'éditeur (nom, adresse, SIREN) seront en placeholders `[À COMPLÉTER]` avec une note dans le chat te demandant de les remplir.
+1. **Confirmation d'inscription** — "Bienvenue à bord, [prénom]. Confirme ton email pour rejoindre l'équipage."
+2. **Reset mot de passe** — "Tu as demandé un nouveau mot de passe. Clique pour le réinitialiser."
+3. **Magic link** — "Connecte-toi à Krakken en un clic."
+4. **Invitation** — (si jamais tu actives ça plus tard)
+5. **Changement d'email** — "Confirme ton nouvel email."
+6. **Réauthentification** — "Confirme que c'est bien toi."
 
-**Nouveau composant `Footer`** ajouté sur :
-- Landing (`/`)
-- `/auth`, `/reset-password`
-- Toutes les pages légales
-
-Liens : CGV · Confidentialité · Mentions légales · Contact (mailto)
+Style : fond blanc (obligatoire pour la délivrabilité), accents teal/turquoise (`#1FB8A8`), typo Nunito/DM Sans, logo Krakken en header, footer minimaliste avec liens légaux.
 
 ---
 
-### 4. Landing → signup direct (retrait waitlist)
+### Étape 3 — Emails transactionnels (app)
 
-Dans `Landing.tsx` :
-- Remplacer tous les CTA "Rejoins l'équipage" qui ouvrent la modal waitlist par des liens directs vers `/auth?mode=signup`
-- Garder le copy/storytelling existant
-- Ajouter une **section pricing** avant le CTA final :
-  - Card unique "Krakken Pro — 9,90 €/mois"
-  - Mention "14 jours d'essai gratuit, sans carte requise au départ" *(à confirmer : actuellement le trial est créé au signup sans carte → OK)*
-  - Liste compacte des features (Produits, Calculateur, Favoris, Stats temps réel)
-  - Bouton "Commencer mon essai" → `/auth`
+Je crée l'infra transactional + 3 templates métier :
 
-Le composant `Auth.tsx` lira `?mode=signup` dans l'URL pour pré-sélectionner le mode signup.
+1. **`welcome-pro`** — déclenché à l'inscription, après création du compte trial
+   - "Ta traque commence. 14 jours d'essai t'attendent."
+   - CTA → `/dashboard`
+2. **`trial-ending`** — déclenché à J-3 de fin d'essai (via cron qu'on ajoutera après, ou manuel pour l'instant)
+   - "Plus que 3 jours d'essai. Active ton abonnement pour continuer."
+   - CTA → `/abonnement`
+3. **`payment-failed`** — déclenché par le webhook Stripe `invoice.payment_failed`
+   - "Ton paiement a échoué. Mets à jour ta carte avant suspension."
+   - CTA → portail Stripe
 
-> Je **ne supprime pas** la table `waitlist` ni le composant modal pour l'instant — au cas où tu voudrais revenir en arrière. Je débranche juste les CTA.
+> **Note** : pour le déclenchement, je branche immédiatement `welcome-pro` (sur signup) et `payment-failed` (dans `payments-webhook`). Le `trial-ending` J-3 nécessite un cron job — je le scaffold aussi mais on verra le déclenchement automatique dans une étape suivante si tu veux.
+
+---
+
+### Étape 4 — Page de désabonnement
+
+Création d'une page `/email-unsubscribe` (route publique) qui valide le token de désabonnement et confirme la désinscription. Design cohérent avec le reste du site (glass panel, fond abyssal).
+
+> Les emails d'auth (reset, confirmation) ne sont pas concernés par le désabonnement — c'est uniquement pour les transactionnels (welcome, trial-ending).
 
 ---
 
 ## Détails techniques
 
+**Outils utilisés (séquence) :**
+1. Tu cliques sur le bouton de setup domaine → DNS auto-délégué à Lovable
+2. `setup_email_infra` → tables (queue pgmq, send_log, suppression list, unsubscribe tokens) + cron dispatcher
+3. `scaffold_auth_email_templates` → 6 templates auth + `auth-email-hook` edge function
+4. `scaffold_transactional_email` → `send-transactional-email` + handlers + 1 template d'exemple
+5. Customisation des 6 templates auth en français + brand Krakken
+6. Création des 3 templates transactionnels (welcome, trial-ending, payment-failed)
+7. Branchement `welcome-pro` dans `Auth.tsx` (après signup réussi)
+8. Branchement `payment-failed` dans `payments-webhook/index.ts` (sur event `invoice.payment_failed`)
+9. Création de la page `/email-unsubscribe` + route dans `App.tsx`
+10. Deploy de toutes les edge functions
+
 **Fichiers créés :**
-- `src/pages/ResetPassword.tsx`
-- `src/pages/CGV.tsx`
-- `src/pages/Confidentialite.tsx`
-- `src/pages/MentionsLegales.tsx`
-- `src/components/SubscriptionBanner.tsx`
-- `src/components/Footer.tsx`
-- `src/components/ForgotPasswordDialog.tsx`
+- `supabase/functions/auth-email-hook/index.ts`
+- `supabase/functions/send-transactional-email/index.ts`
+- `supabase/functions/handle-email-unsubscribe/index.ts`
+- `supabase/functions/handle-email-suppression/index.ts`
+- `supabase/functions/process-email-queue/index.ts`
+- `supabase/functions/_shared/email-templates/*.tsx` (6 templates auth)
+- `supabase/functions/_shared/transactional-email-templates/welcome-pro.tsx`
+- `supabase/functions/_shared/transactional-email-templates/trial-ending.tsx`
+- `supabase/functions/_shared/transactional-email-templates/payment-failed.tsx`
+- `supabase/functions/_shared/transactional-email-templates/registry.ts`
+- `src/pages/EmailUnsubscribe.tsx`
 
 **Fichiers modifiés :**
-- `src/App.tsx` — ajout des 4 nouvelles routes publiques
-- `src/pages/Auth.tsx` — lien "mot de passe oublié" + lecture `?mode=signup`
-- `src/pages/Landing.tsx` — débranchement waitlist + section pricing + footer
-- `src/components/ProtectedRoute.tsx` ou layout commun — montage du `SubscriptionBanner`
+- `src/pages/Auth.tsx` — appel `welcome-pro` après signup
+- `src/App.tsx` — route `/email-unsubscribe`
+- `supabase/functions/payments-webhook/index.ts` — appel `payment-failed` sur échec
+- `supabase/config.toml` — config edge functions emails
 
-**Aucun changement DB / edge function / Stripe.**
+**Aucune modif Stripe / DB schema / front existant.**
 
 ---
 
-## Ce que je ne peux PAS faire dans ce chantier (action de ta part requise)
+## Ce que tu dois faire (1 action)
 
-1. **Go-live Stripe** — à compléter dans l'onglet Payments (claim account + vérification + activation)
-2. **Emails transactionnels brandés** (bienvenue Pro, trial J-3, paiement échoué, reset mdp en français) — nécessite de configurer un **domaine email** (DNS sur ton domaine `krakken.io`). Si tu veux, on lance ce chantier ensuite.
-3. **Analytics** — choix du provider à faire (Plausible, PostHog, ou table custom)
-4. **Compléter les infos légales** dans les pages CGV/Mentions (nom, adresse, SIREN si tu en as un)
+**Cliquer sur le bouton ci-dessous** pour configurer le domaine `notify.krakken.io`. Le reste roule tout seul après.
 
-Je m'occupe de ce qui est codable maintenant. Une fois fait, on enchaîne sur les emails brandés si tu veux.
+<lov-actions>
+<lov-open-email-setup>Configurer le domaine email</lov-open-email-setup>
+</lov-actions>
 
