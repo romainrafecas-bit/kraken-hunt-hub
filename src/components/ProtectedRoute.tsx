@@ -1,6 +1,7 @@
 import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useSubscription } from "@/hooks/useSubscription";
+import SubscriptionBanner from "@/components/SubscriptionBanner";
 
 const LoadingScreen = () => (
   <div
@@ -27,7 +28,17 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     return <Navigate to="/abonnement" replace />;
   }
 
-  return <>{children}</>;
+  return (
+    <>
+      {/* Floating banner above sidebar layout — positioned via container in pages, but we render inline so pages without sidebar still get it */}
+      <div className="fixed top-0 left-0 right-0 z-40 pl-16 xl:pl-56 px-4 lg:px-6 pt-3 pointer-events-none">
+        <div className="pointer-events-auto">
+          <SubscriptionBanner />
+        </div>
+      </div>
+      {children}
+    </>
+  );
 };
 
 export default ProtectedRoute;
