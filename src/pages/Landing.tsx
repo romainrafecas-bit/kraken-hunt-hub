@@ -10,7 +10,7 @@ import {
 import krakkenLogo from "@/assets/krakken-logo.png";
 import { Tentacle, DeepKraken, Particles, InkClouds } from "@/components/landing/KrakenAnimations";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { supabase } from "@/integrations/supabase/client";
+import Footer from "@/components/Footer";
 
 // Animated counter hook
 const useCountUp = (end: number, duration = 2000, startOnView = true) => {
@@ -109,13 +109,13 @@ const Landing = () => {
           <div className="flex items-center gap-8">
             <a href="#fonctionnalites" className="text-[11px] text-foreground/60 hover:text-primary transition-colors hidden sm:block tracking-widest uppercase">Fonctionnalités</a>
             <a href="#acces" className="text-[11px] text-foreground/60 hover:text-primary transition-colors hidden sm:block tracking-widest uppercase">Accès</a>
-            <a href="#acces" className="px-7 py-3 rounded-full text-xs font-bold tracking-widest uppercase transition-all duration-500 hover:scale-105 hover:shadow-[0_0_40px_-8px_hsl(174_72%_46%_/_0.6)]" style={{
+            <Link to="/auth?mode=signup" className="px-7 py-3 rounded-full text-xs font-bold tracking-widest uppercase transition-all duration-500 hover:scale-105 hover:shadow-[0_0_40px_-8px_hsl(174_72%_46%_/_0.6)]" style={{
               background: 'linear-gradient(135deg, hsl(174 72% 46%), hsl(188 78% 48%))',
               color: 'hsl(230 50% 3%)',
               boxShadow: '0 0 30px -6px hsl(174 72% 46% / 0.5)',
             }}>
-              Rejoins l'équipage
-            </a>
+              Commencer
+            </Link>
           </div>
         </div>
       </nav>
@@ -178,10 +178,10 @@ const Landing = () => {
             transition={{ duration: 0.6, delay: 1 }}
             className="flex flex-col items-center gap-6 w-full"
           >
-            <WaitlistForm variant="large" />
+            <SignupCTA variant="large" />
             <div className="flex items-center gap-3">
               <div className="w-1.5 h-1.5 rounded-full bg-kraken-emerald animate-pulse-glow" />
-              <span className="text-[11px] text-foreground/50 tracking-wide">9,90€/mois · Exclusif membres de la formation</span>
+              <span className="text-[11px] text-foreground/50 tracking-wide">14 jours d'essai gratuit · Puis 9,90€/mois · Sans engagement</span>
             </div>
           </motion.div>
         </motion.div>
@@ -770,8 +770,8 @@ const Landing = () => {
               ))}
             </div>
 
-            <WaitlistForm variant="large" />
-            <p className="text-[10px] text-foreground/40 text-center mt-4 tracking-wide">Sans engagement · Annulation à tout moment</p>
+            <SignupCTA variant="large" label="Démarrer mon essai gratuit" />
+            <p className="text-[10px] text-foreground/40 text-center mt-4 tracking-wide">14 jours offerts · Sans carte requise · Annulation à tout moment</p>
           </motion.div>
         </div>
       </section>
@@ -870,22 +870,11 @@ const Landing = () => {
           <p className="text-sm text-foreground/50 mb-12 max-w-md mx-auto">
             Pendant que tu cherches, d'autres vendent.
           </p>
-          <WaitlistForm variant="large" />
+          <SignupCTA variant="large" />
         </motion.div>
       </section>
 
-      {/* ═══ FOOTER ═══ */}
-      <footer className="py-8 px-6 md:px-8" style={{
-        borderTop: '1px solid hsl(225 20% 5%)',
-        background: 'hsl(230 50% 3%)',
-      }}>
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <img src={krakkenLogo} alt="" className="w-5 h-5 object-contain" style={{ opacity: 0.25, filter: 'drop-shadow(0 0 4px hsl(174 72% 46% / 0.3))' }} />
-            <span className="text-[11px] text-foreground/40">© 2026 Krakken</span>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 };
