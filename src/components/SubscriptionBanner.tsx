@@ -104,10 +104,11 @@ const SubscriptionBanner = () => {
 
   return (
     <div
-      className="rounded-xl px-4 py-3 flex items-center gap-3 mb-4"
+      className="rounded-xl px-4 py-3 flex items-center gap-3 shadow-2xl backdrop-blur-xl"
       style={{
         background: s.bg,
         border: `1px solid ${s.border}`,
+        boxShadow: "0 12px 40px -8px hsl(230 50% 1% / 0.6)",
       }}
       role="alert"
     >
