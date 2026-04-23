@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { externalSupabase as supabase } from "@/integrations/supabase/external-client";
 import type { Product } from "@/data/products";
 
@@ -22,14 +22,12 @@ export interface SupabaseProduct {
 }
 
 function parseDate(dateStr: string): Date | null {
-  // ISO format first (YYYY-MM-DD or full ISO timestamp)
   const iso = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})/);
   if (iso) {
     const result = new Date(Date.UTC(+iso[1], +iso[2] - 1, +iso[3]));
     if (result.getUTCDate() !== +iso[3] || result.getUTCMonth() !== +iso[2] - 1) return null;
     return result;
   }
-  // Fallback: DD/MM/YYYY format
   const dmy = dateStr.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})$/);
   if (dmy) {
     let yearNum = parseInt(dmy[3]);
@@ -41,7 +39,6 @@ function parseDate(dateStr: string): Date | null {
     if (result.getUTCDate() !== dayNum || result.getUTCMonth() !== monthNum - 1) return null;
     return result;
   }
-  // Last resort: native Date
   const d = new Date(dateStr);
   if (!isNaN(d.getTime())) return d;
   return null;
@@ -58,8 +55,8 @@ function formatLastSeen(lastSeen: string | null): string {
 }
 
 export function mapToProduct(p: SupabaseProduct, index: number): Product {
-  const sellers = (p.sellers_count === 0 || p.sellers_count === null) 
-    ? (p.in_stock === false ? 0 : 1) 
+  const sellers = (p.sellers_count === 0 || p.sellers_count === null)
+    ? (p.in_stock === false ? 0 : 1)
     : p.sellers_count;
 
   const rawPrice = Number(p.price);
@@ -83,29 +80,24 @@ export function mapToProduct(p: SupabaseProduct, index: number): Product {
   };
 }
 
+async function fetchAllProducts(): Promise<Product[]> {
+  const { data, error } = await supabase
+    .from("products")
+    .select("*")
+    .order("last_seen", { ascending: false });
+  if (error) throw error;
+  return (data || []).map((p: any, i: number) => mapToProduct(p, i));
+}
+
 export function useProducts() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["products-all"],
+    queryFn: fetchAllProducts,
+  });
 
-  useEffect(() => {
-    const fetch = async () => {
-      setLoading(true);
-      const { data, error: err } = await supabase
-        .from("products")
-        .select("*")
-        .order("last_seen", { ascending: false });
-
-      if (err) {
-        setError(err.message);
-        setProducts([]);
-      } else {
-        setProducts((data || []).map((p: any, i: number) => mapToProduct(p, i)));
-      }
-      setLoading(false);
-    };
-    fetch();
-  }, []);
-
-  return { products, loading, error };
+  return {
+    products: data || [],
+    loading: isLoading,
+    error: error ? (error as Error).message : null,
+  };
 }

@@ -22,7 +22,17 @@ const MentionsLegales = lazy(() => import("./pages/MentionsLegales"));
 const Unsubscribe = lazy(() => import("./pages/Unsubscribe"));
 const FAQ = lazy(() => import("./pages/FAQ"));
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000,
+      gcTime: 30 * 60 * 1000,
+      refetchOnWindowFocus: false,
+      refetchOnMount: false,
+      retry: 1,
+    },
+  },
+});
 
 const PageLoader = () => (
   <div className="min-h-screen flex items-center justify-center" style={{ background: 'hsl(230 50% 3%)' }}>
@@ -41,7 +51,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AuthProvider>
-          <Suspense fallback={<PageLoader />}>
+          <Suspense fallback={null}>
             <Routes>
               <Route path="/" element={<Landing />} />
               <Route path="/auth" element={<Auth />} />
