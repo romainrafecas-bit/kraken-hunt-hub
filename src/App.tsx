@@ -20,6 +20,7 @@ const CGV = lazy(() => import("./pages/CGV"));
 const Confidentialite = lazy(() => import("./pages/Confidentialite"));
 const MentionsLegales = lazy(() => import("./pages/MentionsLegales"));
 const Unsubscribe = lazy(() => import("./pages/Unsubscribe"));
+const FAQ = lazy(() => import("./pages/FAQ"));
 
 const queryClient = new QueryClient();
 
@@ -57,6 +58,7 @@ const App = () => (
               <Route path="/profil" element={<Protected><Profil /></Protected>} />
               <Route path="/favoris" element={<Protected><Favoris /></Protected>} />
               <Route path="/abonnement" element={<Protected><Abonnement /></Protected>} />
+              <Route path="/faq" element={<Protected><FAQ /></Protected>} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </Suspense>
