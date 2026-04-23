@@ -99,23 +99,42 @@ function formatCategoryName(slug: string): string {
 }
 
 const ProductAnalysis = () => {
-  const [selectedCategory, setSelectedCategory] = useState("Tous");
-  const [excludedBrands, setExcludedBrands] = useState<Set<string>>(new Set());
-  const [selectedDatePreset, setSelectedDatePreset] = useState("all");
+  const [selectedCategory, setSelectedCategory] = usePersistedState<string>("selectedCategory", "Tous");
+  const [excludedBrands, setExcludedBrands] = usePersistedState<Set<string>>("excludedBrands", new Set());
+  const [selectedDatePreset, setSelectedDatePreset] = usePersistedState<string>("selectedDatePreset", "all");
   const [brandDropdownOpen, setBrandDropdownOpen] = useState(false);
   const brandDropdownRef = useRef<HTMLDivElement>(null);
-  const [sortKey, setSortKey] = useState<SortKey>("lastSeen");
-  const [stockFilter, setStockFilter] = useState<"all" | "in_stock" | "out_of_stock">("all");
-  const [sortDir, setSortDir] = useState<SortDir>("desc");
-  const [page, setPage] = useState(0);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [sortKey, setSortKey] = usePersistedState<SortKey>("sortKey", "lastSeen");
+  const [stockFilter, setStockFilter] = usePersistedState<"all" | "in_stock" | "out_of_stock">("stockFilter", "all");
+  const [sortDir, setSortDir] = usePersistedState<SortDir>("sortDir", "desc");
+  const [page, setPage] = usePersistedState<number>("page", 0);
+  const [searchQuery, setSearchQuery] = usePersistedState<string>("searchQuery", "");
   const { isFavorite, toggleFavorite: toggleFavoriteUrl } = useFavorites();
-  const [priceMin, setPriceMin] = useState<string>("");
-  const [priceMax, setPriceMax] = useState<string>("");
-  const [sellersMin, setSellersMin] = useState<string>("");
-  const [sellersMax, setSellersMax] = useState<string>("");
-  const [selectedUrls, setSelectedUrls] = useState<Set<string>>(new Set());
+  const [priceMin, setPriceMin] = usePersistedState<string>("priceMin", "");
+  const [priceMax, setPriceMax] = usePersistedState<string>("priceMax", "");
+  const [sellersMin, setSellersMin] = usePersistedState<string>("sellersMin", "");
+  const [sellersMax, setSellersMax] = usePersistedState<string>("sellersMax", "");
+  const [selectedUrls, setSelectedUrls] = usePersistedState<Set<string>>("selectedUrls", new Set());
   const [brandSearch, setBrandSearch] = useState("");
+
+  const resetAllFilters = useCallback(() => {
+    try {
+      FILTER_KEYS.forEach(k => localStorage.removeItem(STORAGE_PREFIX + k));
+    } catch { /* ignore */ }
+    setSelectedCategory("Tous");
+    setExcludedBrands(new Set());
+    setSelectedDatePreset("all");
+    setSortKey("lastSeen");
+    setStockFilter("all");
+    setSortDir("desc");
+    setPage(0);
+    setSearchQuery("");
+    setPriceMin("");
+    setPriceMax("");
+    setSellersMin("");
+    setSellersMax("");
+    setSelectedUrls(new Set());
+  }, [setSelectedCategory, setExcludedBrands, setSelectedDatePreset, setSortKey, setStockFilter, setSortDir, setPage, setSearchQuery, setPriceMin, setPriceMax, setSellersMin, setSellersMax, setSelectedUrls]);
 
   // Fetch categories list for dropdown
   const [dynamicCategories, setDynamicCategories] = useState<string[]>(["Tous"]);
