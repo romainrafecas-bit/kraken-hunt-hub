@@ -1,38 +1,38 @@
 
 
-## Forcer l'expiration du compte `2r.retailing@gmail.com`
+## Persister les filtres de la page Produits
 
-Le compte est actuellement en `trialing` jusqu'au **05/05/2026**. Pour simuler un essai expiré et déclencher l'écran "Ton essai est terminé" + redirection forcée vers `/abonnement`, je vais reculer la date de fin d'essai dans le passé.
+**Problème** : tous les filtres (catégorie, marques exclues, recherche, dates, prix, vendeurs, tri, page, sélection) sont en `useState` local dans `ProductAnalysis.tsx`. Dès que l'onglet est rechargé ou le composant remonté (changement d'onglet navigateur → retour → React peut re-render à neuf), tout est réinitialisé.
 
-### Changement DB (1 migration)
+**Solution** : sauvegarder automatiquement chaque filtre dans `localStorage` et le restaurer à l'initialisation du composant.
 
-Update sur la table `subscriptions` pour cet utilisateur :
+### Changements
 
-```sql
-UPDATE public.subscriptions
-SET 
-  trial_ends_at = now() - interval '1 day',
-  status = 'trialing'  -- on garde trialing, mais expiré
-WHERE user_id = '1638f05a-775e-47c4-af12-0dfdb82272e7';
-```
+**1 seul fichier modifié** : `src/components/dashboard/ProductAnalysis.tsx`
 
-### Ce qui va se passer côté UI
+- Créer un petit helper `usePersistedState(key, defaultValue)` qui :
+  - lit `localStorage` au mount pour initialiser le state
+  - écrit dans `localStorage` à chaque changement
+  - supporte `Set` (sérialisation en array) pour `excludedBrands` et `selectedUrls`
+- Remplacer chacun de ces `useState` par `usePersistedState` avec une clé préfixée `krakken:produits:` :
+  - `selectedCategory`, `excludedBrands`, `selectedDatePreset`
+  - `sortKey`, `sortDir`, `stockFilter`, `page`
+  - `searchQuery`, `priceMin`, `priceMax`, `sellersMin`, `sellersMax`
+  - `selectedUrls` (la sélection de produits cochés pour export)
 
-La fonction `has_active_access` (et le hook `useSubscription`) va retourner `hasAccess = false` car :
-- `status = 'trialing'` ET `trial_ends_at < now()` → pas d'accès
+### Pourquoi `localStorage` et pas `sessionStorage`
 
-Résultat à la prochaine reload :
-- `ProtectedRoute` redirige automatiquement vers `/abonnement`
-- La page affiche le bandeau rouge **"Accès suspendu — Ton essai gratuit de 14 jours est arrivé à expiration"**
-- Le bouton retour vers `/profil` est masqué (puisque `hasAccess = false`)
-- Seule la carte d'activation Pro reste visible avec CTA "Activer mon abonnement"
+- `sessionStorage` est perdu si l'utilisateur ferme l'onglet (cas réel : ferme accidentellement, rouvre).
+- `localStorage` survit entre sessions → l'utilisateur retrouve sa traque même le lendemain. C'est ce qu'on veut pour un workflow de sourcing long.
 
-### Pour revenir en arrière plus tard
+### Bouton "Réinitialiser les filtres" (bonus)
 
-Il suffira de me dire "remets l'essai de 2r.retailing à 14 jours" et je relance un UPDATE inverse.
+Petit bouton discret à côté de la barre de filtres pour tout reset d'un clic (utile car les filtres deviennent persistants et il faut un échappatoire).
 
 ### Détails techniques
-- **Fichier modifié** : aucun (uniquement DB)
-- **Migration créée** : 1 (UPDATE conditionnel sur `user_id`)
-- **Aucun impact** sur les autres comptes ni sur la logique applicative
+
+- Aucune modif backend, aucune migration.
+- Aucun impact sur les autres pages (Favoris, Calculateur, etc.) — le hook reste local au fichier.
+- Clés `localStorage` namespacées `krakken:produits:*` pour éviter les collisions.
+- `try/catch` autour des reads/writes localStorage (au cas où mode privé / quota plein).
 
