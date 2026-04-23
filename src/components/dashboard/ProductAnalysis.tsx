@@ -1,4 +1,47 @@
-import { useState, useMemo, useEffect, useRef } from "react";
+import { useState, useMemo, useEffect, useRef, useCallback } from "react";
+
+// ─── Persisted state helper ─────────────────────────────────────────────
+// Stores filter values in localStorage so they survive tab switches & reloads.
+// Supports Set via {__set:true, values:[...]} sentinel.
+const STORAGE_PREFIX = "krakken:produits:";
+
+function readStorage<T>(key: string, fallback: T): T {
+  try {
+    const raw = localStorage.getItem(STORAGE_PREFIX + key);
+    if (raw == null) return fallback;
+    const parsed = JSON.parse(raw);
+    if (parsed && typeof parsed === "object" && parsed.__set === true && Array.isArray(parsed.values)) {
+      return new Set(parsed.values) as unknown as T;
+    }
+    return parsed as T;
+  } catch {
+    return fallback;
+  }
+}
+
+function writeStorage<T>(key: string, value: T) {
+  try {
+    const serialized = value instanceof Set
+      ? JSON.stringify({ __set: true, values: [...value] })
+      : JSON.stringify(value);
+    localStorage.setItem(STORAGE_PREFIX + key, serialized);
+  } catch {
+    /* quota / private mode — ignore */
+  }
+}
+
+function usePersistedState<T>(key: string, defaultValue: T) {
+  const [state, setState] = useState<T>(() => readStorage(key, defaultValue));
+  useEffect(() => { writeStorage(key, state); }, [key, state]);
+  return [state, setState] as const;
+}
+
+const FILTER_KEYS = [
+  "selectedCategory", "excludedBrands", "selectedDatePreset",
+  "sortKey", "sortDir", "stockFilter", "page",
+  "searchQuery", "priceMin", "priceMax", "sellersMin", "sellersMax",
+  "selectedUrls",
+];
 import { motion } from "framer-motion";
 import { ArrowUpDown, ArrowUp, ArrowDown, ChevronLeft, ChevronRight, Search, Users, CalendarDays, Crosshair, Clock, Heart, X, Filter, Euro, Camera, Download } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -56,23 +99,42 @@ function formatCategoryName(slug: string): string {
 }
 
 const ProductAnalysis = () => {
-  const [selectedCategory, setSelectedCategory] = useState("Tous");
-  const [excludedBrands, setExcludedBrands] = useState<Set<string>>(new Set());
-  const [selectedDatePreset, setSelectedDatePreset] = useState("all");
+  const [selectedCategory, setSelectedCategory] = usePersistedState<string>("selectedCategory", "Tous");
+  const [excludedBrands, setExcludedBrands] = usePersistedState<Set<string>>("excludedBrands", new Set());
+  const [selectedDatePreset, setSelectedDatePreset] = usePersistedState<string>("selectedDatePreset", "all");
   const [brandDropdownOpen, setBrandDropdownOpen] = useState(false);
   const brandDropdownRef = useRef<HTMLDivElement>(null);
-  const [sortKey, setSortKey] = useState<SortKey>("lastSeen");
-  const [stockFilter, setStockFilter] = useState<"all" | "in_stock" | "out_of_stock">("all");
-  const [sortDir, setSortDir] = useState<SortDir>("desc");
-  const [page, setPage] = useState(0);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [sortKey, setSortKey] = usePersistedState<SortKey>("sortKey", "lastSeen");
+  const [stockFilter, setStockFilter] = usePersistedState<"all" | "in_stock" | "out_of_stock">("stockFilter", "all");
+  const [sortDir, setSortDir] = usePersistedState<SortDir>("sortDir", "desc");
+  const [page, setPage] = usePersistedState<number>("page", 0);
+  const [searchQuery, setSearchQuery] = usePersistedState<string>("searchQuery", "");
   const { isFavorite, toggleFavorite: toggleFavoriteUrl } = useFavorites();
-  const [priceMin, setPriceMin] = useState<string>("");
-  const [priceMax, setPriceMax] = useState<string>("");
-  const [sellersMin, setSellersMin] = useState<string>("");
-  const [sellersMax, setSellersMax] = useState<string>("");
-  const [selectedUrls, setSelectedUrls] = useState<Set<string>>(new Set());
+  const [priceMin, setPriceMin] = usePersistedState<string>("priceMin", "");
+  const [priceMax, setPriceMax] = usePersistedState<string>("priceMax", "");
+  const [sellersMin, setSellersMin] = usePersistedState<string>("sellersMin", "");
+  const [sellersMax, setSellersMax] = usePersistedState<string>("sellersMax", "");
+  const [selectedUrls, setSelectedUrls] = usePersistedState<Set<string>>("selectedUrls", new Set());
   const [brandSearch, setBrandSearch] = useState("");
+
+  const resetAllFilters = useCallback(() => {
+    try {
+      FILTER_KEYS.forEach(k => localStorage.removeItem(STORAGE_PREFIX + k));
+    } catch { /* ignore */ }
+    setSelectedCategory("Tous");
+    setExcludedBrands(new Set());
+    setSelectedDatePreset("all");
+    setSortKey("lastSeen");
+    setStockFilter("all");
+    setSortDir("desc");
+    setPage(0);
+    setSearchQuery("");
+    setPriceMin("");
+    setPriceMax("");
+    setSellersMin("");
+    setSellersMax("");
+    setSelectedUrls(new Set());
+  }, [setSelectedCategory, setExcludedBrands, setSelectedDatePreset, setSortKey, setStockFilter, setSortDir, setPage, setSearchQuery, setPriceMin, setPriceMax, setSellersMin, setSellersMax, setSelectedUrls]);
 
   // Fetch categories list for dropdown
   const [dynamicCategories, setDynamicCategories] = useState<string[]>(["Tous"]);
@@ -448,11 +510,21 @@ const ProductAnalysis = () => {
           )}
 
           {/* Search */}
-          <div className="relative ml-auto">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
-            <input type="text" placeholder="Traquer un produit..." value={searchQuery}
-              onChange={e => { setSearchQuery(e.target.value); setPage(0); }}
-              className="bg-secondary/60 border border-border/40 rounded-xl pl-9 pr-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 w-full lg:w-56 transition-all" />
+          <div className="relative ml-auto flex items-center gap-2">
+            <button
+              onClick={resetAllFilters}
+              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-secondary/40 border border-border/30 text-xs text-muted-foreground hover:text-foreground hover:bg-secondary/70 transition-all"
+              title="Réinitialiser tous les filtres"
+            >
+              <X className="w-3.5 h-3.5" />
+              Réinitialiser
+            </button>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+              <input type="text" placeholder="Traquer un produit..." value={searchQuery}
+                onChange={e => { setSearchQuery(e.target.value); setPage(0); }}
+                className="bg-secondary/60 border border-border/40 rounded-xl pl-9 pr-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 w-full lg:w-56 transition-all" />
+            </div>
           </div>
         </div>
       </div>
