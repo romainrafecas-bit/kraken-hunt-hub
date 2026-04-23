@@ -525,6 +525,7 @@ const ProductAnalysis = () => {
                 onChange={e => { setSearchQuery(e.target.value); setPage(0); }}
                 className="bg-secondary/60 border border-border/40 rounded-xl pl-9 pr-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 w-full lg:w-56 transition-all" />
             </div>
+          </div>
         </div>
       </div>
 
