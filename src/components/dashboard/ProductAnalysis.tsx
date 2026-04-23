@@ -1,4 +1,47 @@
-import { useState, useMemo, useEffect, useRef } from "react";
+import { useState, useMemo, useEffect, useRef, useCallback } from "react";
+
+// ─── Persisted state helper ─────────────────────────────────────────────
+// Stores filter values in localStorage so they survive tab switches & reloads.
+// Supports Set via {__set:true, values:[...]} sentinel.
+const STORAGE_PREFIX = "krakken:produits:";
+
+function readStorage<T>(key: string, fallback: T): T {
+  try {
+    const raw = localStorage.getItem(STORAGE_PREFIX + key);
+    if (raw == null) return fallback;
+    const parsed = JSON.parse(raw);
+    if (parsed && typeof parsed === "object" && parsed.__set === true && Array.isArray(parsed.values)) {
+      return new Set(parsed.values) as unknown as T;
+    }
+    return parsed as T;
+  } catch {
+    return fallback;
+  }
+}
+
+function writeStorage<T>(key: string, value: T) {
+  try {
+    const serialized = value instanceof Set
+      ? JSON.stringify({ __set: true, values: [...value] })
+      : JSON.stringify(value);
+    localStorage.setItem(STORAGE_PREFIX + key, serialized);
+  } catch {
+    /* quota / private mode — ignore */
+  }
+}
+
+function usePersistedState<T>(key: string, defaultValue: T) {
+  const [state, setState] = useState<T>(() => readStorage(key, defaultValue));
+  useEffect(() => { writeStorage(key, state); }, [key, state]);
+  return [state, setState] as const;
+}
+
+const FILTER_KEYS = [
+  "selectedCategory", "excludedBrands", "selectedDatePreset",
+  "sortKey", "sortDir", "stockFilter", "page",
+  "searchQuery", "priceMin", "priceMax", "sellersMin", "sellersMax",
+  "selectedUrls",
+];
 import { motion } from "framer-motion";
 import { ArrowUpDown, ArrowUp, ArrowDown, ChevronLeft, ChevronRight, Search, Users, CalendarDays, Crosshair, Clock, Heart, X, Filter, Euro, Camera, Download } from "lucide-react";
 import { cn } from "@/lib/utils";
