@@ -510,12 +510,21 @@ const ProductAnalysis = () => {
           )}
 
           {/* Search */}
-          <div className="relative ml-auto">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
-            <input type="text" placeholder="Traquer un produit..." value={searchQuery}
-              onChange={e => { setSearchQuery(e.target.value); setPage(0); }}
-              className="bg-secondary/60 border border-border/40 rounded-xl pl-9 pr-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 w-full lg:w-56 transition-all" />
-          </div>
+          <div className="relative ml-auto flex items-center gap-2">
+            <button
+              onClick={resetAllFilters}
+              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-secondary/40 border border-border/30 text-xs text-muted-foreground hover:text-foreground hover:bg-secondary/70 transition-all"
+              title="Réinitialiser tous les filtres"
+            >
+              <X className="w-3.5 h-3.5" />
+              Réinitialiser
+            </button>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+              <input type="text" placeholder="Traquer un produit..." value={searchQuery}
+                onChange={e => { setSearchQuery(e.target.value); setPage(0); }}
+                className="bg-secondary/60 border border-border/40 rounded-xl pl-9 pr-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 w-full lg:w-56 transition-all" />
+            </div>
         </div>
       </div>
 
