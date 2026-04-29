@@ -249,7 +249,7 @@ const ProductAnalysis = () => {
       const chunk = urls.slice(i, i + chunkSize);
       const { data } = await supabase
         .from("products")
-        .select("title,brand,category,price,rating,review_count,sellers_count,in_stock,recurrences,last_seen,added_date,url,image_url")
+        .select("title,brand,category,price,sellers_count,in_stock,recurrences,last_seen,added_date,url,image_url")
         .in("url", chunk);
       if (data) rows.push(...data);
     }
@@ -259,8 +259,6 @@ const ProductAnalysis = () => {
       "Catégorie": formatCategoryName(p.category || ""),
       "Prix (€)": p.price === -1 ? "Rupture" : (p.price ?? ""),
       "En stock": p.in_stock === false ? "Non" : "Oui",
-      "Note": p.rating ?? "",
-      "Avis": p.review_count ?? "",
       "Vendeurs": p.sellers_count ?? "",
       "Récurrences": p.recurrences ?? "",
       "Dernier vu": p.last_seen ? new Date(p.last_seen).toLocaleDateString("fr-FR") : "",
@@ -272,8 +270,8 @@ const ProductAnalysis = () => {
     const ws = XLSX.utils.json_to_sheet(exportRows);
     ws["!cols"] = [
       { wch: 50 }, { wch: 18 }, { wch: 18 }, { wch: 12 }, { wch: 10 },
-      { wch: 8 }, { wch: 10 }, { wch: 10 }, { wch: 12 }, { wch: 14 },
-      { wch: 14 }, { wch: 60 }, { wch: 60 }, { wch: 60 },
+      { wch: 10 }, { wch: 12 }, { wch: 14 }, { wch: 14 },
+      { wch: 60 }, { wch: 60 }, { wch: 60 },
     ];
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Produits Kraken");
