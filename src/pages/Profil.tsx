@@ -246,8 +246,10 @@ const Profil = () => {
                     </div>
                   );
                 })}
-              </div>
-            </motion.div>
+          </div>
+
+          {OWNER_EMAILS.includes((email ?? "").toLowerCase()) && <AdminSubscriptions />}
+        </motion.div>
           </div>
         </motion.div>
       </main>
