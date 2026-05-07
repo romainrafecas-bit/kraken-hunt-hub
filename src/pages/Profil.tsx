@@ -7,6 +7,9 @@ import { useProfile } from "@/hooks/useProfile";
 import { useFavorites, COLLECTIONS } from "@/hooks/useFavorites";
 import { useNavigate } from "react-router-dom";
 import { useState, useRef, useMemo } from "react";
+import AdminSubscriptions from "@/components/admin/AdminSubscriptions";
+
+const OWNER_EMAILS = ["romain.rafecas@gmail.com", "bouska1@outlook.fr"];
 
 const Profil = () => {
   const navigate = useNavigate();
