@@ -43,10 +43,11 @@ const FILTER_KEYS = [
   "selectedUrls",
 ];
 import { motion } from "framer-motion";
-import { ArrowUpDown, ArrowUp, ArrowDown, ChevronLeft, ChevronRight, Search, Users, CalendarDays, Crosshair, Clock, Heart, X, Filter, Euro, Camera, Download } from "lucide-react";
+import { ArrowUpDown, ArrowUp, ArrowDown, ChevronLeft, ChevronRight, Search, Users, CalendarDays, Crosshair, Clock, Heart, X, Filter, Euro, Camera, Download, Loader2, AlertCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Product } from "@/data/products";
 import { useProductsPaginated } from "@/hooks/useProductsPaginated";
+import { useProductsMeta } from "@/hooks/useProductsMeta";
 import { externalSupabase as supabase } from "@/integrations/supabase/external-client";
 import * as XLSX from "xlsx";
 import ProductSkeleton from "./ProductSkeleton";
