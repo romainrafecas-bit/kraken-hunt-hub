@@ -219,6 +219,38 @@ const ProductAnalysis = () => {
     });
   };
 
+  const selectAllMatching = async () => {
+    if (selectingAll) return;
+    if (totalCount > SELECT_ALL_CAP) {
+      toast.error(`Sélection limitée à ${SELECT_ALL_CAP} produits. Affinez vos filtres.`);
+      return;
+    }
+    setSelectingAll(true);
+    try {
+      const urls = await fetchAllMatchingUrls({
+        category: selectedCategory,
+        excludedBrands,
+        searchQuery,
+        stockFilter,
+        datePreset: selectedDatePreset,
+        priceMin: priceMin === "" ? null : Number(priceMin),
+        priceMax: priceMax === "" ? null : Number(priceMax),
+        sellersMin: sellersMin === "" ? null : Number(sellersMin),
+        sellersMax: sellersMax === "" ? null : Number(sellersMax),
+      });
+      setSelectedUrls(prev => {
+        const next = new Set(prev);
+        urls.forEach(u => next.add(u));
+        return next;
+      });
+      toast.success(`${urls.length} produit${urls.length > 1 ? "s" : ""} sélectionné${urls.length > 1 ? "s" : ""}`);
+    } catch (e: any) {
+      toast.error("Erreur lors de la sélection globale");
+    } finally {
+      setSelectingAll(false);
+    }
+  };
+
   const googleLensUrl = (imageUrl: string) =>
     `https://lens.google.com/uploadbyurl?url=${encodeURIComponent(imageUrl)}`;
 
