@@ -118,6 +118,7 @@ const ProductAnalysis = () => {
   const [sellersMin, setSellersMin] = usePersistedState<string>("sellersMin", "");
   const [sellersMax, setSellersMax] = usePersistedState<string>("sellersMax", "");
   const [selectedUrls, setSelectedUrls] = usePersistedState<Set<string>>("selectedUrls", new Set());
+  const [selectingAll, setSelectingAll] = useState(false);
   const [brandSearch, setBrandSearch] = useState("");
 
   const resetAllFilters = useCallback(() => {
