@@ -306,20 +306,48 @@ const ProductAnalysis = () => {
         {/* Filters row */}
         <div className="mt-4 flex flex-wrap items-center gap-3">
           {/* Category dropdown */}
-          <div className="relative">
+          <div className="relative flex items-center gap-2">
             <select
               value={selectedCategory}
               onChange={e => { setSelectedCategory(e.target.value); setPage(0); }}
-              className="bg-secondary/60 border border-border/40 rounded-xl px-3 py-2 text-sm text-foreground focus:outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all appearance-none cursor-pointer pr-8 min-w-[160px]"
+              disabled={metaLoading}
+              aria-busy={metaLoading}
+              className={cn(
+                "bg-secondary/60 border border-border/40 rounded-xl px-3 py-2 text-sm text-foreground focus:outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all appearance-none pr-8 min-w-[200px]",
+                metaLoading ? "cursor-wait opacity-70 text-muted-foreground italic" : "cursor-pointer"
+              )}
               style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%234dd4ac' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 10px center' }}
             >
-              {dynamicCategories.map(cat => (
-                <option key={cat} value={cat} className="bg-card text-foreground">
-                  {formatCategoryName(cat)}
-                </option>
-              ))}
+              {metaLoading ? (
+                <option value="Tous" className="bg-card text-foreground">Chargement des catégories…</option>
+              ) : (
+                dynamicCategories.map(cat => (
+                  <option key={cat} value={cat} className="bg-card text-foreground">
+                    {formatCategoryName(cat)}
+                  </option>
+                ))
+              )}
             </select>
+            {metaLoading && (
+              <Loader2 className="w-3.5 h-3.5 animate-spin text-primary flex-shrink-0" aria-hidden="true" />
+            )}
+            {metaError && !metaLoading && (
+              <button
+                onClick={() => refetchMeta()}
+                className="inline-flex items-center gap-1 text-xs text-red-400 hover:text-red-300 transition-colors"
+                title="Erreur de chargement — cliquez pour réessayer"
+              >
+                <AlertCircle className="w-3.5 h-3.5" />
+                Réessayer
+              </button>
+            )}
+            {!metaLoading && !metaError && dynamicCategories.length > 1 && (
+              <span className="text-[10px] uppercase tracking-wider text-muted-foreground/70 font-medium whitespace-nowrap">
+                {dynamicCategories.length - 1} cat.
+              </span>
+            )}
           </div>
+
 
           {/* Date preset dropdown */}
           <div className="relative flex items-center gap-2">
