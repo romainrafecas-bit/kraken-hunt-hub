@@ -137,35 +137,14 @@ const ProductAnalysis = () => {
     setSelectedUrls(new Set());
   }, [setSelectedCategory, setExcludedBrands, setSelectedDatePreset, setSortKey, setStockFilter, setSortDir, setPage, setSearchQuery, setPriceMin, setPriceMax, setSellersMin, setSellersMax, setSelectedUrls]);
 
-  // Fetch categories list for dropdown
-  const [dynamicCategories, setDynamicCategories] = useState<string[]>(["Tous"]);
-  const [dynamicBrands, setDynamicBrands] = useState<string[]>(["Toutes"]);
-
-  useEffect(() => {
-    // Fetch distinct categories and brands (lightweight)
-    const fetchMeta = async () => {
-      const PAGE = 1000;
-      const cats = new Set<string>();
-      const brands = new Set<string>();
-      let from = 0;
-      while (true) {
-        const { data } = await supabase
-          .from("products")
-          .select("category, brand")
-          .range(from, from + PAGE - 1);
-        if (!data || data.length === 0) break;
-        data.forEach((r: any) => {
-          if (r.category) cats.add(r.category);
-          if (r.brand) brands.add(r.brand);
-        });
-        if (data.length < PAGE) break;
-        from += PAGE;
-      }
-      setDynamicCategories(["Tous", ...[...cats].sort()]);
-      setDynamicBrands(["Toutes", ...[...brands].sort()]);
-    };
-    fetchMeta();
-  }, []);
+  // Cached meta (categories + brands) — shared via React Query so it survives navigation
+  const {
+    categories: dynamicCategories,
+    brands: dynamicBrands,
+    isLoading: metaLoading,
+    error: metaError,
+    refetch: refetchMeta,
+  } = useProductsMeta();
 
   const filters = useMemo(() => ({
     category: selectedCategory,
