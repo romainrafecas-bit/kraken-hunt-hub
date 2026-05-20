@@ -43,10 +43,11 @@ const FILTER_KEYS = [
   "selectedUrls",
 ];
 import { motion } from "framer-motion";
-import { ArrowUpDown, ArrowUp, ArrowDown, ChevronLeft, ChevronRight, Search, Users, CalendarDays, Crosshair, Clock, Heart, X, Filter, Euro, Camera, Download } from "lucide-react";
+import { ArrowUpDown, ArrowUp, ArrowDown, ChevronLeft, ChevronRight, Search, Users, CalendarDays, Crosshair, Clock, Heart, X, Filter, Euro, Camera, Download, Loader2, AlertCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Product } from "@/data/products";
 import { useProductsPaginated } from "@/hooks/useProductsPaginated";
+import { useProductsMeta } from "@/hooks/useProductsMeta";
 import { externalSupabase as supabase } from "@/integrations/supabase/external-client";
 import * as XLSX from "xlsx";
 import ProductSkeleton from "./ProductSkeleton";
@@ -136,35 +137,14 @@ const ProductAnalysis = () => {
     setSelectedUrls(new Set());
   }, [setSelectedCategory, setExcludedBrands, setSelectedDatePreset, setSortKey, setStockFilter, setSortDir, setPage, setSearchQuery, setPriceMin, setPriceMax, setSellersMin, setSellersMax, setSelectedUrls]);
 
-  // Fetch categories list for dropdown
-  const [dynamicCategories, setDynamicCategories] = useState<string[]>(["Tous"]);
-  const [dynamicBrands, setDynamicBrands] = useState<string[]>(["Toutes"]);
-
-  useEffect(() => {
-    // Fetch distinct categories and brands (lightweight)
-    const fetchMeta = async () => {
-      const PAGE = 1000;
-      const cats = new Set<string>();
-      const brands = new Set<string>();
-      let from = 0;
-      while (true) {
-        const { data } = await supabase
-          .from("products")
-          .select("category, brand")
-          .range(from, from + PAGE - 1);
-        if (!data || data.length === 0) break;
-        data.forEach((r: any) => {
-          if (r.category) cats.add(r.category);
-          if (r.brand) brands.add(r.brand);
-        });
-        if (data.length < PAGE) break;
-        from += PAGE;
-      }
-      setDynamicCategories(["Tous", ...[...cats].sort()]);
-      setDynamicBrands(["Toutes", ...[...brands].sort()]);
-    };
-    fetchMeta();
-  }, []);
+  // Cached meta (categories + brands) — shared via React Query so it survives navigation
+  const {
+    categories: dynamicCategories,
+    brands: dynamicBrands,
+    isLoading: metaLoading,
+    error: metaError,
+    refetch: refetchMeta,
+  } = useProductsMeta();
 
   const filters = useMemo(() => ({
     category: selectedCategory,
@@ -326,20 +306,48 @@ const ProductAnalysis = () => {
         {/* Filters row */}
         <div className="mt-4 flex flex-wrap items-center gap-3">
           {/* Category dropdown */}
-          <div className="relative">
+          <div className="relative flex items-center gap-2">
             <select
               value={selectedCategory}
               onChange={e => { setSelectedCategory(e.target.value); setPage(0); }}
-              className="bg-secondary/60 border border-border/40 rounded-xl px-3 py-2 text-sm text-foreground focus:outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all appearance-none cursor-pointer pr-8 min-w-[160px]"
+              disabled={metaLoading}
+              aria-busy={metaLoading}
+              className={cn(
+                "bg-secondary/60 border border-border/40 rounded-xl px-3 py-2 text-sm text-foreground focus:outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all appearance-none pr-8 min-w-[200px]",
+                metaLoading ? "cursor-wait opacity-70 text-muted-foreground italic" : "cursor-pointer"
+              )}
               style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%234dd4ac' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 10px center' }}
             >
-              {dynamicCategories.map(cat => (
-                <option key={cat} value={cat} className="bg-card text-foreground">
-                  {formatCategoryName(cat)}
-                </option>
-              ))}
+              {metaLoading ? (
+                <option value="Tous" className="bg-card text-foreground">Chargement des catégories…</option>
+              ) : (
+                dynamicCategories.map(cat => (
+                  <option key={cat} value={cat} className="bg-card text-foreground">
+                    {formatCategoryName(cat)}
+                  </option>
+                ))
+              )}
             </select>
+            {metaLoading && (
+              <Loader2 className="w-3.5 h-3.5 animate-spin text-primary flex-shrink-0" aria-hidden="true" />
+            )}
+            {metaError && !metaLoading && (
+              <button
+                onClick={() => refetchMeta()}
+                className="inline-flex items-center gap-1 text-xs text-red-400 hover:text-red-300 transition-colors"
+                title="Erreur de chargement — cliquez pour réessayer"
+              >
+                <AlertCircle className="w-3.5 h-3.5" />
+                Réessayer
+              </button>
+            )}
+            {!metaLoading && !metaError && dynamicCategories.length > 1 && (
+              <span className="text-[10px] uppercase tracking-wider text-muted-foreground/70 font-medium whitespace-nowrap">
+                {dynamicCategories.length - 1} cat.
+              </span>
+            )}
           </div>
+
 
           {/* Date preset dropdown */}
           <div className="relative flex items-center gap-2">
@@ -433,13 +441,26 @@ const ProductAnalysis = () => {
           {/* Exclude brands dropdown */}
           <div className="relative" ref={brandDropdownRef}>
             <button
-              onClick={() => setBrandDropdownOpen(prev => !prev)}
-              className="bg-secondary/60 border border-border/40 rounded-xl px-3 py-2 text-sm text-foreground focus:outline-none focus:border-primary/40 transition-all cursor-pointer pr-8 min-w-[180px] text-left flex items-center gap-2"
+              onClick={() => !metaLoading && setBrandDropdownOpen(prev => !prev)}
+              disabled={metaLoading}
+              aria-busy={metaLoading}
+              className={cn(
+                "bg-secondary/60 border border-border/40 rounded-xl px-3 py-2 text-sm text-foreground focus:outline-none focus:border-primary/40 transition-all pr-8 min-w-[200px] text-left flex items-center gap-2",
+                metaLoading ? "cursor-wait opacity-70" : "cursor-pointer"
+              )}
               style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%234dd4ac' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 10px center' }}
             >
-              <Filter className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
-              <span className="truncate">
-                {excludedBrands.size === 0 ? "Exclure des marques" : `${excludedBrands.size} marque${excludedBrands.size > 1 ? 's' : ''} exclue${excludedBrands.size > 1 ? 's' : ''}`}
+              {metaLoading ? (
+                <Loader2 className="w-3.5 h-3.5 animate-spin text-primary flex-shrink-0" />
+              ) : (
+                <Filter className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
+              )}
+              <span className={cn("truncate", metaLoading && "text-muted-foreground italic")}>
+                {metaLoading
+                  ? "Chargement des marques…"
+                  : excludedBrands.size === 0
+                    ? "Exclure des marques"
+                    : `${excludedBrands.size} marque${excludedBrands.size > 1 ? 's' : ''} exclue${excludedBrands.size > 1 ? 's' : ''}`}
               </span>
             </button>
             {brandDropdownOpen && (
