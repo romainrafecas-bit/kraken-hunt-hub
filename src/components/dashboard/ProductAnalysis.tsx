@@ -48,6 +48,8 @@ import { cn } from "@/lib/utils";
 import { Product } from "@/data/products";
 import { useProductsPaginated } from "@/hooks/useProductsPaginated";
 import { useProductsMeta } from "@/hooks/useProductsMeta";
+import { fetchAllMatchingUrls, SELECT_ALL_CAP } from "@/hooks/productsQuery";
+import { toast } from "sonner";
 import { externalSupabase as supabase } from "@/integrations/supabase/external-client";
 import * as XLSX from "xlsx";
 import ProductSkeleton from "./ProductSkeleton";
@@ -116,6 +118,7 @@ const ProductAnalysis = () => {
   const [sellersMin, setSellersMin] = usePersistedState<string>("sellersMin", "");
   const [sellersMax, setSellersMax] = usePersistedState<string>("sellersMax", "");
   const [selectedUrls, setSelectedUrls] = usePersistedState<Set<string>>("selectedUrls", new Set());
+  const [selectingAll, setSelectingAll] = useState(false);
   const [brandSearch, setBrandSearch] = useState("");
 
   const resetAllFilters = useCallback(() => {
@@ -214,6 +217,38 @@ const ProductAnalysis = () => {
       }
       return next;
     });
+  };
+
+  const selectAllMatching = async () => {
+    if (selectingAll) return;
+    if (totalCount > SELECT_ALL_CAP) {
+      toast.error(`Sélection limitée à ${SELECT_ALL_CAP} produits. Affinez vos filtres.`);
+      return;
+    }
+    setSelectingAll(true);
+    try {
+      const urls = await fetchAllMatchingUrls({
+        category: selectedCategory,
+        excludedBrands,
+        searchQuery,
+        stockFilter,
+        datePreset: selectedDatePreset,
+        priceMin: priceMin === "" ? null : Number(priceMin),
+        priceMax: priceMax === "" ? null : Number(priceMax),
+        sellersMin: sellersMin === "" ? null : Number(sellersMin),
+        sellersMax: sellersMax === "" ? null : Number(sellersMax),
+      });
+      setSelectedUrls(prev => {
+        const next = new Set(prev);
+        urls.forEach(u => next.add(u));
+        return next;
+      });
+      toast.success(`${urls.length} produit${urls.length > 1 ? "s" : ""} sélectionné${urls.length > 1 ? "s" : ""}`);
+    } catch (e: any) {
+      toast.error("Erreur lors de la sélection globale");
+    } finally {
+      setSelectingAll(false);
+    }
   };
 
   const googleLensUrl = (imageUrl: string) =>
@@ -550,28 +585,54 @@ const ProductAnalysis = () => {
 
       {/* Selection toolbar */}
       {selectedUrls.size > 0 && (
-        <div className="px-5 py-2.5 border-b border-border/30 bg-primary/[0.04] flex items-center justify-between flex-wrap gap-2">
-          <span className="text-xs text-foreground">
-            <span className="font-bold text-primary">{selectedUrls.size}</span> produit{selectedUrls.size > 1 ? 's' : ''} sélectionné{selectedUrls.size > 1 ? 's' : ''}
-          </span>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={exportSelectedToExcel}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary/15 border border-primary/30 text-primary hover:bg-primary/25 transition-all text-xs font-bold"
-            >
-              <Download className="w-3.5 h-3.5" />
-              Exporter en Excel
-            </button>
-            <button
-              onClick={clearSelection}
-              className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-secondary/40 border border-border/30 text-muted-foreground hover:text-foreground transition-all text-xs"
-            >
-              <X className="w-3.5 h-3.5" />
-              Effacer
-            </button>
+        <div className="border-b border-border/30 bg-primary/[0.04]">
+          <div className="px-5 py-2.5 flex items-center justify-between flex-wrap gap-2">
+            <span className="text-xs text-foreground">
+              <span className="font-bold text-primary">{selectedUrls.size}</span> produit{selectedUrls.size > 1 ? 's' : ''} sélectionné{selectedUrls.size > 1 ? 's' : ''}
+            </span>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={exportSelectedToExcel}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary/15 border border-primary/30 text-primary hover:bg-primary/25 transition-all text-xs font-bold"
+              >
+                <Download className="w-3.5 h-3.5" />
+                Exporter en Excel
+              </button>
+              <button
+                onClick={clearSelection}
+                className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-secondary/40 border border-border/30 text-muted-foreground hover:text-foreground transition-all text-xs"
+              >
+                <X className="w-3.5 h-3.5" />
+                Effacer
+              </button>
+            </div>
           </div>
+          {allPageSelected && totalCount > paged.length && selectedUrls.size < totalCount && (
+            <div className="px-5 py-2 border-t border-border/20 bg-primary/[0.06] flex items-center justify-center gap-2 text-xs text-muted-foreground flex-wrap">
+              <span>
+                Les <span className="font-semibold text-foreground">{paged.length}</span> produits de cette page sont sélectionnés.
+              </span>
+              <button
+                onClick={selectAllMatching}
+                disabled={selectingAll || totalCount > SELECT_ALL_CAP}
+                className="inline-flex items-center gap-1.5 font-bold text-primary hover:text-primary/80 disabled:opacity-60 disabled:cursor-not-allowed underline underline-offset-2"
+              >
+                {selectingAll ? (
+                  <>
+                    <Loader2 className="w-3 h-3 animate-spin" />
+                    Sélection en cours… ({totalCount})
+                  </>
+                ) : totalCount > SELECT_ALL_CAP ? (
+                  <>Trop de produits ({totalCount}) — affinez les filtres (max {SELECT_ALL_CAP})</>
+                ) : (
+                  <>Sélectionner les {totalCount} produits correspondant au filtre</>
+                )}
+              </button>
+            </div>
+          )}
         </div>
       )}
+
 
       {/* Table */}
       <div className="overflow-x-auto relative">
