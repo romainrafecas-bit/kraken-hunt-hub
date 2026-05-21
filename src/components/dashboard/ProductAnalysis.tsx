@@ -399,6 +399,35 @@ const ProductAnalysis = () => {
             </select>
           </div>
 
+          {/* Select all matching filters — quick access */}
+          {totalCount > 0 && (() => {
+            const allSelected = selectedUrls.size >= totalCount;
+            const overCap = totalCount > SELECT_ALL_CAP;
+            const currentPreset = datePresets.find(d => d.value === selectedDatePreset);
+            const scopeLabel = selectedDatePreset.startsWith("month-") && currentPreset
+              ? `tout ${currentPreset.label}`
+              : `les ${totalCount.toLocaleString("fr-FR")} produits filtrés`;
+            return (
+              <button
+                onClick={selectAllMatching}
+                disabled={selectingAll || overCap || allSelected}
+                title={overCap ? `Maximum ${SELECT_ALL_CAP} produits — affinez les filtres` : undefined}
+                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-primary/15 border border-primary/30 text-primary hover:bg-primary/25 transition-all text-xs font-bold disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                {selectingAll ? (
+                  <><Loader2 className="w-3.5 h-3.5 animate-spin" />Sélection en cours…</>
+                ) : allSelected ? (
+                  <>✓ Tout sélectionné ({totalCount.toLocaleString("fr-FR")})</>
+                ) : overCap ? (
+                  <>Trop de produits ({totalCount.toLocaleString("fr-FR")}) — max {SELECT_ALL_CAP}</>
+                ) : (
+                  <>Sélectionner {scopeLabel}</>
+                )}
+              </button>
+            );
+          })()}
+
+
           {/* Stock filter */}
           <select
             value={stockFilter}

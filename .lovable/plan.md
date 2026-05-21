@@ -1,56 +1,46 @@
-## Problème
-
-Aujourd'hui, la checkbox d'en-tête du tableau Produits ne sélectionne que la **page courante** (20 lignes typiquement). Impossible de dire d'un clic : « sélectionne tous les produits de janvier 2025 » ou « tous les produits filtrés par catégorie Mode ».
-
 ## Objectif
 
-Permettre de sélectionner **l'intégralité du résultat filtré** (toutes pages confondues), pas seulement la page affichée.
+Permettre de sélectionner directement tous les produits correspondant au filtre actif — par exemple tout `Janvier 2025` — puis de les exporter en Excel, sans devoir d’abord cocher toute la page courante.
 
-## Comportement UX
+## Changement UX proposé
 
-Dans la barre d'outils de sélection (qui apparaît dès qu'un produit est coché) :
+Dans la barre de filtres / zone de résultats de la page Produits :
 
-1. Quand la **page courante est entièrement cochée** mais que `totalCount > paged.length`, afficher un bandeau type Gmail :
+1. Ajouter un bouton visible dès qu’un filtre retourne des résultats :
+   - `Sélectionner les 347 produits filtrés`
+   - si le filtre date est un mois : `Sélectionner tout Janvier 2025`
 
-   ```
-   ✓ Les 20 produits de cette page sont sélectionnés.
-   → Sélectionner les 347 produits correspondant au filtre
-   ```
+2. Le bouton sélectionnera toutes les lignes correspondant aux filtres actifs, toutes pages confondues :
+   - mois sélectionné
+   - catégorie
+   - recherche
+   - marques exclues
+   - stock
+   - prix
+   - nombre de vendeurs
 
-   Le lien lance la sélection globale.
+3. Pendant la sélection :
+   - afficher un loader
+   - désactiver le bouton
+   - texte du type `Sélection en cours…`
 
-2. Pendant le fetch global : spinner + texte « Sélection en cours… (347) » et bouton désactivé.
+4. Une fois la sélection terminée :
+   - la toolbar actuelle affichera le nombre total sélectionné
+   - le bouton `Exporter en Excel` fonctionnera avec toute la sélection
 
-3. Une fois fait : message « 347 produits sélectionnés sur tout le filtre » + lien « Désélectionner tout » (= `clearSelection`).
+5. Conserver aussi le comportement existant :
+   - la checkbox du tableau continue de sélectionner uniquement la page visible
+   - le bandeau “sélectionner tous les produits correspondant au filtre” peut rester comme aide secondaire
 
-4. Si l'utilisateur change un filtre (catégorie, date, etc.) après une sélection globale → on garde les URLs déjà sélectionnées (cohérent avec le comportement actuel par page), mais le bandeau « tout sélectionner » réapparaît avec le nouveau `totalCount`.
+## Détail technique
 
-5. La checkbox d'en-tête garde son rôle actuel (toggle page courante uniquement). Le bandeau est le seul vecteur pour « tout sélectionner ».
+- Modifier uniquement `src/components/dashboard/ProductAnalysis.tsx`.
+- Réutiliser la fonction déjà créée `selectAllMatching()` et `fetchAllMatchingUrls()`.
+- Ajouter un label intelligent basé sur `selectedDatePreset` pour afficher le mois courant sélectionné.
+- Afficher le bouton de sélection globale même quand aucun produit n’est encore coché.
+- Garder le garde-fou existant de `5000` produits maximum.
+- Ne pas toucher à la base de données ni aux règles d’accès.
 
-## Implémentation technique
+## Résultat attendu
 
-Dans `src/components/dashboard/ProductAnalysis.tsx` :
-
-- Ajouter un état `selectingAll: boolean` pour le loader.
-- Nouvelle fonction `selectAllMatching()` qui rejoue exactement les mêmes filtres que `useProductsPaginated` mais en mode `select("url")` paginé (chunks de 1000, jusqu'à `totalCount`). Pour éviter la duplication de logique de filtres, **extraire** la construction du `query` Supabase dans une fonction utilitaire partagée :
-
-  - Créer `src/hooks/productsQuery.ts` exportant `buildProductsQuery(supabase, filters)` qui applique toutes les clauses `.eq/.or/.gte/.lte/.not/.range` sauf `range` et `order`.
-  - `useProductsPaginated` réutilise cette fonction et ajoute `order` + `range`.
-  - `selectAllMatching` réutilise la même fonction, ajoute `.select("url")` puis pagine par 1000 jusqu'à épuisement (`while (from < totalCount)`).
-
-- Ajouter les URLs récupérées dans `selectedUrls` via `setSelectedUrls(prev => new Set([...prev, ...newUrls]))`.
-
-- Dans la toolbar de sélection (lignes 552-574), ajouter le bandeau conditionnel décrit plus haut, basé sur `allPageSelected && totalCount > paged.length && selectedUrls.size < totalCount`.
-
-## Limites / garde-fous
-
-- Cap dur à 5000 produits pour éviter qu'un utilisateur sélectionne 50 000 lignes par erreur (l'export Excel reste utilisable). Au-delà : toast « Affinez vos filtres (max 5000) ».
-- Pas de modification du schéma DB, pas de nouvelle policy RLS (la policy `Active subscribers can read products` couvre déjà `select("url")`).
-
-## Fichiers touchés
-
-- `src/components/dashboard/ProductAnalysis.tsx` — toolbar + handler `selectAllMatching` + état `selectingAll`.
-- `src/hooks/useProductsPaginated.ts` — refactor pour exposer `buildProductsQuery`.
-- `src/hooks/productsQuery.ts` *(nouveau)* — fonction utilitaire de construction de query.
-
-Aucune modification de la pagination, du tri, des filtres existants, ni de l'export Excel.
+Quand l’utilisateur choisit `Janvier 2025`, il voit immédiatement une action claire pour sélectionner tous les produits de janvier 2025, puis peut cliquer sur `Exporter en Excel` sans parcourir les pages une par une.
