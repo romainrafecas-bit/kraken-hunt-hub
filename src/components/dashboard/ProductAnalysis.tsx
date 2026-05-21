@@ -238,12 +238,13 @@ const ProductAnalysis = () => {
         sellersMin: sellersMin === "" ? null : Number(sellersMin),
         sellersMax: sellersMax === "" ? null : Number(sellersMax),
       });
-      setSelectedUrls(prev => {
-        const next = new Set(prev);
-        urls.forEach(u => next.add(u));
-        return next;
-      });
-      toast.success(`${urls.length} produit${urls.length > 1 ? "s" : ""} sélectionné${urls.length > 1 ? "s" : ""}`);
+      setSelectedUrls(new Set(urls));
+      const currentPreset = datePresets.find(d => d.value === selectedDatePreset);
+      const scope = selectedDatePreset.startsWith("month-") && currentPreset
+        ? ` pour ${currentPreset.label}`
+        : "";
+      toast.success(`${urls.length} produit${urls.length > 1 ? "s" : ""} sélectionné${urls.length > 1 ? "s" : ""}${scope} (sélection précédente effacée)`);
+
     } catch (e: any) {
       toast.error("Erreur lors de la sélection globale");
     } finally {
