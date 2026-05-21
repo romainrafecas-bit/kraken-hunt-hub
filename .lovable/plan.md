@@ -1,46 +1,62 @@
-## Objectif
+## Bugs identifiés
 
-Permettre de sélectionner directement tous les produits correspondant au filtre actif — par exemple tout `Janvier 2025` — puis de les exporter en Excel, sans devoir d’abord cocher toute la page courante.
+### Bug 1 — La sélection s'ajoute aux sélections précédentes
+Dans `selectAllMatching` (ProductAnalysis.tsx, ligne 241-245) :
 
-## Changement UX proposé
+```ts
+setSelectedUrls(prev => {
+  const next = new Set(prev);   // ← garde les URLs des filtres précédents
+  urls.forEach(u => next.add(u));
+  return next;
+});
+```
 
-Dans la barre de filtres / zone de résultats de la page Produits :
+De plus, `selectedUrls` est persisté en localStorage (`usePersistedState`). Conséquence :
+- L'utilisateur sélectionne tout Février → 300 produits.
+- Change le filtre pour Janvier → clique "Sélectionner tout Janvier 2025" → 200 produits.
+- L'état contient maintenant 500 URLs (Janvier + Février), et l'export Excel exporte les deux mois mélangés.
 
-1. Ajouter un bouton visible dès qu’un filtre retourne des résultats :
-   - `Sélectionner les 347 produits filtrés`
-   - si le filtre date est un mois : `Sélectionner tout Janvier 2025`
+C'est très probablement ce que l'utilisateur observe : "ça ne sélectionne pas ce qu'il faut".
 
-2. Le bouton sélectionnera toutes les lignes correspondant aux filtres actifs, toutes pages confondues :
-   - mois sélectionné
-   - catégorie
-   - recherche
-   - marques exclues
-   - stock
-   - prix
-   - nombre de vendeurs
+### Bug 2 — Pagination Supabase sans `ORDER BY`
+Dans `fetchAllMatchingUrls` (productsQuery.ts, ligne 85-87) :
 
-3. Pendant la sélection :
-   - afficher un loader
-   - désactiver le bouton
-   - texte du type `Sélection en cours…`
+```ts
+let q: any = supabase.from("products").select("url");
+q = applyProductsFilters(q, filters);
+q = q.range(from, to);   // ← aucun .order() → ordre indéterminé
+```
 
-4. Une fois la sélection terminée :
-   - la toolbar actuelle affichera le nombre total sélectionné
-   - le bouton `Exporter en Excel` fonctionnera avec toute la sélection
+Sans `ORDER BY`, Postgres ne garantit pas un ordre stable entre les requêtes paginées. Conséquence : certains produits peuvent être retournés deux fois (sans impact car `Set`) ou manqués (impact réel : sélection incomplète). Pour un mois avec ~300 produits, c'est invisible (un seul chunk). Au-delà de 1000 produits, on peut sélectionner moins que `totalCount`.
 
-5. Conserver aussi le comportement existant :
-   - la checkbox du tableau continue de sélectionner uniquement la page visible
-   - le bandeau “sélectionner tous les produits correspondant au filtre” peut rester comme aide secondaire
+## Correctifs
 
-## Détail technique
+### Fichier `src/components/dashboard/ProductAnalysis.tsx`
 
-- Modifier uniquement `src/components/dashboard/ProductAnalysis.tsx`.
-- Réutiliser la fonction déjà créée `selectAllMatching()` et `fetchAllMatchingUrls()`.
-- Ajouter un label intelligent basé sur `selectedDatePreset` pour afficher le mois courant sélectionné.
-- Afficher le bouton de sélection globale même quand aucun produit n’est encore coché.
-- Garder le garde-fou existant de `5000` produits maximum.
-- Ne pas toucher à la base de données ni aux règles d’accès.
+Remplacer la fonction `selectAllMatching` pour qu'elle **remplace** la sélection (au lieu d'ajouter) :
 
-## Résultat attendu
+```ts
+setSelectedUrls(new Set(urls));
+```
 
-Quand l’utilisateur choisit `Janvier 2025`, il voit immédiatement une action claire pour sélectionner tous les produits de janvier 2025, puis peut cliquer sur `Exporter en Excel` sans parcourir les pages une par une.
+Et ajouter un toast d'info clair :
+```
+347 produits sélectionnés pour Janvier 2025 (sélection précédente effacée)
+```
+
+### Fichier `src/hooks/productsQuery.ts`
+
+Ajouter un ordre stable avant `.range()` :
+
+```ts
+q = q.order("url", { ascending: true });
+q = q.range(from, to);
+```
+
+L'ordre par `url` est arbitraire mais stable et indexé (clé naturelle des produits).
+
+## Hors scope
+
+- Pas de changement de la checkbox "page courante" (toggle additif, comportement standard).
+- Pas de changement du bandeau secondaire dans la toolbar.
+- Pas de changement du cap à 5000.

@@ -84,7 +84,9 @@ export async function fetchAllMatchingUrls(filters: ProductsQueryFilters): Promi
     const to = Math.min(from + chunkSize - 1, SELECT_ALL_CAP - 1);
     let q: any = supabase.from("products").select("url");
     q = applyProductsFilters(q, filters);
+    q = q.order("url", { ascending: true });
     q = q.range(from, to);
+
     const { data, error } = await q;
     if (error) throw error;
     const batch = (data || []).map((r: any) => r.url).filter(Boolean);
