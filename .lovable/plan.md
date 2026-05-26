@@ -1,62 +1,37 @@
-## Bugs identifiés
+## Changement demandé
 
-### Bug 1 — La sélection s'ajoute aux sélections précédentes
-Dans `selectAllMatching` (ProductAnalysis.tsx, ligne 241-245) :
+Revenir au comportement **additif** pour "Sélectionner tout {période}" : sélectionner Janvier puis Février doit cumuler les deux (et non remplacer).
+
+## Correctif
+
+### `src/components/dashboard/ProductAnalysis.tsx` — `selectAllMatching`
+
+Remettre la fusion avec la sélection existante au lieu du remplacement :
 
 ```ts
 setSelectedUrls(prev => {
-  const next = new Set(prev);   // ← garde les URLs des filtres précédents
+  const next = new Set(prev);
   urls.forEach(u => next.add(u));
   return next;
 });
 ```
 
-De plus, `selectedUrls` est persisté en localStorage (`usePersistedState`). Conséquence :
-- L'utilisateur sélectionne tout Février → 300 produits.
-- Change le filtre pour Janvier → clique "Sélectionner tout Janvier 2025" → 200 produits.
-- L'état contient maintenant 500 URLs (Janvier + Février), et l'export Excel exporte les deux mois mélangés.
+Adapter le toast pour refléter le cumul, en indiquant combien ont été ajoutées et le total :
+- `+218 produits ajoutés (Février 2025) — 565 sélectionnés au total`
+- Si tout était déjà sélectionné : `Tous les produits de Février 2025 étaient déjà sélectionnés`
 
-C'est très probablement ce que l'utilisateur observe : "ça ne sélectionne pas ce qu'il faut".
+### Pour permettre de retirer une période entière
 
-### Bug 2 — Pagination Supabase sans `ORDER BY`
-Dans `fetchAllMatchingUrls` (productsQuery.ts, ligne 85-87) :
+Comme la sélection est cumulative et peut couvrir des produits hors de la page courante (donc non décochables un par un facilement), ajouter une action symétrique **"Désélectionner tout {période}"** juste à côté du bouton "Sélectionner tout {période}".
 
-```ts
-let q: any = supabase.from("products").select("url");
-q = applyProductsFilters(q, filters);
-q = q.range(from, to);   // ← aucun .order() → ordre indéterminé
-```
+- Visible quand au moins 1 produit du filtre actif est déjà sélectionné.
+- Réutilise `fetchAllMatchingUrls(filters)` puis fait : `setSelectedUrls(prev => { const n = new Set(prev); urls.forEach(u => n.delete(u)); return n; })`.
+- Toast : `-218 produits retirés (Février 2025) — 347 restants`.
 
-Sans `ORDER BY`, Postgres ne garantit pas un ordre stable entre les requêtes paginées. Conséquence : certains produits peuvent être retournés deux fois (sans impact car `Set`) ou manqués (impact réel : sélection incomplète). Pour un mois avec ~300 produits, c'est invisible (un seul chunk). Au-delà de 1000 produits, on peut sélectionner moins que `totalCount`.
-
-## Correctifs
-
-### Fichier `src/components/dashboard/ProductAnalysis.tsx`
-
-Remplacer la fonction `selectAllMatching` pour qu'elle **remplace** la sélection (au lieu d'ajouter) :
-
-```ts
-setSelectedUrls(new Set(urls));
-```
-
-Et ajouter un toast d'info clair :
-```
-347 produits sélectionnés pour Janvier 2025 (sélection précédente effacée)
-```
-
-### Fichier `src/hooks/productsQuery.ts`
-
-Ajouter un ordre stable avant `.range()` :
-
-```ts
-q = q.order("url", { ascending: true });
-q = q.range(from, to);
-```
-
-L'ordre par `url` est arbitraire mais stable et indexé (clé naturelle des produits).
+Le bouton global "Effacer" (vide tout) reste tel quel.
 
 ## Hors scope
 
-- Pas de changement de la checkbox "page courante" (toggle additif, comportement standard).
-- Pas de changement du bandeau secondaire dans la toolbar.
-- Pas de changement du cap à 5000.
+- Pas de changement de la pagination ni de l'ORDER BY (correctif Bug 2 conservé).
+- Pas de changement de l'export Excel.
+- Pas de modale de gestion (option écartée — l'action "désélectionner la période" couvre le besoin avec un clic).

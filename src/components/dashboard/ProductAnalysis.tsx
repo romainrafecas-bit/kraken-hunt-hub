@@ -238,15 +238,73 @@ const ProductAnalysis = () => {
         sellersMin: sellersMin === "" ? null : Number(sellersMin),
         sellersMax: sellersMax === "" ? null : Number(sellersMax),
       });
-      setSelectedUrls(new Set(urls));
       const currentPreset = datePresets.find(d => d.value === selectedDatePreset);
       const scope = selectedDatePreset.startsWith("month-") && currentPreset
-        ? ` pour ${currentPreset.label}`
+        ? ` (${currentPreset.label})`
         : "";
-      toast.success(`${urls.length} produit${urls.length > 1 ? "s" : ""} sélectionné${urls.length > 1 ? "s" : ""}${scope} (sélection précédente effacée)`);
-
+      let added = 0;
+      let total = 0;
+      setSelectedUrls(prev => {
+        const next = new Set(prev);
+        for (const u of urls) {
+          if (!next.has(u)) added++;
+          next.add(u);
+        }
+        total = next.size;
+        return next;
+      });
+      if (added === 0) {
+        toast.info(`Tous les produits${scope} étaient déjà sélectionnés — ${total} au total`);
+      } else {
+        toast.success(`+${added} produit${added > 1 ? "s" : ""} ajouté${added > 1 ? "s" : ""}${scope} — ${total} sélectionné${total > 1 ? "s" : ""} au total`);
+      }
     } catch (e: any) {
       toast.error("Erreur lors de la sélection globale");
+    } finally {
+      setSelectingAll(false);
+    }
+  };
+
+  const deselectAllMatching = async () => {
+    if (selectingAll) return;
+    if (totalCount > SELECT_ALL_CAP) {
+      toast.error(`Désélection limitée à ${SELECT_ALL_CAP} produits. Affinez vos filtres.`);
+      return;
+    }
+    setSelectingAll(true);
+    try {
+      const urls = await fetchAllMatchingUrls({
+        category: selectedCategory,
+        excludedBrands,
+        searchQuery,
+        stockFilter,
+        datePreset: selectedDatePreset,
+        priceMin: priceMin === "" ? null : Number(priceMin),
+        priceMax: priceMax === "" ? null : Number(priceMax),
+        sellersMin: sellersMin === "" ? null : Number(sellersMin),
+        sellersMax: sellersMax === "" ? null : Number(sellersMax),
+      });
+      const currentPreset = datePresets.find(d => d.value === selectedDatePreset);
+      const scope = selectedDatePreset.startsWith("month-") && currentPreset
+        ? ` (${currentPreset.label})`
+        : "";
+      let removed = 0;
+      let total = 0;
+      setSelectedUrls(prev => {
+        const next = new Set(prev);
+        for (const u of urls) {
+          if (next.delete(u)) removed++;
+        }
+        total = next.size;
+        return next;
+      });
+      if (removed === 0) {
+        toast.info(`Aucun produit${scope} n'était sélectionné`);
+      } else {
+        toast.success(`-${removed} produit${removed > 1 ? "s" : ""} retiré${removed > 1 ? "s" : ""}${scope} — ${total} restant${total > 1 ? "s" : ""}`);
+      }
+    } catch (e: any) {
+      toast.error("Erreur lors de la désélection globale");
     } finally {
       setSelectingAll(false);
     }
@@ -402,29 +460,40 @@ const ProductAnalysis = () => {
 
           {/* Select all matching filters — quick access */}
           {totalCount > 0 && (() => {
-            const allSelected = selectedUrls.size >= totalCount;
             const overCap = totalCount > SELECT_ALL_CAP;
             const currentPreset = datePresets.find(d => d.value === selectedDatePreset);
             const scopeLabel = selectedDatePreset.startsWith("month-") && currentPreset
               ? `tout ${currentPreset.label}`
               : `les ${totalCount.toLocaleString("fr-FR")} produits filtrés`;
+            const deselectLabel = selectedDatePreset.startsWith("month-") && currentPreset
+              ? `Désélectionner ${currentPreset.label}`
+              : `Désélectionner les ${totalCount.toLocaleString("fr-FR")} filtrés`;
             return (
-              <button
-                onClick={selectAllMatching}
-                disabled={selectingAll || overCap || allSelected}
-                title={overCap ? `Maximum ${SELECT_ALL_CAP} produits — affinez les filtres` : undefined}
-                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-primary/15 border border-primary/30 text-primary hover:bg-primary/25 transition-all text-xs font-bold disabled:opacity-60 disabled:cursor-not-allowed"
-              >
-                {selectingAll ? (
-                  <><Loader2 className="w-3.5 h-3.5 animate-spin" />Sélection en cours…</>
-                ) : allSelected ? (
-                  <>✓ Tout sélectionné ({totalCount.toLocaleString("fr-FR")})</>
-                ) : overCap ? (
-                  <>Trop de produits ({totalCount.toLocaleString("fr-FR")}) — max {SELECT_ALL_CAP}</>
-                ) : (
-                  <>Sélectionner {scopeLabel}</>
+              <>
+                <button
+                  onClick={selectAllMatching}
+                  disabled={selectingAll || overCap}
+                  title={overCap ? `Maximum ${SELECT_ALL_CAP} produits — affinez les filtres` : undefined}
+                  className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-primary/15 border border-primary/30 text-primary hover:bg-primary/25 transition-all text-xs font-bold disabled:opacity-60 disabled:cursor-not-allowed"
+                >
+                  {selectingAll ? (
+                    <><Loader2 className="w-3.5 h-3.5 animate-spin" />Sélection en cours…</>
+                  ) : overCap ? (
+                    <>Trop de produits ({totalCount.toLocaleString("fr-FR")}) — max {SELECT_ALL_CAP}</>
+                  ) : (
+                    <>Sélectionner {scopeLabel}</>
+                  )}
+                </button>
+                {selectedUrls.size > 0 && !overCap && (
+                  <button
+                    onClick={deselectAllMatching}
+                    disabled={selectingAll}
+                    className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-secondary/60 border border-border/40 text-muted-foreground hover:text-foreground hover:border-border transition-all text-xs font-bold disabled:opacity-60 disabled:cursor-not-allowed"
+                  >
+                    {deselectLabel}
+                  </button>
                 )}
-              </button>
+              </>
             );
           })()}
 
