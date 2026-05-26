@@ -238,15 +238,73 @@ const ProductAnalysis = () => {
         sellersMin: sellersMin === "" ? null : Number(sellersMin),
         sellersMax: sellersMax === "" ? null : Number(sellersMax),
       });
-      setSelectedUrls(new Set(urls));
       const currentPreset = datePresets.find(d => d.value === selectedDatePreset);
       const scope = selectedDatePreset.startsWith("month-") && currentPreset
-        ? ` pour ${currentPreset.label}`
+        ? ` (${currentPreset.label})`
         : "";
-      toast.success(`${urls.length} produit${urls.length > 1 ? "s" : ""} sélectionné${urls.length > 1 ? "s" : ""}${scope} (sélection précédente effacée)`);
-
+      let added = 0;
+      let total = 0;
+      setSelectedUrls(prev => {
+        const next = new Set(prev);
+        for (const u of urls) {
+          if (!next.has(u)) added++;
+          next.add(u);
+        }
+        total = next.size;
+        return next;
+      });
+      if (added === 0) {
+        toast.info(`Tous les produits${scope} étaient déjà sélectionnés — ${total} au total`);
+      } else {
+        toast.success(`+${added} produit${added > 1 ? "s" : ""} ajouté${added > 1 ? "s" : ""}${scope} — ${total} sélectionné${total > 1 ? "s" : ""} au total`);
+      }
     } catch (e: any) {
       toast.error("Erreur lors de la sélection globale");
+    } finally {
+      setSelectingAll(false);
+    }
+  };
+
+  const deselectAllMatching = async () => {
+    if (selectingAll) return;
+    if (totalCount > SELECT_ALL_CAP) {
+      toast.error(`Désélection limitée à ${SELECT_ALL_CAP} produits. Affinez vos filtres.`);
+      return;
+    }
+    setSelectingAll(true);
+    try {
+      const urls = await fetchAllMatchingUrls({
+        category: selectedCategory,
+        excludedBrands,
+        searchQuery,
+        stockFilter,
+        datePreset: selectedDatePreset,
+        priceMin: priceMin === "" ? null : Number(priceMin),
+        priceMax: priceMax === "" ? null : Number(priceMax),
+        sellersMin: sellersMin === "" ? null : Number(sellersMin),
+        sellersMax: sellersMax === "" ? null : Number(sellersMax),
+      });
+      const currentPreset = datePresets.find(d => d.value === selectedDatePreset);
+      const scope = selectedDatePreset.startsWith("month-") && currentPreset
+        ? ` (${currentPreset.label})`
+        : "";
+      let removed = 0;
+      let total = 0;
+      setSelectedUrls(prev => {
+        const next = new Set(prev);
+        for (const u of urls) {
+          if (next.delete(u)) removed++;
+        }
+        total = next.size;
+        return next;
+      });
+      if (removed === 0) {
+        toast.info(`Aucun produit${scope} n'était sélectionné`);
+      } else {
+        toast.success(`-${removed} produit${removed > 1 ? "s" : ""} retiré${removed > 1 ? "s" : ""}${scope} — ${total} restant${total > 1 ? "s" : ""}`);
+      }
+    } catch (e: any) {
+      toast.error("Erreur lors de la désélection globale");
     } finally {
       setSelectingAll(false);
     }
