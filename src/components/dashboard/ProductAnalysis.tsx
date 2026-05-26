@@ -460,29 +460,40 @@ const ProductAnalysis = () => {
 
           {/* Select all matching filters — quick access */}
           {totalCount > 0 && (() => {
-            const allSelected = selectedUrls.size >= totalCount;
             const overCap = totalCount > SELECT_ALL_CAP;
             const currentPreset = datePresets.find(d => d.value === selectedDatePreset);
             const scopeLabel = selectedDatePreset.startsWith("month-") && currentPreset
               ? `tout ${currentPreset.label}`
               : `les ${totalCount.toLocaleString("fr-FR")} produits filtrés`;
+            const deselectLabel = selectedDatePreset.startsWith("month-") && currentPreset
+              ? `Désélectionner ${currentPreset.label}`
+              : `Désélectionner les ${totalCount.toLocaleString("fr-FR")} filtrés`;
             return (
-              <button
-                onClick={selectAllMatching}
-                disabled={selectingAll || overCap || allSelected}
-                title={overCap ? `Maximum ${SELECT_ALL_CAP} produits — affinez les filtres` : undefined}
-                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-primary/15 border border-primary/30 text-primary hover:bg-primary/25 transition-all text-xs font-bold disabled:opacity-60 disabled:cursor-not-allowed"
-              >
-                {selectingAll ? (
-                  <><Loader2 className="w-3.5 h-3.5 animate-spin" />Sélection en cours…</>
-                ) : allSelected ? (
-                  <>✓ Tout sélectionné ({totalCount.toLocaleString("fr-FR")})</>
-                ) : overCap ? (
-                  <>Trop de produits ({totalCount.toLocaleString("fr-FR")}) — max {SELECT_ALL_CAP}</>
-                ) : (
-                  <>Sélectionner {scopeLabel}</>
+              <>
+                <button
+                  onClick={selectAllMatching}
+                  disabled={selectingAll || overCap}
+                  title={overCap ? `Maximum ${SELECT_ALL_CAP} produits — affinez les filtres` : undefined}
+                  className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-primary/15 border border-primary/30 text-primary hover:bg-primary/25 transition-all text-xs font-bold disabled:opacity-60 disabled:cursor-not-allowed"
+                >
+                  {selectingAll ? (
+                    <><Loader2 className="w-3.5 h-3.5 animate-spin" />Sélection en cours…</>
+                  ) : overCap ? (
+                    <>Trop de produits ({totalCount.toLocaleString("fr-FR")}) — max {SELECT_ALL_CAP}</>
+                  ) : (
+                    <>Sélectionner {scopeLabel}</>
+                  )}
+                </button>
+                {selectedUrls.size > 0 && !overCap && (
+                  <button
+                    onClick={deselectAllMatching}
+                    disabled={selectingAll}
+                    className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-secondary/60 border border-border/40 text-muted-foreground hover:text-foreground hover:border-border transition-all text-xs font-bold disabled:opacity-60 disabled:cursor-not-allowed"
+                  >
+                    {deselectLabel}
+                  </button>
                 )}
-              </button>
+              </>
             );
           })()}
 
