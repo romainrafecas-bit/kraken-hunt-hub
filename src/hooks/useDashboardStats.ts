@@ -108,7 +108,7 @@ async function loadDashboardStats(): Promise<Omit<DashboardStats, "loading" | "e
 
   const categoryStats = Object.entries(catMap)
     .map(([name, d]) => ({ name, ...d }))
-    .sort((a, b) => b.recurrences - a.recurrences);
+    .sort((a, b) => b.recurrences - a.recurrences || a.name.localeCompare(b.name));
 
   const { data: latestRaw } = await supabase
     .from("products")
