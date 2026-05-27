@@ -55,8 +55,10 @@ const Index = () => {
   const [hoveredCat, setHoveredCat] = useState<string | null>(null);
   const [hoveredProduct, setHoveredProduct] = useState<number | null>(null);
 
-  const catStats = useMemo(() => 
-    categoryStats.map(c => ({ name: formatCat(c.name), slug: c.name, sales: c.recurrences, count: c.count })),
+  const catStats = useMemo(() =>
+    categoryStats
+      .map(c => ({ name: formatCat(c.name), slug: c.name, sales: c.recurrences, count: c.count }))
+      .sort((a, b) => b.sales - a.sales || b.count - a.count || a.slug.localeCompare(b.slug)),
     [categoryStats]
   );
   const catTotal = catStats.reduce((s, c) => s + c.sales, 0) || 1;
