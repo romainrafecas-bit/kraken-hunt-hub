@@ -33,6 +33,7 @@ async function fetchAllColumn<T>(extraSelect: string): Promise<T[]> {
     const { data, error } = await supabase
       .from("products")
       .select(extraSelect)
+      .order("url", { ascending: true })
       .range(from, from + PAGE - 1);
     if (error) throw error;
     if (!data || data.length === 0) break;
@@ -107,7 +108,7 @@ async function loadDashboardStats(): Promise<Omit<DashboardStats, "loading" | "e
 
   const categoryStats = Object.entries(catMap)
     .map(([name, d]) => ({ name, ...d }))
-    .sort((a, b) => b.recurrences - a.recurrences);
+    .sort((a, b) => b.recurrences - a.recurrences || a.name.localeCompare(b.name));
 
   const { data: latestRaw } = await supabase
     .from("products")
