@@ -221,13 +221,13 @@ const Index = () => {
                     const offset = cumulative * circumference;
                     cumulative += pct;
                     const hue = catHues[i % catHues.length];
-                    const isHovered = hoveredCat === cat.name;
+                    const isHovered = hoveredCat === cat.slug;
                     return (
-                      <motion.circle key={cat.name} cx="50" cy="50" r={radius} fill="none" stroke={`hsl(${hue})`}
+                      <motion.circle key={cat.slug} cx="50" cy="50" r={radius} fill="none" stroke={`hsl(${hue})`}
                         strokeWidth={isHovered ? 10 : 7} strokeDasharray={`${pct * circumference} ${circumference}`}
                         strokeDashoffset={-offset} strokeLinecap="round" className="cursor-pointer transition-all duration-300"
                         style={{ filter: isHovered ? `drop-shadow(0 0 6px hsl(${hue} / 0.5))` : 'none', opacity: hoveredCat && !isHovered ? 0.3 : 1 }}
-                        onMouseEnter={() => setHoveredCat(cat.name)} onMouseLeave={() => setHoveredCat(null)}
+                        onMouseEnter={() => setHoveredCat(cat.slug)} onMouseLeave={() => setHoveredCat(null)}
                         initial={{ strokeDasharray: `0 ${circumference}` }} animate={{ strokeDasharray: `${pct * circumference} ${circumference}` }}
                         transition={{ delay: 0.5 + i * 0.06, duration: 0.8, ease: [0.16, 1, 0.3, 1] }} />
                     );
@@ -243,10 +243,10 @@ const Index = () => {
               {catStats.map((cat, i) => {
                 const pct = Math.round((cat.sales / catTotal) * 100);
                 const hue = catHues[i % catHues.length];
-                const isHovered = hoveredCat === cat.name;
+                const isHovered = hoveredCat === cat.slug;
                 return (
-                  <motion.div key={cat.name} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.55 + i * 0.04 }}
-                    onMouseEnter={() => setHoveredCat(cat.name)} onMouseLeave={() => setHoveredCat(null)}
+                  <motion.div key={cat.slug} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.55 + i * 0.04 }}
+                    onMouseEnter={() => setHoveredCat(cat.slug)} onMouseLeave={() => setHoveredCat(null)}
                     className="flex items-center gap-3 py-1.5 cursor-pointer group"
                     style={{ opacity: hoveredCat && !isHovered ? 0.4 : 1, transition: 'opacity 0.2s' }}>
                     <span className="w-2.5 h-2.5 rounded-full flex-shrink-0 transition-transform duration-200 group-hover:scale-125"
