@@ -1,37 +1,36 @@
-## Changement demandé
+## Problème
 
-Revenir au comportement **additif** pour "Sélectionner tout {période}" : sélectionner Janvier puis Février doit cumuler les deux (et non remplacer).
+Sur le dashboard, la section "Répartition par catégorie" change d'ordre à chaque rafraîchissement. La donnée vient de `useDashboardStats` qui pagine la table `products` en chunks de 1000 via `fetchAllColumn`.
 
-## Correctif
-
-### `src/components/dashboard/ProductAnalysis.tsx` — `selectAllMatching`
-
-Remettre la fusion avec la sélection existante au lieu du remplacement :
+**Cause racine** : la requête de pagination dans `src/hooks/useDashboardStats.ts` n'a aucun `ORDER BY` :
 
 ```ts
-setSelectedUrls(prev => {
-  const next = new Set(prev);
-  urls.forEach(u => next.add(u));
-  return next;
-});
+await supabase.from("products").select(extraSelect).range(from, from + PAGE - 1);
 ```
 
-Adapter le toast pour refléter le cumul, en indiquant combien ont été ajoutées et le total :
-- `+218 produits ajoutés (Février 2025) — 565 sélectionnés au total`
-- Si tout était déjà sélectionné : `Tous les produits de Février 2025 étaient déjà sélectionnés`
+Sans ordre explicite, Postgres ne garantit pas l'ordre entre les pages. Selon le plan d'exécution, certaines lignes sont comptées deux fois ou omises. Les sommes `recurrences` par catégorie fluctuent légèrement, ce qui modifie le tri `sort((a,b) => b.recurrences - a.recurrences)` et change l'ordre du donut + de la légende à chaque chargement.
 
-### Pour permettre de retirer une période entière
+De plus, le tri final compare uniquement `recurrences` : en cas d'égalité, l'ordre n'est pas déterministe vis-à-vis du nom.
 
-Comme la sélection est cumulative et peut couvrir des produits hors de la page courante (donc non décochables un par un facilement), ajouter une action symétrique **"Désélectionner tout {période}"** juste à côté du bouton "Sélectionner tout {période}".
+## Correction
 
-- Visible quand au moins 1 produit du filtre actif est déjà sélectionné.
-- Réutilise `fetchAllMatchingUrls(filters)` puis fait : `setSelectedUrls(prev => { const n = new Set(prev); urls.forEach(u => n.delete(u)); return n; })`.
-- Toast : `-218 produits retirés (Février 2025) — 347 restants`.
+Dans `src/hooks/useDashboardStats.ts` :
 
-Le bouton global "Effacer" (vide tout) reste tel quel.
+1. **Pagination déterministe** dans `fetchAllColumn` — ajouter un `ORDER BY` sur la clé primaire `url` :
+   ```ts
+   .select(extraSelect)
+   .order("url", { ascending: true })
+   .range(from, from + PAGE - 1);
+   ```
+   Garantit que chaque ligne est lue exactement une fois → sommes stables.
+
+2. **Tri stable** sur `categoryStats` — départager les égalités par nom :
+   ```ts
+   .sort((a, b) => b.recurrences - a.recurrences || a.name.localeCompare(b.name));
+   ```
 
 ## Hors scope
 
-- Pas de changement de la pagination ni de l'ORDER BY (correctif Bug 2 conservé).
-- Pas de changement de l'export Excel.
-- Pas de modale de gestion (option écartée — l'action "désélectionner la période" couvre le besoin avec un clic).
+- Aucun changement de design / animation sur `Index.tsx` ni `CategoryBreakdown.tsx`.
+- Aucun changement sur `ProductAnalysis.tsx` ni la sélection produits.
+- Aucun changement de schéma DB.
