@@ -275,7 +275,8 @@ const ProductAnalysis = () => {
         toast.success(`+${added} produit${added > 1 ? "s" : ""} ajouté${added > 1 ? "s" : ""}${scope} — ${total} sélectionné${total > 1 ? "s" : ""} au total`);
       }
     } catch (e: any) {
-      toast.error("Erreur lors de la sélection globale");
+      console.error("Sélection globale échouée:", e);
+      toast.error(e?.message ? `Sélection échouée : ${e.message}` : "Erreur lors de la sélection globale");
     } finally {
       setSelectingAll(false);
     }
@@ -320,7 +321,8 @@ const ProductAnalysis = () => {
         toast.success(`-${removed} produit${removed > 1 ? "s" : ""} retiré${removed > 1 ? "s" : ""}${scope} — ${total} restant${total > 1 ? "s" : ""}`);
       }
     } catch (e: any) {
-      toast.error("Erreur lors de la désélection globale");
+      console.error("Désélection globale échouée:", e);
+      toast.error(e?.message ? `Désélection échouée : ${e.message}` : "Erreur lors de la désélection globale");
     } finally {
       setSelectingAll(false);
     }
