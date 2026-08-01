@@ -34,17 +34,19 @@ export function applyProductsFilters<Q extends ReturnType<typeof supabase.from> 
     q = q.or("price.eq.-1,in_stock.eq.false");
   }
 
+  // `last_seen` est une colonne DATE : on compare avec des dates nues (YYYY-MM-DD)
+  // pour éviter tout décalage de fuseau horaire côté serveur.
   if (filters.datePreset === "2026") {
-    q = q.gte("last_seen", "2026-01-01T00:00:00Z").lt("last_seen", "2027-01-01T00:00:00Z");
+    q = q.gte("last_seen", "2026-01-01").lt("last_seen", "2027-01-01");
   } else if (filters.datePreset === "2025") {
-    q = q.gte("last_seen", "2025-01-01T00:00:00Z").lt("last_seen", "2026-01-01T00:00:00Z");
+    q = q.gte("last_seen", "2025-01-01").lt("last_seen", "2026-01-01");
   } else if (filters.datePreset.startsWith("month-")) {
     const [, y, m] = filters.datePreset.split("-");
     const year = parseInt(y, 10);
     const month = parseInt(m, 10);
     if (!isNaN(year) && !isNaN(month)) {
-      const start = new Date(Date.UTC(year, month - 1, 1)).toISOString();
-      const end = new Date(Date.UTC(month === 12 ? year + 1 : year, month === 12 ? 0 : month, 1)).toISOString();
+      const start = toDateOnly(year, month, 1);
+      const end = month === 12 ? toDateOnly(year + 1, 1, 1) : toDateOnly(year, month + 1, 1);
       q = q.gte("last_seen", start).lt("last_seen", end);
     }
   } else if (filters.datePreset !== "all") {
@@ -53,9 +55,10 @@ export function applyProductsFilters<Q extends ReturnType<typeof supabase.from> 
     if (days) {
       const cutoff = new Date();
       cutoff.setDate(cutoff.getDate() - days);
-      q = q.gte("last_seen", cutoff.toISOString());
+      q = q.gte("last_seen", toDateOnly(cutoff.getFullYear(), cutoff.getMonth() + 1, cutoff.getDate()));
     }
   }
+
 
   if (filters.excludedBrands.size > 0) {
     const excluded = [...filters.excludedBrands];
