@@ -233,6 +233,24 @@ export type Database = {
         }
         Relationships: []
       }
+      products_stats_cache: {
+        Row: {
+          id: number
+          payload: Json
+          updated_at: string
+        }
+        Insert: {
+          id?: number
+          payload: Json
+          updated_at?: string
+        }
+        Update: {
+          id?: number
+          payload?: Json
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
