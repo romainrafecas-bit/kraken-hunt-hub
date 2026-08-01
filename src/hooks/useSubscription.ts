@@ -52,6 +52,44 @@ const computeAccess = (row: any): { hasAccess: boolean; daysLeft: number | null 
   return { hasAccess: false, daysLeft: null };
 };
 
+type Listener = () => void;
+const realtimeRegistry = new Map<string, { channel: any; listeners: Set<Listener> }>();
+
+function subscribeToSubscription(userId: string, listener: Listener) {
+  let entry = realtimeRegistry.get(userId);
+  if (!entry) {
+    const listeners = new Set<Listener>();
+    const channel = supabase
+      .channel(`subscription-${userId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "subscriptions",
+          filter: `user_id=eq.${userId}`,
+        },
+        () => {
+          realtimeRegistry.get(userId)?.listeners.forEach((l) => l());
+        },
+      )
+      .subscribe();
+    entry = { channel, listeners };
+    realtimeRegistry.set(userId, entry);
+  }
+  entry.listeners.add(listener);
+}
+
+function unsubscribeFromSubscription(userId: string, listener: Listener) {
+  const entry = realtimeRegistry.get(userId);
+  if (!entry) return;
+  entry.listeners.delete(listener);
+  if (entry.listeners.size === 0) {
+    supabase.removeChannel(entry.channel);
+    realtimeRegistry.delete(userId);
+  }
+}
+
 /**
  * Shared subscription state. Backed by React Query so every component that calls
  * this hook reuses one single request instead of hitting the API each time.
@@ -83,27 +121,16 @@ export const useSubscription = (): SubscriptionState => {
     await queryClient.invalidateQueries({ queryKey: ["subscription", userId] });
   }, [queryClient, userId]);
 
-  // Realtime updates keep the shared cache fresh (Stripe webhooks, trial end, …)
+  // Realtime updates keep the shared cache fresh (Stripe webhooks, trial end, …).
+  // One single channel is shared by every consumer of this hook (ref-counted),
+  // since Supabase rejects duplicate channel names.
   useEffect(() => {
     if (!userId) return;
-    const channel = supabase
-      .channel(`sub-${userId}`)
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "subscriptions",
-          filter: `user_id=eq.${userId}`,
-        },
-        () => {
-          queryClient.invalidateQueries({ queryKey: ["subscription", userId] });
-        },
-      )
-      .subscribe();
-    return () => {
-      supabase.removeChannel(channel);
+    const listener = () => {
+      queryClient.invalidateQueries({ queryKey: ["subscription", userId] });
     };
+    subscribeToSubscription(userId, listener);
+    return () => unsubscribeFromSubscription(userId, listener);
   }, [userId, queryClient]);
 
   const { hasAccess, daysLeft } = computeAccess(row);
