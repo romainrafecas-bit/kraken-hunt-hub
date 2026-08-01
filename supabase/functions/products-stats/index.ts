@@ -167,6 +167,24 @@ Deno.serve(async (req) => {
       return json({ ...cached.payload, cached: true, updatedAt: cached.updated_at });
     }
 
+    // Stale-while-revalidate: never make a user wait for the full aggregation.
+    if (cached && !force) {
+      const refresh = (async () => {
+        try {
+          const payload = await computeStats();
+          await admin
+            .from("products_stats_cache")
+            .upsert({ id: 1, payload, updated_at: new Date().toISOString() });
+        } catch (e) {
+          console.error("background refresh failed:", e);
+        }
+      })();
+      // @ts-ignore EdgeRuntime is available in Supabase edge functions
+      if (typeof EdgeRuntime !== "undefined") EdgeRuntime.waitUntil(refresh);
+      return json({ ...cached.payload, cached: true, stale: true, updatedAt: cached.updated_at });
+    }
+
+
     let payload: Record<string, unknown>;
     try {
       payload = await computeStats();
