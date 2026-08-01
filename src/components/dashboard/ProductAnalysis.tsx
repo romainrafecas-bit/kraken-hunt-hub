@@ -36,6 +36,16 @@ function usePersistedState<T>(key: string, defaultValue: T) {
   return [state, setState] as const;
 }
 
+// Debounces fast-changing text inputs so we don't fire a query per keystroke.
+function useDebounced<T>(value: T, delay = 400): T {
+  const [debounced, setDebounced] = useState(value);
+  useEffect(() => {
+    const t = setTimeout(() => setDebounced(value), delay);
+    return () => clearTimeout(t);
+  }, [value, delay]);
+  return debounced;
+}
+
 const FILTER_KEYS = [
   "selectedCategory", "excludedBrands", "selectedDatePreset",
   "sortKey", "sortDir", "stockFilter", "page",
@@ -51,7 +61,6 @@ import { useProductsMeta } from "@/hooks/useProductsMeta";
 import { fetchAllMatchingUrls, SELECT_ALL_CAP } from "@/hooks/productsQuery";
 import { toast } from "sonner";
 import { externalSupabase as supabase } from "@/integrations/supabase/external-client";
-import * as XLSX from "xlsx";
 import ProductSkeleton from "./ProductSkeleton";
 import EmptyState from "./EmptyState";
 import { useFavorites } from "@/hooks/useFavorites";
@@ -119,6 +128,7 @@ const ProductAnalysis = () => {
   const [sellersMax, setSellersMax] = usePersistedState<string>("sellersMax", "");
   const [selectedUrls, setSelectedUrls] = usePersistedState<Set<string>>("selectedUrls", new Set());
   const [selectingAll, setSelectingAll] = useState(false);
+  const [exporting, setExporting] = useState(false);
   const [brandSearch, setBrandSearch] = useState("");
 
   const resetAllFilters = useCallback(() => {
@@ -149,21 +159,27 @@ const ProductAnalysis = () => {
     refetch: refetchMeta,
   } = useProductsMeta();
 
+  const debouncedSearch = useDebounced(searchQuery);
+  const debouncedPriceMin = useDebounced(priceMin);
+  const debouncedPriceMax = useDebounced(priceMax);
+  const debouncedSellersMin = useDebounced(sellersMin);
+  const debouncedSellersMax = useDebounced(sellersMax);
+
   const filters = useMemo(() => ({
     category: selectedCategory,
     excludedBrands,
-    searchQuery,
+    searchQuery: debouncedSearch,
     stockFilter,
     datePreset: selectedDatePreset,
     sortKey,
     sortDir,
     page,
     pageSize: ITEMS_PER_PAGE,
-    priceMin: priceMin === "" ? null : Number(priceMin),
-    priceMax: priceMax === "" ? null : Number(priceMax),
-    sellersMin: sellersMin === "" ? null : Number(sellersMin),
-    sellersMax: sellersMax === "" ? null : Number(sellersMax),
-  }), [selectedCategory, excludedBrands, searchQuery, stockFilter, selectedDatePreset, sortKey, sortDir, page, priceMin, priceMax, sellersMin, sellersMax]);
+    priceMin: debouncedPriceMin === "" ? null : Number(debouncedPriceMin),
+    priceMax: debouncedPriceMax === "" ? null : Number(debouncedPriceMax),
+    sellersMin: debouncedSellersMin === "" ? null : Number(debouncedSellersMin),
+    sellersMax: debouncedSellersMax === "" ? null : Number(debouncedSellersMax),
+  }), [selectedCategory, excludedBrands, debouncedSearch, stockFilter, selectedDatePreset, sortKey, sortDir, page, debouncedPriceMin, debouncedPriceMax, debouncedSellersMin, debouncedSellersMax]);
 
   const { products: paged, totalCount, loading: isLoading } = useProductsPaginated(filters);
   const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE);
@@ -314,17 +330,31 @@ const ProductAnalysis = () => {
     `https://lens.google.com/uploadbyurl?url=${encodeURIComponent(imageUrl)}`;
 
   const exportSelectedToExcel = async () => {
-    if (selectedUrls.size === 0) return;
+    if (selectedUrls.size === 0 || exporting) return;
+    setExporting(true);
+    try {
+      await runExport();
+    } catch (e: any) {
+      console.error("Export Excel échoué:", e);
+      toast.error(e?.message ? `Export échoué : ${e.message}` : "Export échoué. Réessayez.");
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  const runExport = async () => {
+    const XLSX = await import("xlsx");
     const urls = [...selectedUrls];
     // Fetch full data for selected products from the server (in chunks to stay under URL limits)
     const chunkSize = 100;
     const rows: any[] = [];
     for (let i = 0; i < urls.length; i += chunkSize) {
       const chunk = urls.slice(i, i + chunkSize);
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("products")
         .select("title,brand,category,price,sellers_count,in_stock,recurrences,last_seen,added_date,url,image_url")
         .in("url", chunk);
+      if (error) throw error;
       if (data) rows.push(...data);
     }
     const exportRows = rows.map((p: any) => ({
@@ -351,6 +381,7 @@ const ProductAnalysis = () => {
     XLSX.utils.book_append_sheet(wb, ws, "Produits Kraken");
     const date = new Date().toISOString().slice(0, 10);
     XLSX.writeFile(wb, `kraken-produits-${date}.xlsx`);
+    toast.success(`${exportRows.length} produits exportés`);
   };
 
   const clearSelection = () => setSelectedUrls(new Set());
@@ -692,10 +723,11 @@ const ProductAnalysis = () => {
             <div className="flex items-center gap-2">
               <button
                 onClick={exportSelectedToExcel}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary/15 border border-primary/30 text-primary hover:bg-primary/25 transition-all text-xs font-bold"
+                disabled={exporting}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary/15 border border-primary/30 text-primary hover:bg-primary/25 transition-all text-xs font-bold disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <Download className="w-3.5 h-3.5" />
-                Exporter en Excel
+                {exporting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Download className="w-3.5 h-3.5" />}
+                {exporting ? "Export en cours…" : "Exporter en Excel"}
               </button>
               <button
                 onClick={clearSelection}
