@@ -79,25 +79,3 @@ export function mapToProduct(p: SupabaseProduct, index: number): Product {
     addedDate: p.added_date || undefined,
   };
 }
-
-async function fetchAllProducts(): Promise<Product[]> {
-  const { data, error } = await supabase
-    .from("products")
-    .select("*")
-    .order("last_seen", { ascending: false });
-  if (error) throw error;
-  return (data || []).map((p: any, i: number) => mapToProduct(p, i));
-}
-
-export function useProducts() {
-  const { data, isLoading, error } = useQuery({
-    queryKey: ["products-all"],
-    queryFn: fetchAllProducts,
-  });
-
-  return {
-    products: data || [],
-    loading: isLoading,
-    error: error ? (error as Error).message : null,
-  };
-}

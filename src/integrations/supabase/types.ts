@@ -233,6 +233,24 @@ export type Database = {
         }
         Relationships: []
       }
+      products_stats_cache: {
+        Row: {
+          id: number
+          payload: Json
+          updated_at: string
+        }
+        Insert: {
+          id?: number
+          payload: Json
+          updated_at?: string
+        }
+        Update: {
+          id?: number
+          payload?: Json
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -359,6 +377,7 @@ export type Database = {
         Args: { message_id: number; queue_name: string }
         Returns: boolean
       }
+      email_queue_dispatch: { Args: never; Returns: undefined }
       enqueue_email: {
         Args: { payload: Json; queue_name: string }
         Returns: number

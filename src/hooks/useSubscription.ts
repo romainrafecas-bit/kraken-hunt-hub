@@ -1,6 +1,8 @@
-import { useEffect, useState, useCallback } from "react";
+import { useCallback } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { useEffect } from "react";
 
 export type SubStatus =
   | "trialing"
@@ -50,60 +52,91 @@ const computeAccess = (row: any): { hasAccess: boolean; daysLeft: number | null 
   return { hasAccess: false, daysLeft: null };
 };
 
-export const useSubscription = (): SubscriptionState => {
-  const { user } = useAuth();
-  const [row, setRow] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+type Listener = () => void;
+const realtimeRegistry = new Map<string, { channel: any; listeners: Set<Listener> }>();
 
-  const fetchSub = useCallback(async () => {
-    if (!user) {
-      setRow(null);
-      setLoading(false);
-      return;
-    }
-    const { data, error } = await supabase
-      .from("subscriptions")
-      .select("*")
-      .eq("user_id", user.id)
-      .maybeSingle();
-    if (error) console.error("useSubscription error:", error);
-    setRow(data);
-    setLoading(false);
-  }, [user]);
-
-  useEffect(() => {
-    setLoading(true);
-    fetchSub();
-  }, [fetchSub]);
-
-  // Realtime updates — build channel only when user.id changes; avoid re-subscribing on fetchSub identity changes
-  useEffect(() => {
-    if (!user?.id) return;
+function subscribeToSubscription(userId: string, listener: Listener) {
+  let entry = realtimeRegistry.get(userId);
+  if (!entry) {
+    const listeners = new Set<Listener>();
     const channel = supabase
-      .channel(`sub-${user.id}-${Math.random().toString(36).slice(2)}`)
+      .channel(`subscription-${userId}`)
       .on(
         "postgres_changes",
         {
           event: "*",
           schema: "public",
           table: "subscriptions",
-          filter: `user_id=eq.${user.id}`,
+          filter: `user_id=eq.${userId}`,
         },
         () => {
-          fetchSub();
+          realtimeRegistry.get(userId)?.listeners.forEach((l) => l());
         },
       )
       .subscribe();
-    return () => {
-      supabase.removeChannel(channel);
+    entry = { channel, listeners };
+    realtimeRegistry.set(userId, entry);
+  }
+  entry.listeners.add(listener);
+}
+
+function unsubscribeFromSubscription(userId: string, listener: Listener) {
+  const entry = realtimeRegistry.get(userId);
+  if (!entry) return;
+  entry.listeners.delete(listener);
+  if (entry.listeners.size === 0) {
+    supabase.removeChannel(entry.channel);
+    realtimeRegistry.delete(userId);
+  }
+}
+
+/**
+ * Shared subscription state. Backed by React Query so every component that calls
+ * this hook reuses one single request instead of hitting the API each time.
+ */
+export const useSubscription = (): SubscriptionState => {
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
+  const userId = user?.id ?? null;
+
+  const { data: row, isLoading } = useQuery({
+    queryKey: ["subscription", userId],
+    enabled: !!userId,
+    staleTime: 60 * 1000,
+    gcTime: 30 * 60 * 1000,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("subscriptions")
+        .select("*")
+        .eq("user_id", userId!)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const refetch = useCallback(async () => {
+    await queryClient.invalidateQueries({ queryKey: ["subscription", userId] });
+  }, [queryClient, userId]);
+
+  // Realtime updates keep the shared cache fresh (Stripe webhooks, trial end, …).
+  // One single channel is shared by every consumer of this hook (ref-counted),
+  // since Supabase rejects duplicate channel names.
+  useEffect(() => {
+    if (!userId) return;
+    const listener = () => {
+      queryClient.invalidateQueries({ queryKey: ["subscription", userId] });
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.id]);
+    subscribeToSubscription(userId, listener);
+    return () => unsubscribeFromSubscription(userId, listener);
+  }, [userId, queryClient]);
 
   const { hasAccess, daysLeft } = computeAccess(row);
 
   return {
-    loading,
+    loading: !!userId && isLoading,
     status: (row?.status as SubStatus) ?? null,
     trialEndsAt: row?.trial_ends_at ? new Date(row.trial_ends_at) : null,
     currentPeriodEnd: row?.current_period_end ? new Date(row.current_period_end) : null,
@@ -112,6 +145,6 @@ export const useSubscription = (): SubscriptionState => {
     daysLeft,
     isTrialing: row?.status === "trialing",
     isActive: row?.status === "active",
-    refetch: fetchSub,
+    refetch,
   };
 };
