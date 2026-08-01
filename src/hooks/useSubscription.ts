@@ -1,6 +1,8 @@
-import { useEffect, useState, useCallback } from "react";
+import { useCallback } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { useEffect } from "react";
 
 export type SubStatus =
   | "trialing"
@@ -50,60 +52,64 @@ const computeAccess = (row: any): { hasAccess: boolean; daysLeft: number | null 
   return { hasAccess: false, daysLeft: null };
 };
 
+/**
+ * Shared subscription state. Backed by React Query so every component that calls
+ * this hook reuses one single request instead of hitting the API each time.
+ */
 export const useSubscription = (): SubscriptionState => {
   const { user } = useAuth();
-  const [row, setRow] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
+  const userId = user?.id ?? null;
 
-  const fetchSub = useCallback(async () => {
-    if (!user) {
-      setRow(null);
-      setLoading(false);
-      return;
-    }
-    const { data, error } = await supabase
-      .from("subscriptions")
-      .select("*")
-      .eq("user_id", user.id)
-      .maybeSingle();
-    if (error) console.error("useSubscription error:", error);
-    setRow(data);
-    setLoading(false);
-  }, [user]);
+  const { data: row, isLoading } = useQuery({
+    queryKey: ["subscription", userId],
+    enabled: !!userId,
+    staleTime: 60 * 1000,
+    gcTime: 30 * 60 * 1000,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("subscriptions")
+        .select("*")
+        .eq("user_id", userId!)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+  });
 
+  const refetch = useCallback(async () => {
+    await queryClient.invalidateQueries({ queryKey: ["subscription", userId] });
+  }, [queryClient, userId]);
+
+  // Realtime updates keep the shared cache fresh (Stripe webhooks, trial end, …)
   useEffect(() => {
-    setLoading(true);
-    fetchSub();
-  }, [fetchSub]);
-
-  // Realtime updates — build channel only when user.id changes; avoid re-subscribing on fetchSub identity changes
-  useEffect(() => {
-    if (!user?.id) return;
+    if (!userId) return;
     const channel = supabase
-      .channel(`sub-${user.id}-${Math.random().toString(36).slice(2)}`)
+      .channel(`sub-${userId}`)
       .on(
         "postgres_changes",
         {
           event: "*",
           schema: "public",
           table: "subscriptions",
-          filter: `user_id=eq.${user.id}`,
+          filter: `user_id=eq.${userId}`,
         },
         () => {
-          fetchSub();
+          queryClient.invalidateQueries({ queryKey: ["subscription", userId] });
         },
       )
       .subscribe();
     return () => {
       supabase.removeChannel(channel);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.id]);
+  }, [userId, queryClient]);
 
   const { hasAccess, daysLeft } = computeAccess(row);
 
   return {
-    loading,
+    loading: !!userId && isLoading,
     status: (row?.status as SubStatus) ?? null,
     trialEndsAt: row?.trial_ends_at ? new Date(row.trial_ends_at) : null,
     currentPeriodEnd: row?.current_period_end ? new Date(row.current_period_end) : null,
@@ -112,6 +118,6 @@ export const useSubscription = (): SubscriptionState => {
     daysLeft,
     isTrialing: row?.status === "trialing",
     isActive: row?.status === "active",
-    refetch: fetchSub,
+    refetch,
   };
 };
