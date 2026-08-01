@@ -12,6 +12,11 @@ export interface ProductsQueryFilters {
   sellersMax?: number | null;
 }
 
+/** Formate une date en YYYY-MM-DD (sans fuseau horaire). */
+function toDateOnly(year: number, month: number, day: number): string {
+  return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+}
+
 /**
  * Applies all "where" clauses shared between the paginated list query and
  * the "select all matching" query. Does NOT add ordering or range/limit.
