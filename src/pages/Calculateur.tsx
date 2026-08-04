@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { Calculator, Save, RotateCcw, TrendingUp, Trash2, Sparkles } from "lucide-react";
 import KrakkenSidebar from "@/components/dashboard/KrakkenSidebar";
@@ -21,6 +21,7 @@ import {
   type MarketplaceId,
 } from "@/data/marketplaceFees";
 import { useMarginCalculations } from "@/hooks/useMarginCalculations";
+import { markMission } from "@/hooks/useHunterProgress";
 
 interface Inputs {
   label: string;
