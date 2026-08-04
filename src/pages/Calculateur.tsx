@@ -59,6 +59,12 @@ const Calculateur = () => {
   const { calculations, save, remove } = useMarginCalculations();
   const [saving, setSaving] = useState(false);
 
+  useEffect(() => {
+    markMission("marge");
+  }, []);
+
+
+
   const set = <K extends keyof Inputs>(k: K, v: Inputs[K]) =>
     setInputs((s) => ({ ...s, [k]: v }));
 
