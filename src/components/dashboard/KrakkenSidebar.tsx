@@ -58,6 +58,36 @@ const KrakkenSidebar = () => {
         </div>
       </div>
 
+      {/* Progression du chasseur */}
+      <div className="relative z-10 px-3 pt-3">
+        <button
+          onClick={() => navigate("/dashboard")}
+          className="hidden xl:block w-full text-left rounded-xl p-3"
+          style={{
+            background: "hsl(var(--secondary) / 0.5)",
+            border: "1px solid hsl(var(--primary) / 0.15)",
+          }}
+          title="Ta progression"
+        >
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-[11px] font-bold text-foreground truncate">
+              Niv. {level} · {rank}
+            </span>
+            <span className="game-chip game-chip-amber !text-[0.6rem] !px-1.5">
+              <Flame className="w-2.5 h-2.5" />
+              {streak}
+            </span>
+          </div>
+          <div className="xp-track h-1.5">
+            <div className="xp-fill" style={{ width: `${progress}%` }} />
+          </div>
+        </button>
+        <div className="xl:hidden flex flex-col items-center">
+          <span className="font-display font-black text-xs text-primary">{level}</span>
+          <span className="text-[0.5rem] text-muted-foreground uppercase">niv.</span>
+        </div>
+      </div>
+
       {/* Nav */}
       <nav className="flex-1 py-4 px-2 xl:px-3 space-y-1 mt-1 relative z-10">
         {navItems.map((item) => (
