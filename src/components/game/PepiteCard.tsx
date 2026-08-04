@@ -34,13 +34,22 @@ const PepiteCard = ({ product, favorite, onToggleFavorite, delay = 0 }: PepiteCa
       transition={{ duration: 0.4, delay }}
       className="bento-tile bento-interactive p-3.5 flex gap-3.5 items-center"
     >
-      <div className="relative w-16 h-16 rounded-xl overflow-hidden shrink-0 bg-secondary">
+      <div className="relative w-16 h-16 rounded-xl overflow-hidden shrink-0 bg-secondary flex items-center justify-center">
         {product.image ? (
-          <img src={product.image} alt={product.name} loading="lazy" className="w-full h-full object-cover" />
+          <img
+            src={product.image}
+            alt=""
+            loading="lazy"
+            className="w-full h-full object-cover"
+            onError={(e) => {
+              (e.currentTarget as HTMLImageElement).style.display = "none";
+            }}
+          />
         ) : (
-          <Sparkles className="w-5 h-5 m-auto text-muted-foreground" />
+          <Sparkles className="w-5 h-5 text-muted-foreground" />
         )}
       </div>
+
 
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2 mb-1">

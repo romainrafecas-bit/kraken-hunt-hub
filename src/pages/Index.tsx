@@ -111,25 +111,28 @@ const Index = () => {
           </BentoTile>
 
           {/* STATS RAPIDES */}
-          {quickStats.map((s, i) => (
-            <BentoTile key={s.label} delay={0.1 + i * 0.04} className="lg:col-span-1 p-4">
-              <div className="flex items-center gap-3">
-                <span className="w-10 h-10 rounded-xl bg-secondary/70 flex items-center justify-center shrink-0">
-                  <s.icon className={`w-5 h-5 ${s.tone}`} />
-                </span>
-                <div className="min-w-0">
-                  <p className="text-[0.65rem] uppercase tracking-[0.14em] text-muted-foreground truncate">
-                    {s.label}
-                  </p>
-                  {loading && s.label === "Produits à explorer" ? (
-                    <Skeleton className="h-6 w-20 mt-1" />
-                  ) : (
-                    <p className="font-display font-black text-xl tabular-nums">{s.value}</p>
-                  )}
+          <div className="lg:col-span-3 grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {quickStats.map((s, i) => (
+              <BentoTile key={s.label} delay={0.1 + i * 0.04} className="p-4">
+                <div className="flex items-center gap-3">
+                  <span className="w-10 h-10 rounded-xl bg-secondary/70 flex items-center justify-center shrink-0">
+                    <s.icon className={`w-5 h-5 ${s.tone}`} />
+                  </span>
+                  <div className="min-w-0">
+                    <p className="text-[0.65rem] uppercase tracking-[0.14em] text-muted-foreground truncate">
+                      {s.label}
+                    </p>
+                    {loading && s.label === "Produits à explorer" ? (
+                      <Skeleton className="h-6 w-20 mt-1" />
+                    ) : (
+                      <p className="font-display font-black text-xl tabular-nums">{s.value}</p>
+                    )}
+                  </div>
                 </div>
-              </div>
-            </BentoTile>
-          ))}
+              </BentoTile>
+            ))}
+          </div>
+
 
           {/* PÉPITES DU JOUR */}
           <BentoTile delay={0.2} className="lg:col-span-2">
