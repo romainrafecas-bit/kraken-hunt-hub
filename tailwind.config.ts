@@ -12,8 +12,8 @@ export default {
     },
     extend: {
       fontFamily: {
-        display: ["Nunito", "sans-serif"],
-        body: ["DM Sans", "sans-serif"],
+        display: ["Sora", "Nunito", "sans-serif"],
+        body: ["Manrope", "DM Sans", "sans-serif"],
         mono: ["JetBrains Mono", "monospace"],
       },
       colors: {
