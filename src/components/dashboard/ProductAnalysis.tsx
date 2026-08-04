@@ -150,6 +150,31 @@ const ProductAnalysis = () => {
     setSelectedUrls(new Set());
   }, [setSelectedCategory, setExcludedBrands, setSelectedDatePreset, setSortKey, setStockFilter, setSortDir, setPage, setSearchQuery, setPriceMin, setPriceMax, setSellersMin, setSellersMax, setSelectedUrls]);
 
+  // Chasses rapides (presets débutants) déclenchées depuis la page Produits
+  useEffect(() => {
+    const onPreset = (e: Event) => {
+      const f = (e as CustomEvent).detail as Record<string, any>;
+      setPage(0);
+      setSearchQuery("");
+      setPriceMin(f.priceMin ?? "");
+      setPriceMax(f.priceMax ?? "");
+      setSellersMin(f.sellersMin ?? "");
+      setSellersMax(f.sellersMax ?? "");
+      if (f.stockFilter) setStockFilter(f.stockFilter);
+      if (f.datePreset) setSelectedDatePreset(f.datePreset);
+      if (f.category) setSelectedCategory(f.category);
+      if (f.sortKey) setSortKey(f.sortKey);
+      if (f.sortDir) setSortDir(f.sortDir);
+    };
+    const onReset = () => resetAllFilters();
+    window.addEventListener("krakken:hunt-preset", onPreset);
+    window.addEventListener("krakken:hunt-reset", onReset);
+    return () => {
+      window.removeEventListener("krakken:hunt-preset", onPreset);
+      window.removeEventListener("krakken:hunt-reset", onReset);
+    };
+  }, [resetAllFilters, setPage, setSearchQuery, setPriceMin, setPriceMax, setSellersMin, setSellersMax, setStockFilter, setSelectedDatePreset, setSelectedCategory, setSortKey, setSortDir]);
+
   // Cached meta (categories + brands) — shared via React Query so it survives navigation
   const {
     categories: dynamicCategories,
