@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Nunito:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -262,3 +262,104 @@
 
 .scrollbar-hide::-webkit-scrollbar { display: none; }
 .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+@layer components {
+  /* === BENTO TILES (dashboard gamifié) === */
+  .bento-tile {
+    @apply relative rounded-2xl p-5 overflow-hidden bg-card/70 backdrop-blur-xl;
+    border: 1px solid hsl(var(--border) / 0.8);
+    box-shadow: 0 4px 28px -10px hsl(228 50% 2% / 0.7);
+  }
+
+  .bento-glow-teal {
+    border-color: hsl(var(--primary) / 0.22);
+    box-shadow: 0 0 34px -14px hsl(var(--primary) / 0.35), 0 4px 28px -10px hsl(228 50% 2% / 0.7);
+  }
+
+  .bento-glow-violet {
+    border-color: hsl(var(--accent) / 0.22);
+    box-shadow: 0 0 34px -14px hsl(var(--accent) / 0.35), 0 4px 28px -10px hsl(228 50% 2% / 0.7);
+  }
+
+  .bento-interactive {
+    @apply cursor-pointer transition-all duration-300;
+  }
+  .bento-interactive:hover {
+    transform: translateY(-3px);
+    border-color: hsl(var(--primary) / 0.4);
+    box-shadow: 0 0 40px -12px hsl(var(--primary) / 0.4), 0 10px 30px -12px hsl(228 50% 2% / 0.8);
+  }
+
+  /* === XP BAR === */
+  .xp-track {
+    @apply h-2.5 w-full rounded-full overflow-hidden;
+    background: hsl(var(--muted));
+  }
+  .xp-fill {
+    @apply h-full rounded-full;
+    background: linear-gradient(90deg, hsl(var(--primary)), hsl(var(--accent)));
+    box-shadow: 0 0 12px hsl(var(--primary) / 0.5);
+  }
+
+  /* === GAME CHIPS === */
+  .game-chip {
+    @apply inline-flex items-center gap-1 text-[0.7rem] font-bold px-2 py-0.5 rounded-full;
+  }
+  .game-chip-teal {
+    color: hsl(174 72% 62%);
+    background: hsl(var(--primary) / 0.12);
+    border: 1px solid hsl(var(--primary) / 0.25);
+  }
+  .game-chip-violet {
+    color: hsl(262 72% 76%);
+    background: hsl(var(--accent) / 0.12);
+    border: 1px solid hsl(var(--accent) / 0.25);
+  }
+  .game-chip-amber {
+    color: hsl(38 92% 66%);
+    background: hsl(38 92% 56% / 0.12);
+    border: 1px solid hsl(38 92% 56% / 0.25);
+  }
+
+  /* === MISSIONS === */
+  .mission-row {
+    @apply w-full flex items-center gap-3 rounded-xl px-3 py-2.5 transition-all duration-200;
+    background: hsl(var(--secondary) / 0.5);
+    border: 1px solid hsl(var(--border) / 0.7);
+  }
+  .mission-row:hover {
+    border-color: hsl(var(--primary) / 0.35);
+    background: hsl(var(--secondary) / 0.8);
+  }
+  .mission-row-done {
+    opacity: 0.6;
+  }
+  .mission-check {
+    @apply w-5 h-5 rounded-full flex items-center justify-center shrink-0;
+    border: 1.5px solid hsl(var(--primary) / 0.4);
+  }
+  .mission-check-done {
+    background: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+    border-color: hsl(var(--primary));
+    box-shadow: 0 0 12px hsl(var(--primary) / 0.5);
+  }
+
+  /* === QUICK HUNT PRESETS === */
+  .hunt-chip {
+    @apply flex items-center gap-2 rounded-xl px-3.5 py-2 text-sm font-semibold transition-all duration-200 whitespace-nowrap;
+    background: hsl(var(--secondary) / 0.6);
+    border: 1px solid hsl(var(--border));
+    color: hsl(var(--foreground));
+  }
+  .hunt-chip:hover {
+    border-color: hsl(var(--primary) / 0.45);
+    box-shadow: 0 0 20px -8px hsl(var(--primary) / 0.5);
+    transform: translateY(-2px);
+  }
+  .hunt-chip-active {
+    background: hsl(var(--primary) / 0.15);
+    border-color: hsl(var(--primary) / 0.55);
+    color: hsl(174 72% 68%);
+  }
+}
