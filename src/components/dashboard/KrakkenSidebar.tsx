@@ -1,23 +1,25 @@
-import { LayoutDashboard, Package, Calculator, Anchor, User, Heart, LogOut, Crown, Sparkles, HelpCircle } from "lucide-react";
+import { Compass, Target, Calculator, User, Heart, LogOut, Crown, Sparkles, HelpCircle, Flame } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { NavLink, useNavigate } from "react-router-dom";
 import krakkenLogo from "@/assets/krakken-logo.png";
 import { useAuth } from "@/contexts/AuthContext";
 import { useSubscription } from "@/hooks/useSubscription";
+import { useHunterProgress } from "@/hooks/useHunterProgress";
 
 const navItems = [
-  { icon: LayoutDashboard, label: "Dashboard", to: "/dashboard" },
-  { icon: Package, label: "Produits", to: "/produits" },
-  { icon: Heart, label: "Favoris", to: "/favoris" },
-  { icon: Calculator, label: "Calculateur", to: "/calculateur" },
+  { icon: Compass, label: "Accueil", to: "/dashboard" },
+  { icon: Target, label: "Chasse aux pépites", to: "/produits" },
+  { icon: Heart, label: "Mes pépites", to: "/favoris" },
+  { icon: Calculator, label: "Calcul de marge", to: "/calculateur" },
   { icon: User, label: "Mon profil", to: "/profil" },
   { icon: Crown, label: "Abonnement", to: "/abonnement" },
-  { icon: HelpCircle, label: "FAQ", to: "/faq" },
+  { icon: HelpCircle, label: "Aide", to: "/faq" },
 ];
 
 const KrakkenSidebar = () => {
   const { signOut } = useAuth();
   const navigate = useNavigate();
+  const { level, rank, progress, streak } = useHunterProgress();
   const { isTrialing, isActive, daysLeft } = useSubscription();
   const handleSignOut = async () => {
     await signOut();
