@@ -41,7 +41,7 @@ const KrakkenNav = () => {
 
   const linkClass = ({ isActive }: { isActive: boolean }) =>
     cn(
-      "group relative flex h-16 items-center gap-2 px-3 text-[13px] transition-colors whitespace-nowrap",
+      "group relative flex h-16 items-center gap-2 px-3 text-sm transition-colors whitespace-nowrap",
       isActive
         ? "text-foreground font-semibold"
         : "text-sidebar-foreground hover:text-foreground",
@@ -96,8 +96,8 @@ const KrakkenNav = () => {
               className="hidden md:flex h-8 items-center gap-2 border border-border px-3 text-left"
               title="Gérer mon abonnement"
             >
-              <span className="text-[11px] text-foreground font-semibold">Essai</span>
-              <span className="text-[11px] text-primary font-mono">{daysLeft} j</span>
+              <span className="text-xs text-foreground font-semibold">Essai</span>
+              <span className="text-xs text-primary font-mono">{daysLeft} j</span>
             </Button>
           )}
           {isActive && (
@@ -105,7 +105,7 @@ const KrakkenNav = () => {
               className="hidden md:flex items-center gap-1.5 border border-border px-2.5 py-1.5 rounded-md"
             >
               <Crown className="w-3.5 h-3.5 text-primary" />
-              <span className="text-[11px] text-foreground font-semibold">Pro</span>
+              <span className="text-xs text-foreground font-semibold">Pro</span>
             </span>
           )}
           <DropdownMenu>
@@ -152,7 +152,7 @@ const KrakkenNav = () => {
               {({ isActive }) => (
                 <>
                   <item.icon className="w-4 h-4" />
-                  <span className="text-[13px]">{item.label}</span>
+                  <span className="text-sm">{item.label}</span>
                 </>
               )}
             </NavLink>

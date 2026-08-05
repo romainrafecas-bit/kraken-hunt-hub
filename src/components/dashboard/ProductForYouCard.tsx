@@ -22,7 +22,7 @@ const ProductForYouCard = ({ product, rank, isFavorite, onToggleFavorite }: Prop
         {imageFailed || !product.image ? (
           <div className="flex h-full flex-col items-center justify-center gap-2 text-muted-foreground">
             <ImageOff className="w-5 h-5" strokeWidth={1.5} />
-            <span className="text-[10px]">Aperçu indisponible</span>
+            <span className="text-xs">Aperçu indisponible</span>
           </div>
         ) : (
           <img
@@ -35,7 +35,7 @@ const ProductForYouCard = ({ product, rank, isFavorite, onToggleFavorite }: Prop
           />
         )}
         {rank != null && rank <= 3 && (
-          <span className="absolute top-2 left-2 px-2 py-0.5 rounded-sm bg-primary/10 text-[10px] font-bold text-primary">
+          <span className="absolute top-2 left-2 px-2 py-0.5 rounded-sm bg-primary/10 text-xs font-bold text-primary">
             TOP {rank}
           </span>
         )}
@@ -54,7 +54,7 @@ const ProductForYouCard = ({ product, rank, isFavorite, onToggleFavorite }: Prop
       </div>
 
       <div className="min-w-0 space-y-2">
-        <p className="text-[10px] uppercase text-muted-foreground truncate">
+        <p className="text-xs uppercase text-muted-foreground truncate">
           {product.brand} · {getCategoryLabel(product.category)}
         </p>
         <h3 className="text-sm font-semibold text-foreground leading-snug line-clamp-2">{product.name}</h3>
@@ -62,10 +62,10 @@ const ProductForYouCard = ({ product, rank, isFavorite, onToggleFavorite }: Prop
           <span className="text-base font-bold text-foreground">
             {outOfStock ? "—" : `${product.price.toFixed(2)} €`}
           </span>
-           <span className="flex items-center gap-1 text-[11px] text-primary">
+           <span className="flex items-center gap-1 text-xs text-primary">
              <Repeat className="w-3 h-3" /> {product.recurrences} réc.
           </span>
-           <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
+           <span className="flex items-center gap-1 text-xs text-muted-foreground">
              <Users className="w-3 h-3" /> {product.sellers} vend.
           </span>
         </div>

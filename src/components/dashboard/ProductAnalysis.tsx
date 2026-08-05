@@ -469,7 +469,7 @@ const ProductAnalysis = () => {
               </button>
             )}
             {!metaLoading && !metaError && dynamicCategories.length > 1 && (
-              <span className="text-[10px] uppercase tracking-wider text-muted-foreground/70 font-medium whitespace-nowrap">
+              <span className="text-xs uppercase tracking-wider text-muted-foreground font-medium whitespace-nowrap">
                 {dynamicCategories.length - 1} cat.
               </span>
             )}
@@ -552,7 +552,7 @@ const ProductAnalysis = () => {
               placeholder="Min"
               value={priceMin}
               onChange={e => { setPriceMin(e.target.value); setPage(0); }}
-              className="bg-transparent w-16 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none"
+              className="bg-transparent w-16 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
             />
             <span className="text-muted-foreground/50 text-xs">–</span>
             <input
@@ -561,7 +561,7 @@ const ProductAnalysis = () => {
               placeholder="Max"
               value={priceMax}
               onChange={e => { setPriceMax(e.target.value); setPage(0); }}
-              className="bg-transparent w-16 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none"
+              className="bg-transparent w-16 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
             />
             {(priceMin !== "" || priceMax !== "") && (
               <button
@@ -583,7 +583,7 @@ const ProductAnalysis = () => {
               placeholder="Min"
               value={sellersMin}
               onChange={e => { setSellersMin(e.target.value); setPage(0); }}
-              className="bg-transparent w-14 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none"
+              className="bg-transparent w-14 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
             />
             <span className="text-muted-foreground/50 text-xs">–</span>
             <input
@@ -592,7 +592,7 @@ const ProductAnalysis = () => {
               placeholder="Max"
               value={sellersMax}
               onChange={e => { setSellersMax(e.target.value); setPage(0); }}
-              className="bg-transparent w-14 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none"
+              className="bg-transparent w-14 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
             />
             {(sellersMin !== "" || sellersMax !== "") && (
               <button
@@ -640,7 +640,7 @@ const ProductAnalysis = () => {
                     placeholder="Rechercher une marque…"
                     value={brandSearch}
                     onChange={e => setBrandSearch(e.target.value)}
-                    className="w-full bg-secondary/60 border border-border/40 rounded-lg pl-8 pr-3 py-1.5 text-xs text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:border-primary/40"
+                    className="w-full bg-secondary/60 border border-border/40 rounded-lg pl-8 pr-3 py-1.5 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/40"
                   />
                 </div>
                 {excludedBrands.size > 0 && (
@@ -709,7 +709,7 @@ const ProductAnalysis = () => {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
               <input type="text" placeholder="Traquer un produit..." value={searchQuery}
                 onChange={e => { setSearchQuery(e.target.value); setPage(0); }}
-                className="bg-secondary/60 border border-border/40 rounded-xl pl-9 pr-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 w-full lg:w-56 transition-all" />
+                className="bg-secondary/60 border border-border/40 rounded-xl pl-9 pr-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 w-full lg:w-56 transition-all" />
             </div>
           </div>
         </div>
@@ -847,7 +847,7 @@ const ProductAnalysis = () => {
                     </a>
                   </td>
                   <td className="px-4 py-3"><span className="text-sm font-medium text-foreground/85">{product.brand}</span></td>
-                  <td className="px-4 py-3"><span className="bio-badge bio-cyan text-[10px]">{formatCategoryName(product.category)}</span></td>
+                  <td className="px-4 py-3"><span className="bio-badge bio-cyan text-xs">{formatCategoryName(product.category)}</span></td>
                   <td className="px-4 py-3">
                     {product.price === -1 ? (
                       <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-bold bg-red-500/15 text-red-400 border border-red-500/25">Rupture</span>
