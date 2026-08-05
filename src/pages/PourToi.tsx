@@ -128,7 +128,7 @@ const MiniRow = ({
       />
     </span>
     <span className="flex-1 min-w-0">
-      <span className="block text-[12px] font-semibold text-foreground truncate">{product.name}</span>
+      <span className="block text-xs font-semibold text-foreground truncate">{product.name}</span>
       <span className="block text-xs text-muted-foreground font-mono">
         {product.price === -1 ? "—" : `${product.price.toFixed(2)} €`} · {product.recurrences} réc.
       </span>
@@ -156,7 +156,7 @@ const PourToi = () => {
   return (
     <div className="min-h-screen bg-background">
       <KrakkenNav />
-      <main className="max-w-[1440px] mx-auto pt-24 px-4 lg:px-8 pb-12 space-y-8">
+      <main id="main" className="max-w-[1440px] mx-auto pt-24 px-4 lg:px-8 pb-12 space-y-8">
         {/* En-tête éditorial */}
         <section className="flex flex-wrap items-end justify-between gap-4">
           <div>
@@ -168,7 +168,7 @@ const PourToi = () => {
           </div>
           <div className="flex items-center gap-2">
             {isFetching && !isLoading && <Loader2 className="w-3.5 h-3.5 text-primary animate-spin" />}
-            <span className="flex items-center gap-2 px-3 py-2 rounded-md border border-border text-[12px] text-muted-foreground">
+            <span className="flex items-center gap-2 px-3 py-2 rounded-md border border-border text-xs text-muted-foreground">
               <Wallet className="w-3.5 h-3.5 text-primary/70" />
               <select
                 value={BUDGETS.findIndex(
@@ -178,7 +178,7 @@ const PourToi = () => {
                   const b = BUDGETS[Number(e.target.value)] ?? BUDGETS[0];
                   update({ budgetMin: b.min, budgetMax: b.max });
                 }}
-                className="bg-transparent text-foreground text-[12px] font-semibold outline-none cursor-pointer"
+                className="bg-transparent text-foreground text-xs font-semibold outline-none cursor-pointer"
               >
                 {BUDGETS.map((b, i) => (
                   <option key={b.label} value={i} className="bg-card">
@@ -188,7 +188,7 @@ const PourToi = () => {
               </select>
             </span>
             <label
-              className="flex items-center gap-2 px-3 py-2 rounded-md border border-border text-[12px] text-muted-foreground cursor-pointer"
+              className="flex items-center gap-2 px-3 py-2 rounded-md border border-border text-xs text-muted-foreground cursor-pointer"
             >
               <input
                 type="checkbox"
@@ -213,19 +213,19 @@ const PourToi = () => {
         </section>
 
         {/* Chips catégories */}
-        <section className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
+        <section className="flex gap-2 overflow-x-auto scrollbar-hide scroll-fade-x pb-1">
           <Button
             variant="outline"
             onClick={() => update({ categories: [] })}
             className={cn(
-              "h-8 px-3.5 text-[12px] flex-shrink-0",
+              "h-8 px-3.5 text-xs flex-shrink-0",
               preferences.categories.length === 0 ? "border-primary text-primary" : "text-muted-foreground",
             )}
           >
             Toutes catégories
           </Button>
           {metaLoading && (
-            <span className="flex items-center gap-2 text-[12px] text-muted-foreground px-2">
+            <span className="flex items-center gap-2 text-xs text-muted-foreground px-2">
               <Loader2 className="w-3.5 h-3.5 animate-spin" /> chargement…
             </span>
           )}
@@ -237,7 +237,7 @@ const PourToi = () => {
                 key={c}
                 onClick={() => toggleCategory(c)}
                 className={cn(
-                  "h-8 gap-1.5 px-3.5 text-[12px] flex-shrink-0",
+                  "h-8 gap-1.5 px-3.5 text-xs flex-shrink-0",
                   active ? "border-primary text-primary" : "text-muted-foreground",
                 )}
               >
@@ -318,7 +318,7 @@ const PourToi = () => {
                 <h2 className="kraken-title text-lg">Fraîches captures</h2>
                 <span className="text-xs text-muted-foreground">Repérées le plus récemment</span>
               </div>
-              <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-2 snap-x">
+              <div className="flex gap-4 overflow-x-auto scrollbar-hide scroll-fade-x pb-2 snap-x">
                 {recent.map((p) => (
                   <div key={p.url} className="w-44 md:w-52 flex-shrink-0 snap-start">
                     <ProductForYouCard

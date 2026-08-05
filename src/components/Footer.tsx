@@ -18,9 +18,9 @@ const Footer = () => {
             className="w-5 h-5 object-contain"
             style={{ opacity: 0.25, filter: "drop-shadow(0 0 4px hsl(174 72% 46% / 0.3))" }}
           />
-          <span className="text-[11px] text-foreground/40">© {new Date().getFullYear()} Krakken</span>
+          <span className="text-xs text-muted-foreground">© {new Date().getFullYear()} Krakken</span>
         </div>
-        <nav className="flex flex-wrap items-center gap-x-5 gap-y-2 text-[11px] text-foreground/50">
+        <nav className="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-muted-foreground">
           <Link to="/cgv" className="hover:text-primary transition-colors">CGV</Link>
           <span className="text-foreground/15">·</span>
           <Link to="/confidentialite" className="hover:text-primary transition-colors">Confidentialité</Link>

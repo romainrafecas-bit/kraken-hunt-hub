@@ -145,7 +145,7 @@ const Calculateur = () => {
   return (
     <div className="min-h-screen flex bg-background">
       <KrakkenSidebar />
-      <main className="flex-1 ml-16 xl:ml-56 p-6 lg:p-10">
+      <main id="main" className="mx-auto w-full max-w-[1440px] px-4 pb-12 pt-24 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}

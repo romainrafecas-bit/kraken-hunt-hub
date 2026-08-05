@@ -39,7 +39,7 @@ const TopBrands = ({ products, loading }: TopBrandsProps) => {
           <div key={brand.name} className="group">
             <div className="flex justify-between text-xs mb-1.5">
               <span className="text-secondary-foreground font-medium group-hover:text-foreground transition-colors">{brand.name}</span>
-              <span className="text-muted-foreground font-mono text-[11px]">{brand.sales.toLocaleString()}</span>
+              <span className="text-muted-foreground font-mono text-xs">{brand.sales.toLocaleString()}</span>
             </div>
             <div className="w-full h-2 rounded-full bg-muted/40 overflow-hidden">
               <motion.div initial={{ width: 0 }} animate={{ width: `${(brand.sales / maxSales) * 100}%` }}

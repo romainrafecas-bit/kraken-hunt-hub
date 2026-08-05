@@ -81,7 +81,7 @@ const Abonnement = () => {
     <div className="min-h-screen abyss-gradient">
       <PaymentTestModeBanner />
       <KrakkenSidebar />
-      <main className="pt-24 px-4 lg:px-6 pb-10 space-y-5 max-w-4xl">
+      <main id="main" className="mx-auto w-full max-w-4xl space-y-6 px-4 pb-12 pt-24 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
@@ -163,11 +163,11 @@ const Abonnement = () => {
                     </div>
                   </div>
                   {cancelAtPeriodEnd ? (
-                    <span className="text-[11px] px-2 py-1 rounded-md bg-destructive/10 text-destructive font-semibold">
+                    <span className="text-xs px-2 py-1 rounded-md bg-destructive/10 text-destructive font-semibold">
                       Annulation programmée
                     </span>
                   ) : (
-                    <span className="text-[11px] px-2 py-1 rounded-md bg-primary/10 text-primary font-semibold">
+                    <span className="text-xs px-2 py-1 rounded-md bg-primary/10 text-primary font-semibold">
                       Actif
                     </span>
                   )}
@@ -205,7 +205,7 @@ const Abonnement = () => {
                     </button>
                   )}
                 </div>
-                <p className="text-[11px] text-muted-foreground">
+                <p className="text-xs text-muted-foreground">
                   La gestion (carte, factures, annulation) s'ouvre dans un nouvel onglet via notre portail sécurisé.
                 </p>
               </motion.div>

@@ -53,7 +53,7 @@ const CategoryBreakdown = ({ products, loading }: CategoryBreakdownProps) => {
         <h3 className="font-display text-sm font-bold text-foreground flex items-center gap-2">
           <span style={{ filter: 'drop-shadow(0 0 4px hsl(188 78% 52% / 0.4))' }}>🌊</span> Zones de chasse
         </h3>
-        <span className="bio-badge bio-cyan text-[10px]">{sorted.length} zones</span>
+        <span className="bio-badge bio-cyan text-xs">{sorted.length} zones</span>
       </div>
       <div className="grid grid-cols-2 gap-2.5">
         {sorted.map((cat, i) => {
@@ -72,7 +72,7 @@ const CategoryBreakdown = ({ products, loading }: CategoryBreakdownProps) => {
                     <span className="text-sm" style={{ filter: `drop-shadow(0 0 3px ${c.glow})` }}>{icon}</span>
                     <span className="text-xs font-bold truncate" style={{ color: c.bar }}>{cat.name}</span>
                   </div>
-                  <span className="text-[10px] font-mono font-black" style={{ color: c.bar, textShadow: `0 0 8px ${c.glow}` }}>{pct}%</span>
+                  <span className="text-xs font-mono font-black" style={{ color: c.bar, textShadow: `0 0 8px ${c.glow}` }}>{pct}%</span>
                 </div>
                 <div className="h-1.5 rounded-full overflow-hidden mb-2" style={{ background: 'hsl(225 18% 10%)' }}>
                   <motion.div initial={{ width: 0 }} animate={{ width: `${pct}%` }}
@@ -80,8 +80,8 @@ const CategoryBreakdown = ({ products, loading }: CategoryBreakdownProps) => {
                     className="h-full rounded-full" style={{ backgroundColor: c.bar, boxShadow: `0 0 10px ${c.glow}` }} />
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] text-muted-foreground">{cat.count} produit{cat.count > 1 ? "s" : ""}</span>
-                  <span className="text-[10px] font-mono text-muted-foreground">{cat.sales.toLocaleString("fr-FR")} ventes</span>
+                  <span className="text-xs text-muted-foreground">{cat.count} produit{cat.count > 1 ? "s" : ""}</span>
+                  <span className="text-xs font-mono text-muted-foreground">{cat.sales.toLocaleString("fr-FR")} ventes</span>
                 </div>
               </div>
             </motion.div>
