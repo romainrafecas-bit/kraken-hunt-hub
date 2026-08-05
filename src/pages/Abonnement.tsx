@@ -163,11 +163,11 @@ const Abonnement = () => {
                     </div>
                   </div>
                   {cancelAtPeriodEnd ? (
-                    <span className="text-[11px] px-2 py-1 rounded-md bg-destructive/10 text-destructive font-semibold">
+                    <span className="text-xs px-2 py-1 rounded-md bg-destructive/10 text-destructive font-semibold">
                       Annulation programmée
                     </span>
                   ) : (
-                    <span className="text-[11px] px-2 py-1 rounded-md bg-primary/10 text-primary font-semibold">
+                    <span className="text-xs px-2 py-1 rounded-md bg-primary/10 text-primary font-semibold">
                       Actif
                     </span>
                   )}
@@ -205,7 +205,7 @@ const Abonnement = () => {
                     </button>
                   )}
                 </div>
-                <p className="text-[11px] text-muted-foreground">
+                <p className="text-xs text-muted-foreground">
                   La gestion (carte, factures, annulation) s'ouvre dans un nouvel onglet via notre portail sécurisé.
                 </p>
               </motion.div>

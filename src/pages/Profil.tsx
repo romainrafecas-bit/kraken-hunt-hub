@@ -129,7 +129,7 @@ const Profil = () => {
                   <h1 className="kraken-title text-2xl group-hover:text-primary transition-colors">
                     {profile?.display_name || email.split("@")[0] || "Élève"}
                   </h1>
-                  <span className="text-[10px] text-muted-foreground/60 group-hover:text-primary/60">cliquer pour modifier</span>
+                  <span className="text-xs text-muted-foreground group-hover:text-primary/60">cliquer pour modifier</span>
                 </button>
               )}
               <div className="flex flex-wrap gap-3 mt-2.5">
@@ -190,7 +190,7 @@ const Profil = () => {
               </div>
               <div>
                 <p className="text-2xl font-bold text-foreground font-display leading-none">{totalFavorites}</p>
-                <p className="text-[11px] text-muted-foreground mt-1">Favoris au total</p>
+                <p className="text-xs text-muted-foreground mt-1">Favoris au total</p>
               </div>
             </motion.div>
 
@@ -209,7 +209,7 @@ const Profil = () => {
               </div>
               <div className="min-w-0">
                 <p className="text-base font-bold text-foreground font-display leading-tight truncate">{favoriteCategory}</p>
-                <p className="text-[11px] text-muted-foreground mt-1">Catégorie favorite</p>
+                <p className="text-xs text-muted-foreground mt-1">Catégorie favorite</p>
               </div>
             </motion.div>
 
@@ -230,7 +230,7 @@ const Profil = () => {
                   const pct = totalFavorites ? Math.round((count / totalFavorites) * 100) : 0;
                   return (
                     <div key={c} className="space-y-1">
-                      <div className="flex justify-between text-[11px]">
+                      <div className="flex justify-between text-xs">
                         <span className="text-muted-foreground">{c}</span>
                         <span className="text-foreground font-semibold">{count}</span>
                       </div>
