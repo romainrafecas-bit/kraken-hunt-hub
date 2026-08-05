@@ -19,7 +19,7 @@ const Favoris = () => {
     return (
       <div className="min-h-screen abyss-gradient">
         <KrakkenSidebar />
-        <main className="pl-16 xl:pl-56 p-4 lg:p-6 space-y-5">
+        <main className="pt-16 p-4 lg:p-6 space-y-5">
           <Skeleton className="h-20 w-full rounded-2xl" />
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
             {Array.from({ length: 8 }).map((_, i) => <Skeleton key={i} className="h-72 rounded-xl" />)}
@@ -32,7 +32,7 @@ const Favoris = () => {
   return (
     <div className="min-h-screen abyss-gradient">
       <KrakkenSidebar />
-      <main className="pl-16 xl:pl-56 p-4 lg:p-6 space-y-5">
+      <main className="pt-16 p-4 lg:p-6 space-y-5">
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4 }} className="glass-panel-glow p-5 relative overflow-hidden">
           <div className="absolute top-0 right-0 w-48 h-48 pointer-events-none" style={{ background: 'radial-gradient(ellipse at 100% 0%, hsl(var(--kraken-rose) / 0.06), transparent 60%)' }} />
           <div className="flex items-center justify-between relative z-10">
