@@ -134,7 +134,7 @@ const KrakkenNav = () => {
           )}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="hidden lg:inline-flex h-9 w-9" title="Compte et réglages">
+              <Button variant="ghost" size="icon" className="hidden h-10 w-10 lg:inline-flex" title="Compte et réglages" aria-label="Compte et réglages">
                 <MoreHorizontal className="w-4 h-4" />
               </Button>
             </DropdownMenuTrigger>
