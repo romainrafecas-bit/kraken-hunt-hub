@@ -213,7 +213,7 @@ const PourToi = () => {
         </section>
 
         {/* Chips catégories */}
-        <section className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
+        <section className="flex gap-2 overflow-x-auto scrollbar-hide scroll-fade-x pb-1">
           <Button
             variant="outline"
             onClick={() => update({ categories: [] })}
@@ -318,7 +318,7 @@ const PourToi = () => {
                 <h2 className="kraken-title text-lg">Fraîches captures</h2>
                 <span className="text-xs text-muted-foreground">Repérées le plus récemment</span>
               </div>
-              <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-2 snap-x">
+              <div className="flex gap-4 overflow-x-auto scrollbar-hide scroll-fade-x pb-2 snap-x">
                 {recent.map((p) => (
                   <div key={p.url} className="w-44 md:w-52 flex-shrink-0 snap-start">
                     <ProductForYouCard
