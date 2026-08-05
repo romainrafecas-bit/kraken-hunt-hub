@@ -43,7 +43,7 @@ const Spotlight = ({
     initial={{ opacity: 0, scale: 0.99 }}
     animate={{ opacity: 1, scale: 1 }}
     transition={{ duration: 0.4 }}
-    className="glass-panel-glow relative overflow-hidden p-5 lg:p-7 h-full flex flex-col lg:flex-row gap-6 items-center"
+    className="glass-panel-glow relative overflow-hidden p-5 lg:p-7 h-full min-w-0 flex flex-col lg:flex-row gap-6 items-center"
   >
     <div
       className="absolute inset-0 pointer-events-none"
