@@ -1,164 +1,202 @@
-import { LayoutDashboard, Package, Calculator, Anchor, User, Heart, LogOut, Crown, Sparkles, HelpCircle } from "lucide-react";
+import { Gauge, Boxes, Calculator, Bookmark, CircleUserRound, LogOut, Crown, Flame, LifeBuoy, Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { NavLink, useNavigate } from "react-router-dom";
+import { useState } from "react";
 import krakkenLogo from "@/assets/krakken-logo.png";
 import { useAuth } from "@/contexts/AuthContext";
 import { useSubscription } from "@/hooks/useSubscription";
 
 const navItems = [
-  { icon: Sparkles, label: "Produits pour toi", to: "/pour-toi" },
-  { icon: LayoutDashboard, label: "Dashboard", to: "/dashboard" },
-  { icon: Package, label: "Produits", to: "/produits" },
-  { icon: Heart, label: "Favoris", to: "/favoris" },
+  { icon: Flame, label: "Pour toi", to: "/pour-toi" },
+  { icon: Gauge, label: "Dashboard", to: "/dashboard" },
+  { icon: Boxes, label: "Produits", to: "/produits" },
+  { icon: Bookmark, label: "Favoris", to: "/favoris" },
   { icon: Calculator, label: "Calculateur", to: "/calculateur" },
-  { icon: User, label: "Mon profil", to: "/profil" },
+  { icon: CircleUserRound, label: "Profil", to: "/profil" },
   { icon: Crown, label: "Abonnement", to: "/abonnement" },
-  { icon: HelpCircle, label: "FAQ", to: "/faq" },
+  { icon: LifeBuoy, label: "FAQ", to: "/faq" },
 ];
 
-const KrakkenSidebar = () => {
+const KrakkenNav = () => {
   const { signOut } = useAuth();
   const navigate = useNavigate();
   const { isTrialing, isActive, daysLeft } = useSubscription();
+  const [mobileOpen, setMobileOpen] = useState(false);
+
   const handleSignOut = async () => {
     await signOut();
     navigate("/auth");
   };
-  return (
-    <aside className="w-16 xl:w-56 h-screen bg-sidebar backdrop-blur-xl border-r border-sidebar-border flex flex-col fixed left-0 top-0 z-50 overflow-hidden">
-      {/* Atmospheric background */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute bottom-0 left-0 right-0 h-40 opacity-30"
-          style={{
-            background: 'radial-gradient(ellipse at 50% 100%, hsl(174 72% 46% / 0.12), transparent 70%)',
-          }}
-        />
-        <div className="absolute top-20 -left-4 w-32 h-64 opacity-10"
-          style={{
-            background: 'radial-gradient(ellipse, hsl(262 52% 58% / 0.3), transparent 70%)',
-          }}
-        />
-      </div>
 
-      {/* Logo */}
-      <div className="relative p-3 xl:p-4 flex items-center gap-3 border-b border-sidebar-border h-16">
-        <div className="w-10 h-10 rounded-2xl flex items-center justify-center flex-shrink-0 overflow-hidden relative" style={{
-          background: 'linear-gradient(145deg, hsl(228 42% 7%), hsl(225 35% 5%))',
-          border: '1px solid hsl(174 72% 46% / 0.2)',
-          boxShadow: '0 0 20px -4px hsl(174 72% 46% / 0.25), inset 0 0 12px hsl(174 72% 46% / 0.05)'
-        }}>
-          <img src={krakkenLogo} alt="Krakken" className="w-9 h-9 object-contain" style={{
-            filter: 'drop-shadow(0 0 6px hsl(174 72% 46% / 0.4))'
-          }} />
-        </div>
-        <div className="hidden xl:block">
-          <h1 className="kraken-title text-base tracking-wide">KRAKKEN</h1>
-          <p className="text-[0.55rem] text-muted-foreground font-medium uppercase tracking-[0.2em]">Chasseur des abysses</p>
-        </div>
-      </div>
+  const linkClass = ({ isActive }: { isActive: boolean }) =>
+    cn(
+      "group relative flex items-center gap-2 px-3 py-2 rounded-xl transition-all duration-300 whitespace-nowrap",
+      isActive
+        ? "text-primary font-semibold"
+        : "text-sidebar-foreground hover:text-foreground hover:bg-sidebar-accent/50",
+    );
 
-      {/* Nav */}
-      <nav className="flex-1 py-4 px-2 xl:px-3 space-y-1 mt-1 relative z-10">
-        {navItems.map((item) => (
-          <NavLink
-            key={item.label}
-            to={item.to}
-            end={item.to === "/dashboard"}
-            className={({ isActive }) =>
-              cn(
-                "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-300 group relative",
-                isActive
-                  ? "text-primary font-semibold"
-                  : "text-sidebar-foreground hover:text-foreground hover:bg-sidebar-accent/60"
-              )
+  const renderIcon = (Icon: typeof Gauge, isActive: boolean) => (
+    <span
+      className={cn(
+        "w-7 h-7 rounded-[0.6rem] flex items-center justify-center flex-shrink-0 transition-all duration-300",
+        !isActive && "group-hover:scale-[1.06]",
+      )}
+      style={
+        isActive
+          ? {
+              background: "linear-gradient(145deg, hsl(174 72% 46% / 0.22), hsl(262 52% 58% / 0.16))",
+              border: "1px solid hsl(174 72% 56% / 0.35)",
+              boxShadow: "0 0 14px -3px hsl(174 72% 46% / 0.5), inset 0 1px 0 hsl(185 80% 70% / 0.18)",
             }
-          >
-            {({ isActive }) => (
-              <>
-                {isActive && (
-                  <>
-                    <div className="absolute inset-0 rounded-xl overflow-hidden">
-                      <div className="absolute inset-0 bg-primary/[0.07]" />
-                      <div className="absolute inset-0" style={{
-                        background: 'linear-gradient(90deg, hsl(174 72% 46% / 0.12), transparent)',
-                      }} />
-                    </div>
-                    <div className="absolute left-0 top-2 bottom-2 w-[3px] rounded-r-full" style={{
-                      background: 'linear-gradient(180deg, hsl(174 72% 56%), hsl(262 52% 58%))',
-                      boxShadow: '0 0 10px hsl(174 72% 46% / 0.5), 0 0 20px hsl(174 72% 46% / 0.2)'
-                    }} />
-                  </>
-                )}
-                <item.icon className={cn(
-                  "w-[18px] h-[18px] flex-shrink-0 relative z-10 transition-all duration-300",
-                  isActive ? "text-primary" : "group-hover:text-primary/70"
-                )} style={isActive ? { filter: 'drop-shadow(0 0 4px hsl(174 72% 46% / 0.4))' } : {}} />
-                <span className="hidden xl:block text-[13px] relative z-10">{item.label}</span>
-              </>
-            )}
-          </NavLink>
-        ))}
-      </nav>
+          : {
+              background: "linear-gradient(145deg, hsl(225 26% 12% / 0.9), hsl(228 38% 8% / 0.9))",
+              border: "1px solid hsl(225 20% 18%)",
+            }
+      }
+    >
+      <Icon
+        className={cn("w-[15px] h-[15px] transition-colors duration-300", isActive ? "text-primary" : "group-hover:text-primary/80")}
+        strokeWidth={2.1}
+        style={isActive ? { filter: "drop-shadow(0 0 5px hsl(174 72% 46% / 0.55))" } : {}}
+      />
+    </span>
+  );
 
-      {/* Tentacle divider */}
-      <div className="mx-4 tentacle-line" />
+  return (
+    <header
+      className="fixed top-0 left-0 right-0 z-50 h-16 bg-sidebar/85 backdrop-blur-xl border-b border-sidebar-border"
+      style={{ boxShadow: "0 6px 32px -18px hsl(228 50% 2% / 0.9)" }}
+    >
+      {/* Ambient glow */}
+      <div
+        className="absolute inset-0 pointer-events-none opacity-60"
+        style={{ background: "radial-gradient(ellipse at 12% 120%, hsl(174 72% 46% / 0.1), transparent 60%)" }}
+      />
 
-      {/* Status */}
-      <div className="p-3 xl:p-4 relative z-10">
-        {isTrialing && daysLeft !== null && (
-          <button
-            onClick={() => navigate("/abonnement")}
-            className="hidden xl:flex w-full items-center gap-2 p-3 rounded-xl relative overflow-hidden text-left hover:border-primary/40 transition-all"
+      <div className="relative h-full px-3 lg:px-5 flex items-center gap-4">
+        {/* Logo */}
+        <NavLink to="/pour-toi" className="flex items-center gap-2.5 flex-shrink-0">
+          <span
+            className="w-10 h-10 rounded-2xl flex items-center justify-center overflow-hidden"
             style={{
-              background: 'linear-gradient(135deg, hsl(225 32% 8% / 0.9), hsl(225 28% 10% / 0.6))',
-              border: '1px solid hsl(174 72% 46% / 0.2)',
-              boxShadow: '0 0 20px -8px hsl(174 72% 46% / 0.15)'
+              background: "linear-gradient(145deg, hsl(228 42% 7%), hsl(225 35% 5%))",
+              border: "1px solid hsl(174 72% 46% / 0.22)",
+              boxShadow: "0 0 20px -4px hsl(174 72% 46% / 0.3), inset 0 0 12px hsl(174 72% 46% / 0.06)",
             }}
-            title="Gérer mon abonnement"
           >
-            <Sparkles className="w-4 h-4 text-primary flex-shrink-0" style={{
-              filter: 'drop-shadow(0 0 4px hsl(174 72% 46% / 0.4))'
-            }} />
-            <div className="min-w-0">
-              <p className="text-[11px] text-foreground font-semibold">Essai gratuit</p>
-              <p className="text-[10px] text-primary/80 font-mono">
-                {daysLeft} j restant{daysLeft > 1 ? 's' : ''}
-              </p>
-            </div>
+            <img
+              src={krakkenLogo}
+              alt="Krakken"
+              className="w-9 h-9 object-contain"
+              style={{ filter: "drop-shadow(0 0 6px hsl(174 72% 46% / 0.45))" }}
+            />
+          </span>
+          <span className="hidden sm:block leading-none">
+            <span className="kraken-title text-base tracking-wide block">KRAKKEN</span>
+            <span className="text-[0.5rem] text-muted-foreground font-medium uppercase tracking-[0.22em]">
+              Chasseur des abysses
+            </span>
+          </span>
+        </NavLink>
+
+        <div className="tentacle-line-v h-8 hidden lg:block" />
+
+        {/* Desktop nav */}
+        <nav className="hidden lg:flex items-center gap-0.5 flex-1 min-w-0 overflow-x-auto scrollbar-hide">
+          {navItems.map((item) => (
+            <NavLink key={item.label} to={item.to} end={item.to === "/dashboard"} className={linkClass}>
+              {({ isActive }) => (
+                <>
+                  {renderIcon(item.icon, isActive)}
+                  <span className="text-[13px] hidden xl:block">{item.label}</span>
+                  {isActive && (
+                    <span
+                      className="absolute left-3 right-3 -bottom-[9px] h-[2px] rounded-full"
+                      style={{
+                        background: "linear-gradient(90deg, hsl(174 72% 56%), hsl(262 52% 58%))",
+                        boxShadow: "0 0 10px hsl(174 72% 46% / 0.6)",
+                      }}
+                    />
+                  )}
+                </>
+              )}
+            </NavLink>
+          ))}
+        </nav>
+
+        <div className="flex-1 lg:hidden" />
+
+        {/* Status + actions */}
+        <div className="flex items-center gap-2 flex-shrink-0">
+          {isTrialing && daysLeft !== null && (
+            <button
+              onClick={() => navigate("/abonnement")}
+              className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-xl text-left transition-all hover:border-primary/40"
+              style={{
+                background: "linear-gradient(135deg, hsl(225 32% 8% / 0.9), hsl(225 28% 10% / 0.6))",
+                border: "1px solid hsl(174 72% 46% / 0.2)",
+              }}
+              title="Gérer mon abonnement"
+            >
+              <span className="text-[11px] text-foreground font-semibold">Essai</span>
+              <span className="text-[11px] text-primary font-mono">{daysLeft} j</span>
+            </button>
+          )}
+          {isActive && (
+            <span
+              className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl"
+              style={{
+                background: "linear-gradient(135deg, hsl(225 32% 8% / 0.9), hsl(225 28% 10% / 0.6))",
+                border: "1px solid hsl(174 72% 46% / 0.15)",
+              }}
+            >
+              <Crown className="w-3.5 h-3.5 text-primary" />
+              <span className="text-[11px] text-foreground font-semibold">Pro</span>
+            </span>
+          )}
+          <button
+            onClick={handleSignOut}
+            className="w-9 h-9 rounded-xl flex items-center justify-center text-muted-foreground transition-all hover:bg-destructive/10 hover:text-destructive"
+            style={{ border: "1px solid hsl(225 20% 16%)" }}
+            title="Se déconnecter"
+          >
+            <LogOut className="w-4 h-4" />
           </button>
-        )}
-        {isActive && (
-          <div className="hidden xl:flex items-center gap-2 p-3 rounded-xl relative overflow-hidden" style={{
-            background: 'linear-gradient(135deg, hsl(225 32% 8% / 0.9), hsl(225 28% 10% / 0.6))',
-            border: '1px solid hsl(174 72% 46% / 0.15)',
-          }}>
-            <Crown className="w-4 h-4 text-primary flex-shrink-0" style={{
-              filter: 'drop-shadow(0 0 4px hsl(174 72% 46% / 0.4))'
-            }} />
-            <div className="min-w-0">
-              <p className="text-[11px] text-foreground font-semibold">Krakken Pro</p>
-              <p className="text-[10px] text-primary/70 font-mono">Actif</p>
-            </div>
-          </div>
-        )}
-        <div className="xl:hidden flex justify-center">
-          <span className="w-2 h-2 rounded-full bg-primary" style={{
-            animation: 'bioluminescence 3s ease-in-out infinite',
-            boxShadow: '0 0 8px 2px hsl(174 72% 46% / 0.5)'
-          }} />
+          <button
+            onClick={() => setMobileOpen((v) => !v)}
+            className="lg:hidden w-9 h-9 rounded-xl flex items-center justify-center text-foreground"
+            style={{ border: "1px solid hsl(225 20% 16%)" }}
+            title="Menu"
+          >
+            {mobileOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+          </button>
         </div>
-        <button
-          onClick={handleSignOut}
-          className="mt-2 w-full flex items-center justify-center xl:justify-start gap-2 px-3 py-2 rounded-xl text-[12px] font-semibold transition-all hover:bg-destructive/10"
-          style={{ color: 'hsl(var(--muted-foreground))' }}
-          title="Se déconnecter"
-        >
-          <LogOut className="w-4 h-4" />
-          <span className="hidden xl:inline">Se déconnecter</span>
-        </button>
       </div>
-    </aside>
+
+      {/* Mobile menu */}
+      {mobileOpen && (
+        <nav className="lg:hidden bg-sidebar/95 backdrop-blur-xl border-b border-sidebar-border px-3 py-3 grid grid-cols-2 gap-1">
+          {navItems.map((item) => (
+            <NavLink
+              key={item.label}
+              to={item.to}
+              end={item.to === "/dashboard"}
+              onClick={() => setMobileOpen(false)}
+              className={linkClass}
+            >
+              {({ isActive }) => (
+                <>
+                  {renderIcon(item.icon, isActive)}
+                  <span className="text-[13px]">{item.label}</span>
+                </>
+              )}
+            </NavLink>
+          ))}
+        </nav>
+      )}
+    </header>
   );
 };
 
-export default KrakkenSidebar;
+export default KrakkenNav;

@@ -72,7 +72,7 @@ const Index = () => {
     return (
       <div className="min-h-screen abyss-gradient overflow-hidden">
         <KrakkenSidebar />
-        <main className="pl-16 xl:pl-56 min-h-screen p-6 space-y-6">
+        <main className="pt-24 min-h-screen px-6 pb-10 space-y-6">
           <Skeleton className="h-20 w-full rounded-2xl" />
           <Skeleton className="h-52 w-full rounded-2xl" />
           <div className="grid grid-cols-2 gap-3">
@@ -87,7 +87,7 @@ const Index = () => {
     return (
       <div className="min-h-screen abyss-gradient overflow-hidden">
         <KrakkenSidebar />
-        <main className="pl-16 xl:pl-56 min-h-screen p-6">
+        <main className="pt-24 min-h-screen px-6 pb-10">
           <EmptyState />
         </main>
       </div>
@@ -97,7 +97,7 @@ const Index = () => {
   return (
     <div className="min-h-screen abyss-gradient overflow-hidden">
       <KrakkenSidebar />
-      <main className="pl-16 xl:pl-56 min-h-screen relative">
+      <main className="pt-24 min-h-screen relative">
         <div className="fixed inset-0 pointer-events-none" style={{
           background: `radial-gradient(ellipse 600px 400px at 70% 30%, hsl(174 72% 46% / 0.03), transparent),
             radial-gradient(ellipse 500px 500px at 30% 70%, hsl(262 52% 58% / 0.025), transparent)`,
