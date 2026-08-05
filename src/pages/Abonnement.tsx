@@ -81,7 +81,7 @@ const Abonnement = () => {
     <div className="min-h-screen abyss-gradient">
       <PaymentTestModeBanner />
       <KrakkenSidebar />
-      <main id="main" className="pt-24 px-4 lg:px-6 pb-10 space-y-5 max-w-4xl">
+      <main id="main" className="mx-auto w-full max-w-4xl space-y-6 px-4 pb-12 pt-24 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
