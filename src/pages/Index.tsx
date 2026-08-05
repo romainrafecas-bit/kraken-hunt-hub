@@ -133,13 +133,13 @@ const Index = () => {
                 backgroundColor: 'hsl(162 68% 44%)', boxShadow: '0 0 10px hsl(162 68% 44% / 0.7)', animation: 'bioluminescence 2s ease-in-out infinite',
               }} />
               <div className="text-left">
-                <p className="text-[8px] font-display uppercase tracking-[0.2em] text-muted-foreground mb-0.5">Dernière mise à jour</p>
+                <p className="text-xs font-display uppercase tracking-[0.2em] text-muted-foreground mb-0.5">Dernière mise à jour</p>
                 <div className="flex items-baseline gap-2">
                   <p className="text-base font-display font-black tabular-nums" style={{ color: 'hsl(174 72% 56%)', textShadow: '0 0 14px hsl(174 72% 46% / 0.35)' }}>
                     {lastUpdateLabel}
                   </p>
                   {lastUpdateRelative && (
-                    <span className="text-[9px] font-display font-bold" style={{ color: 'hsl(162 68% 52%)' }}>
+                    <span className="text-xs font-display font-bold" style={{ color: 'hsl(162 68% 52%)' }}>
                       {lastUpdateRelative}
                     </span>
                   )}
@@ -153,7 +153,7 @@ const Index = () => {
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }} className="px-6 lg:px-10 mt-10 relative z-10">
           <div className="flex items-end justify-between mb-6">
             <div>
-              <p className="text-[9px] font-display uppercase tracking-[0.3em] text-muted-foreground mb-1">Évolution</p>
+              <p className="text-xs font-display uppercase tracking-[0.3em] text-muted-foreground mb-1">Évolution</p>
               <div className="flex items-baseline gap-3">
                 <p className="text-4xl font-display font-black tabular-nums" style={{ color: 'hsl(174 72% 56%)', textShadow: '0 0 30px hsl(174 72% 46% / 0.4)' }}>
                   {totalProducts.toLocaleString("fr-FR")}
@@ -166,13 +166,13 @@ const Index = () => {
                 <span className="text-xs font-display font-bold" style={{ color: 'hsl(162 68% 52%)' }}>
                   +{cumulativeData[cumulativeData.length - 1].added}
                 </span>
-                <span className="text-[9px] font-display text-muted-foreground">dernier jour</span>
+                <span className="text-xs font-display text-muted-foreground">dernier jour</span>
               </div>
             )}
           </div>
           <div className="w-full h-52 mt-2">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={cumulativeData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+              <AreaChart data={cumulativeData} margin={{ top: 10, right: 12, left: 0, bottom: 0 }}>
                 <defs>
                   <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0%" stopColor="hsl(174, 72%, 46%)" stopOpacity={0.35} />
@@ -237,7 +237,7 @@ const Index = () => {
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
                 <span className="text-2xl font-display font-black text-foreground">{catStats.length}</span>
-                <span className="text-[9px] font-display text-muted-foreground uppercase tracking-wider">catégories</span>
+                <span className="text-xs font-display text-muted-foreground uppercase tracking-wider">catégories</span>
               </div>
             </div>
             <div className="flex-1 grid grid-cols-2 gap-x-6 gap-y-2 w-full">
@@ -269,7 +269,7 @@ const Index = () => {
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }} className="px-6 lg:px-10 pb-16 relative z-10">
           <div className="flex items-center justify-between mb-6">
             <p className="text-xs font-display uppercase tracking-[0.25em] text-muted-foreground font-bold">Dernières prises</p>
-            <span className="text-[9px] font-display uppercase tracking-[0.2em] text-muted-foreground">Top {topProducts.length}</span>
+            <span className="text-xs font-display uppercase tracking-[0.2em] text-muted-foreground">Top {topProducts.length}</span>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {topProducts.map((p, i) => {
@@ -351,7 +351,7 @@ const Index = () => {
                   <div className="flex-1 min-w-0 relative">
                     <p className="text-sm font-display font-bold text-foreground/95 truncate leading-tight">{p.name}</p>
                     <div className="flex items-center gap-1.5 mt-1.5">
-                      <span className="text-[9px] font-display font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-md"
+                      <span className="text-xs font-display font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-md"
                         style={{
                           color: `hsl(${glowHue})`,
                           background: `hsl(${glowHue} / 0.1)`,
@@ -359,8 +359,8 @@ const Index = () => {
                         }}>
                         {p.brand}
                       </span>
-                      <span className="text-[9px] font-display text-muted-foreground">·</span>
-                      <span className="text-[9px] font-display text-muted-foreground truncate">{formatCat(p.category)}</span>
+                      <span className="text-xs font-display text-muted-foreground">·</span>
+                      <span className="text-xs font-display text-muted-foreground truncate">{formatCat(p.category)}</span>
                     </div>
                     <div className="flex items-center gap-1.5 mt-1.5">
                       <span className="w-1 h-1 rounded-full" style={{ background: `hsl(${glowHue} / 0.6)`, boxShadow: `0 0 4px hsl(${glowHue} / 0.5)` }} />
