@@ -11,6 +11,7 @@ import Landing from "./pages/Landing";
 const Auth = lazy(() => import("./pages/Auth"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const Index = lazy(() => import("./pages/Index"));
+const PourToi = lazy(() => import("./pages/PourToi"));
 const Produits = lazy(() => import("./pages/Produits"));
 const Calculateur = lazy(() => import("./pages/Calculateur"));
 const Profil = lazy(() => import("./pages/Profil"));
