@@ -156,7 +156,7 @@ const PourToi = () => {
   return (
     <div className="min-h-screen bg-background">
       <KrakkenNav />
-      <main className="max-w-[1440px] mx-auto pt-24 px-4 lg:px-8 pb-12 space-y-8">
+      <main id="main" className="max-w-[1440px] mx-auto pt-24 px-4 lg:px-8 pb-12 space-y-8">
         {/* En-tête éditorial */}
         <section className="flex flex-wrap items-end justify-between gap-4">
           <div>

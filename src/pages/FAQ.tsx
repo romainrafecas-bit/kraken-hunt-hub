@@ -103,7 +103,7 @@ const FAQ = () => {
   return (
     <div className="min-h-screen flex" style={{ background: "hsl(230 50% 3%)" }}>
       <KrakkenSidebar />
-      <main className="flex-1 ml-16 xl:ml-56 px-6 lg:px-12 py-10 lg:py-14 max-w-5xl">
+      <main id="main" className="mx-auto w-full max-w-5xl px-4 pb-12 pt-24 lg:px-8">
         <motion.header
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}

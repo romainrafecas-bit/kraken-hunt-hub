@@ -79,7 +79,7 @@ const Profil = () => {
   return (
     <div className="min-h-screen abyss-gradient">
       <KrakkenSidebar />
-      <main className="pt-24 px-4 lg:px-6 pb-10 space-y-5">
+      <main id="main" className="pt-24 px-4 lg:px-6 pb-10 space-y-5">
         {/* Profile Card */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}
