@@ -52,13 +52,13 @@ const Spotlight = ({
       ) : (
         <img src={product.image} alt={product.name} referrerPolicy="no-referrer" onError={() => setImageFailed(true)} className="w-full h-full object-contain p-8" />
       )}
-      <span className="absolute top-3 left-3 flex items-center gap-1.5 rounded-sm bg-primary px-2.5 py-1 text-[10px] font-bold uppercase text-primary-foreground">
+      <span className="absolute top-3 left-3 flex items-center gap-1.5 rounded-sm bg-primary px-2.5 py-1 text-xs font-bold uppercase text-primary-foreground">
         <Flame className="w-3 h-3" /> N°1 aujourd’hui
       </span>
     </div>
 
     <div className="min-w-0 space-y-5">
-      <p className="text-[11px] uppercase text-muted-foreground truncate">
+      <p className="text-xs uppercase text-muted-foreground truncate">
         {product.brand} · {getCategoryLabel(product.category)}
       </p>
       <h2 className="font-display font-black text-2xl lg:text-3xl leading-tight text-foreground line-clamp-3">
@@ -129,11 +129,11 @@ const MiniRow = ({
     </span>
     <span className="flex-1 min-w-0">
       <span className="block text-[12px] font-semibold text-foreground truncate">{product.name}</span>
-      <span className="block text-[11px] text-muted-foreground font-mono">
+      <span className="block text-xs text-muted-foreground font-mono">
         {product.price === -1 ? "—" : `${product.price.toFixed(2)} €`} · {product.recurrences} réc.
       </span>
     </span>
-    <span className="text-[10px] font-mono text-primary/70 flex-shrink-0">#{rank}</span>
+    <span className="text-xs font-mono text-primary/70 flex-shrink-0">#{rank}</span>
     <ChevronRight className="w-3.5 h-3.5 text-muted-foreground group-hover:text-primary flex-shrink-0" />
   </Button>
 );
@@ -160,7 +160,7 @@ const PourToi = () => {
         {/* En-tête éditorial */}
         <section className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <p className="text-[10px] uppercase text-primary mb-1.5">Sélection du jour</p>
+            <p className="text-xs uppercase text-primary mb-1.5">Sélection du jour</p>
             <h1 className="font-display font-black text-3xl text-foreground">Produits pour toi</h1>
             <p className="text-sm text-muted-foreground mt-1">
               Les dernières prises gagnantes, calibrées sur ton profil de chasse
@@ -257,7 +257,7 @@ const PourToi = () => {
         ) : featured.length === 0 ? (
           <div className="glass-panel p-10 text-center space-y-2">
             <p className="text-sm text-foreground font-semibold">Aucune prise pour ce profil</p>
-            <p className="text-[13px] text-muted-foreground">
+            <p className="text-sm text-muted-foreground">
               Élargis ton budget ou tes catégories pour voir remonter des produits.
             </p>
           </div>
@@ -273,7 +273,7 @@ const PourToi = () => {
               )}
               <div className="min-w-0 border-t border-border py-4 space-y-2.5">
 
-                <p className="text-[10px] uppercase text-muted-foreground">À comparer</p>
+                <p className="text-xs uppercase text-muted-foreground">À comparer</p>
                 {shortlist.map((p, i) => (
                   <MiniRow
                     key={p.url}
@@ -291,7 +291,7 @@ const PourToi = () => {
               <section className="space-y-3">
                 <div className="flex items-baseline justify-between">
                   <h2 className="kraken-title text-lg">Prises populaires</h2>
-                  <span className="text-[11px] text-muted-foreground">Les plus fortes récurrences de ton profil</span>
+                  <span className="text-xs text-muted-foreground">Les plus fortes récurrences de ton profil</span>
                 </div>
                 <div className="grid lg:grid-cols-2 gap-x-8">
                   {grid.map((p, i) => (
@@ -316,7 +316,7 @@ const PourToi = () => {
             <section className="space-y-3">
               <div className="flex items-baseline justify-between">
                 <h2 className="kraken-title text-lg">Fraîches captures</h2>
-                <span className="text-[11px] text-muted-foreground">Repérées le plus récemment</span>
+                <span className="text-xs text-muted-foreground">Repérées le plus récemment</span>
               </div>
               <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-2 snap-x">
                 {recent.map((p) => (
