@@ -35,11 +35,7 @@ const ProductForYouCard = ({ product, rank, isFavorite, onToggleFavorite }: Prop
           />
         )}
         {rank != null && rank <= 3 && (
-          <span
-            className="absolute top-2 left-2 px-2 py-0.5 rounded-lg text-[10px] font-bold tracking-wide"
-            style={{
-            className="absolute top-2 left-2 px-2 py-0.5 rounded-sm bg-primary/10 text-[10px] font-bold text-primary"
-          >
+          <span className="absolute top-2 left-2 px-2 py-0.5 rounded-sm bg-primary/10 text-[10px] font-bold text-primary">
             TOP {rank}
           </span>
         )}
