@@ -22,5 +22,5 @@ const CATEGORY_LABELS: Record<string, string> = {
 
 export function getCategoryLabel(category: string) {
   const normalized = category.trim().toLowerCase();
-  return CATEGORY_LABELS[normalized] ?? category.replaceAll("-", " ").replace(/^./, (letter) => letter.toUpperCase());
+  return CATEGORY_LABELS[normalized] ?? category.replace(/-/g, " ").replace(/^./, (letter) => letter.toUpperCase());
 }
