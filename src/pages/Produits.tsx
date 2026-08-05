@@ -7,7 +7,7 @@ const Produits = () => {
   return (
     <div className="min-h-screen abyss-gradient">
       <KrakkenSidebar />
-      <main className="pt-20 p-4 lg:p-6 space-y-5">
+      <main className="pt-24 px-4 lg:px-6 pb-10 space-y-5">
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}

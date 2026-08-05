@@ -184,7 +184,7 @@ const PourToi = () => {
   return (
     <div className="min-h-screen abyss-gradient">
       <KrakkenNav />
-      <main className="pt-20 p-4 lg:p-6 space-y-7">
+      <main className="pt-24 px-4 lg:px-6 pb-10 space-y-7">
         {/* En-tête éditorial */}
         <section className="flex flex-wrap items-end justify-between gap-4">
           <div>
