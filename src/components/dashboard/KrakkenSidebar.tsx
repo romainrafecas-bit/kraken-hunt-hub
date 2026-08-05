@@ -76,23 +76,38 @@ const KrakkenNav = () => {
 
 
         {/* Desktop nav */}
-        <nav className="hidden lg:flex items-center gap-1 flex-1 min-w-0">
+        <nav aria-label="Navigation principale" className="hidden min-w-0 flex-1 items-center gap-1 lg:flex">
           {navItems.map((item) => (
-            <NavLink key={item.label} to={item.to} end={item.to === "/dashboard"} className={linkClass}>
+            <NavLink
+              key={item.label}
+              to={item.to}
+              end={item.to === "/dashboard"}
+              className={linkClass}
+            >
               {({ isActive }) => (
                 <>
-                  <item.icon className={cn("w-4 h-4", isActive ? "text-primary" : "text-sidebar-foreground")} strokeWidth={1.8} />
+                  <item.icon
+                    aria-hidden="true"
+                    className={cn(
+                      "h-4 w-4 transition-colors duration-200",
+                      isActive ? "text-primary" : "text-sidebar-foreground group-hover:text-primary",
+                    )}
+                    strokeWidth={1.9}
+                  />
                   <span>{item.label}</span>
-                  {isActive && (
-                    <span
-                      className="absolute left-3 right-3 bottom-0 h-0.5 bg-primary"
-                    />
-                  )}
+                  <span
+                    aria-hidden="true"
+                    className={cn(
+                      "absolute bottom-0 left-3 right-3 h-0.5 origin-left bg-primary transition-transform duration-200",
+                      isActive ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100 group-hover:bg-primary/40",
+                    )}
+                  />
                 </>
               )}
             </NavLink>
           ))}
         </nav>
+
 
         <div className="flex-1 lg:hidden" />
 
