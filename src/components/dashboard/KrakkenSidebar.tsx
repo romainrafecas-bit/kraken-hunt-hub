@@ -6,6 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useSubscription } from "@/hooks/useSubscription";
 
 const navItems = [
+  { icon: Sparkles, label: "Produits pour toi", to: "/pour-toi" },
   { icon: LayoutDashboard, label: "Dashboard", to: "/dashboard" },
   { icon: Package, label: "Produits", to: "/produits" },
   { icon: Heart, label: "Favoris", to: "/favoris" },
