@@ -232,9 +232,20 @@
 
   /* === TYPOGRAPHY === */
   .soft-label {
-    @apply text-[0.65rem] font-semibold uppercase tracking-wider;
-    color: hsl(195 25% 78%);
+    @apply text-xs font-semibold uppercase tracking-wide;
+    color: hsl(200 14% 72%);
   }
+
+  .section-title {
+    @apply font-display font-black tracking-tight text-foreground;
+  }
+
+  .num {
+    @apply font-mono tabular-nums;
+    font-variant-numeric: tabular-nums;
+  }
+
+
 
   .kraken-title {
     @apply font-display font-black tracking-tight;
