@@ -146,20 +146,33 @@
 
 
 @layer utilities {
-  /* === GLASS PANELS === */
+  /* === SURFACES === */
   .glass-panel {
-    @apply bg-card/60 backdrop-blur-xl border border-border/40 rounded-2xl;
-    box-shadow: 0 4px 32px -8px hsl(228 50% 2% / 0.6);
+    @apply bg-card/70 backdrop-blur-xl border border-border/60 rounded-xl;
+    box-shadow: var(--elev-2);
   }
 
   .glass-panel-glow {
-    @apply bg-card/55 backdrop-blur-xl rounded-2xl;
-    border: 1px solid hsl(174 72% 46% / 0.1);
+    @apply bg-card/70 backdrop-blur-xl rounded-xl;
+    border: 1px solid hsl(174 72% 46% / 0.18);
     box-shadow:
-      0 0 30px -12px hsl(174 72% 46% / 0.12),
-      0 4px 32px -8px hsl(228 50% 2% / 0.6),
-      inset 0 1px 0 0 hsl(185 80% 60% / 0.05);
+      var(--elev-2),
+      inset 0 1px 0 0 hsl(185 80% 60% / 0.06);
   }
+
+  /* Interactive surface: subtle lift + accent border on hover */
+  .surface-interactive {
+    transition: border-color 200ms ease, box-shadow 200ms ease, transform 200ms ease;
+  }
+  .surface-interactive:hover {
+    border-color: hsl(var(--primary) / 0.4);
+    box-shadow: var(--elev-3);
+    transform: translateY(-2px);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .surface-interactive:hover { transform: none; }
+  }
+
 
   /* === KRAKEN GLOW EFFECTS === */
   .glow-text {
