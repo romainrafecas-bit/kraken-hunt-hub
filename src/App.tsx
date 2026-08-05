@@ -11,6 +11,7 @@ import Landing from "./pages/Landing";
 const Auth = lazy(() => import("./pages/Auth"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const Index = lazy(() => import("./pages/Index"));
+const PourToi = lazy(() => import("./pages/PourToi"));
 const Produits = lazy(() => import("./pages/Produits"));
 const Calculateur = lazy(() => import("./pages/Calculateur"));
 const Profil = lazy(() => import("./pages/Profil"));
@@ -62,6 +63,7 @@ const App = () => (
               <Route path="/mentions-legales" element={<MentionsLegales />} />
               <Route path="/unsubscribe" element={<Unsubscribe />} />
               <Route path="/dashboard" element={<Protected><Index /></Protected>} />
+              <Route path="/pour-toi" element={<Protected><PourToi /></Protected>} />
               <Route path="/produits" element={<Protected><Produits /></Protected>} />
               <Route path="/calculateur" element={<Protected><Calculateur /></Protected>} />
               <Route path="/analytics" element={<Navigate to="/calculateur" replace />} />
