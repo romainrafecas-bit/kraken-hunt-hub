@@ -154,35 +154,58 @@ const KrakkenNav = () => {
             variant="ghost"
             size="icon"
             onClick={() => setMobileOpen((v) => !v)}
-            className="lg:hidden h-9 w-9"
-            title="Menu"
+            className="h-11 w-11 lg:hidden"
+            aria-label={mobileOpen ? "Fermer le menu" : "Ouvrir le menu"}
+            aria-expanded={mobileOpen}
           >
-            {mobileOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+            {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </Button>
         </div>
       </div>
 
       {/* Mobile menu */}
       {mobileOpen && (
-        <nav className="lg:hidden bg-sidebar border-b border-sidebar-border px-4 py-3 grid grid-cols-2 gap-1">
+        <nav
+          aria-label="Navigation principale"
+          className="grid gap-0.5 border-b border-sidebar-border bg-sidebar px-3 py-2 shadow-[var(--elev-3)] lg:hidden"
+        >
           {[...navItems, ...accountItems].map((item) => (
             <NavLink
               key={item.label}
               to={item.to}
               end={item.to === "/dashboard"}
               onClick={() => setMobileOpen(false)}
-              className={linkClass}
+              className={({ isActive }) =>
+                cn(
+                  "flex h-12 items-center gap-3 rounded-md px-3 text-sm transition-colors",
+                  isActive
+                    ? "bg-secondary font-semibold text-foreground"
+                    : "text-sidebar-foreground hover:bg-secondary/60 hover:text-foreground",
+                )
+              }
             >
               {({ isActive }) => (
                 <>
-                  <item.icon className="w-4 h-4" />
-                  <span className="text-sm">{item.label}</span>
+                  <item.icon
+                    aria-hidden="true"
+                    className={cn("h-4 w-4", isActive ? "text-primary" : "text-muted-foreground")}
+                    strokeWidth={1.9}
+                  />
+                  <span>{item.label}</span>
                 </>
               )}
             </NavLink>
           ))}
+          <button
+            type="button"
+            onClick={handleSignOut}
+            className="flex h-12 items-center gap-3 rounded-md px-3 text-sm text-destructive transition-colors hover:bg-destructive/10"
+          >
+            <LogOut className="h-4 w-4" aria-hidden="true" /> Se déconnecter
+          </button>
         </nav>
       )}
+
     </header>
   );
 };
