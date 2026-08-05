@@ -339,9 +339,11 @@ const Index = () => {
                       border: `1px solid hsl(${glowHue} / 0.25)`,
                       boxShadow: `0 4px 14px -2px hsl(220 60% 2% / 0.7), 0 0 0 1px hsl(225 28% 7%), inset 0 0 0 1px hsl(${glowHue} / 0.05)`,
                     }}>
-                    <img src={p.image} alt={p.name}
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                      loading="lazy" />
+                    <img src={p.image} alt=""
+                      className="w-full h-full bg-card object-contain p-1 transition-transform duration-500 group-hover:scale-110"
+                      loading="lazy" referrerPolicy="no-referrer"
+                      onError={(e) => { e.currentTarget.style.visibility = "hidden"; }} />
+
                     {/* Overlay océan subtil */}
                     <div className="absolute inset-0 pointer-events-none"
                       style={{ background: `linear-gradient(180deg, transparent 60%, hsl(220 60% 4% / 0.4))` }} />
