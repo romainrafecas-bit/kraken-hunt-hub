@@ -298,7 +298,7 @@ const PourToi = () => {
           </div>
         ) : (
           <>
-            <section className="grid lg:grid-cols-[2fr_1fr] gap-4 items-stretch">
+            <section className="grid lg:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)] gap-4 items-stretch">
               {spotlight && (
                 <Spotlight
                   product={spotlight}
@@ -306,7 +306,8 @@ const PourToi = () => {
                   onToggleFavorite={toggleFavorite}
                 />
               )}
-              <div className="glass-panel p-4 space-y-2.5">
+              <div className="glass-panel p-4 space-y-2.5 min-w-0">
+
                 <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Le podium</p>
                 {shortlist.map((p, i) => (
                   <MiniRow
