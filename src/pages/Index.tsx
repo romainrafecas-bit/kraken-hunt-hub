@@ -180,8 +180,18 @@ const Index = () => {
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(225, 20%, 14%)" vertical={false} />
-                <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fill: 'hsl(210, 14%, 65%)', fontSize: 11, fontWeight: 600, fontFamily: 'DM Sans' }} />
-                <YAxis axisLine={false} tickLine={false} tick={{ fill: 'hsl(210, 14%, 55%)', fontSize: 10, fontFamily: 'DM Sans' }} domain={[0, 'auto']} />
+                <XAxis dataKey="day" axisLine={false} tickLine={false} minTickGap={24} tick={{ fill: 'hsl(205, 12%, 70%)', fontSize: 12, fontWeight: 600, fontFamily: 'DM Sans' }} />
+                <YAxis
+                  axisLine={false}
+                  tickLine={false}
+                  width={48}
+                  tickCount={5}
+                  allowDecimals={false}
+                  tickFormatter={compactNumber}
+                  tick={{ fill: 'hsl(205, 12%, 66%)', fontSize: 12, fontFamily: 'DM Sans' }}
+                  domain={[0, 'auto']}
+                />
+
                 <Tooltip
                   formatter={(value: number, name: string) => [value.toLocaleString("fr-FR"), "Total produits"]}
                   contentStyle={{ background: 'hsl(225, 32%, 8%)', border: '1px solid hsl(174, 72%, 46%, 0.2)', borderRadius: '12px', boxShadow: '0 8px 32px hsl(228, 50%, 2%, 0.6)', color: 'hsl(185, 20%, 88%)', fontSize: 12, fontFamily: 'DM Sans' }}
