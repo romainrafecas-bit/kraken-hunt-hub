@@ -41,30 +41,39 @@ const KrakkenNav = () => {
 
   const linkClass = ({ isActive }: { isActive: boolean }) =>
     cn(
-      "group relative flex h-16 items-center gap-2 px-3 text-sm transition-colors whitespace-nowrap",
+      "group relative flex h-16 items-center gap-2 px-3 text-sm font-medium whitespace-nowrap transition-colors duration-200",
       isActive
         ? "text-foreground font-semibold"
         : "text-sidebar-foreground hover:text-foreground",
     );
 
   return (
-    <header
-      className="fixed top-0 left-0 right-0 z-50 h-16 bg-sidebar/95 backdrop-blur-xl border-b border-sidebar-border"
-    >
-      <div className="h-full max-w-[1440px] mx-auto px-4 lg:px-8 flex items-center gap-6">
+    <header className="fixed top-0 left-0 right-0 z-50 h-16 border-b border-sidebar-border bg-sidebar/90 backdrop-blur-xl">
+      <a
+        href="#main"
+        className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-card focus:px-3 focus:py-2 focus:text-sm focus:text-foreground"
+      >
+        Aller au contenu
+      </a>
+      <div className="mx-auto flex h-full max-w-[1440px] items-center gap-6 px-4 lg:px-8">
         {/* Logo */}
-        <NavLink to="/pour-toi" className="flex items-center gap-2.5 flex-shrink-0">
-          <span className="w-8 h-8 flex items-center justify-center overflow-hidden">
+        <NavLink
+          to="/pour-toi"
+          aria-label="Krakken — accueil"
+          className="flex flex-shrink-0 items-center gap-2.5 rounded-md transition-opacity hover:opacity-80"
+        >
+          <span className="flex h-8 w-8 items-center justify-center overflow-hidden">
             <img
               src={krakkenLogo}
-              alt="Krakken"
+              alt=""
               className="w-8 h-8 object-contain"
             />
           </span>
           <span className="hidden sm:block leading-none">
-            <span className="font-display text-[15px] font-black text-foreground block">KRAKKEN</span>
+            <span className="block font-display text-[15px] font-black tracking-tight text-foreground">KRAKKEN</span>
           </span>
         </NavLink>
+
 
         {/* Desktop nav */}
         <nav className="hidden lg:flex items-center gap-1 flex-1 min-w-0">
