@@ -6,16 +6,16 @@
 
 @layer base {
   :root {
-    --background: 228 42% 5%;
-    --foreground: 185 20% 88%;
+    --background: 210 17% 2%;
+    --foreground: 192 10% 90%;
 
-    --card: 225 32% 8%;
+    --card: 210 17% 8%;
     --card-foreground: 185 20% 88%;
 
     --popover: 225 32% 9%;
     --popover-foreground: 185 20% 88%;
 
-    --primary: 174 72% 46%;
+    --primary: 184 56% 54%;
     --primary-foreground: 228 42% 4%;
 
     --secondary: 225 22% 12%;
@@ -24,17 +24,17 @@
     --muted: 225 18% 14%;
     --muted-foreground: 210 10% 42%;
 
-    --accent: 262 52% 58%;
-    --accent-foreground: 262 95% 92%;
+    --accent: 210 11% 25%;
+    --accent-foreground: 192 10% 90%;
 
     --destructive: 0 72% 52%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 225 20% 12%;
-    --input: 225 20% 12%;
+    --border: 210 11% 18%;
+    --input: 210 11% 18%;
     --ring: 174 72% 46%;
 
-    --radius: 0.75rem;
+    --radius: 0.5rem;
 
     /* === KRAKEN PALETTE === */
     --kraken-teal: 174 72% 46%;
@@ -48,7 +48,7 @@
     --kraken-deep: 230 50% 3%;
     --kraken-glow: 180 80% 60%;
 
-    --sidebar-background: 228 40% 6%;
+    --sidebar-background: 210 17% 4%;
     --sidebar-foreground: 195 12% 50%;
     --sidebar-primary: 174 72% 46%;
     --sidebar-primary-foreground: 228 42% 4%;
@@ -66,10 +66,7 @@
 
   body {
     @apply bg-background text-foreground font-body antialiased;
-    background-image:
-      radial-gradient(ellipse at 8% 92%, hsl(174 72% 46% / 0.05) 0%, transparent 50%),
-      radial-gradient(ellipse at 92% 8%, hsl(262 52% 58% / 0.04) 0%, transparent 40%),
-      radial-gradient(ellipse at 50% 50%, hsl(228 42% 5% / 1) 0%, transparent 100%);
+    background-image: none;
   }
 
   h1, h2, h3, h4, h5, h6 {
