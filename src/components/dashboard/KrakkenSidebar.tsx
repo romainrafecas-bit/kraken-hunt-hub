@@ -1,25 +1,23 @@
-import { Compass, Target, Calculator, User, Heart, LogOut, Crown, Sparkles, HelpCircle, Flame } from "lucide-react";
+import { LayoutDashboard, Package, Calculator, Anchor, User, Heart, LogOut, Crown, Sparkles, HelpCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { NavLink, useNavigate } from "react-router-dom";
 import krakkenLogo from "@/assets/krakken-logo.png";
 import { useAuth } from "@/contexts/AuthContext";
 import { useSubscription } from "@/hooks/useSubscription";
-import { useHunterProgress } from "@/hooks/useHunterProgress";
 
 const navItems = [
-  { icon: Compass, label: "Accueil", to: "/dashboard" },
-  { icon: Target, label: "Chasse aux pépites", to: "/produits" },
-  { icon: Heart, label: "Mes pépites", to: "/favoris" },
-  { icon: Calculator, label: "Calcul de marge", to: "/calculateur" },
+  { icon: LayoutDashboard, label: "Dashboard", to: "/dashboard" },
+  { icon: Package, label: "Produits", to: "/produits" },
+  { icon: Heart, label: "Favoris", to: "/favoris" },
+  { icon: Calculator, label: "Calculateur", to: "/calculateur" },
   { icon: User, label: "Mon profil", to: "/profil" },
   { icon: Crown, label: "Abonnement", to: "/abonnement" },
-  { icon: HelpCircle, label: "Aide", to: "/faq" },
+  { icon: HelpCircle, label: "FAQ", to: "/faq" },
 ];
 
 const KrakkenSidebar = () => {
   const { signOut } = useAuth();
   const navigate = useNavigate();
-  const { level, rank, progress, streak } = useHunterProgress();
   const { isTrialing, isActive, daysLeft } = useSubscription();
   const handleSignOut = async () => {
     await signOut();
@@ -55,36 +53,6 @@ const KrakkenSidebar = () => {
         <div className="hidden xl:block">
           <h1 className="kraken-title text-base tracking-wide">KRAKKEN</h1>
           <p className="text-[0.55rem] text-muted-foreground font-medium uppercase tracking-[0.2em]">Chasseur des abysses</p>
-        </div>
-      </div>
-
-      {/* Progression du chasseur */}
-      <div className="relative z-10 px-3 pt-3">
-        <button
-          onClick={() => navigate("/dashboard")}
-          className="hidden xl:block w-full text-left rounded-xl p-3"
-          style={{
-            background: "hsl(var(--secondary) / 0.5)",
-            border: "1px solid hsl(var(--primary) / 0.15)",
-          }}
-          title="Ta progression"
-        >
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-[11px] font-bold text-foreground truncate">
-              Niv. {level} · {rank}
-            </span>
-            <span className="game-chip game-chip-amber !text-[0.6rem] !px-1.5">
-              <Flame className="w-2.5 h-2.5" />
-              {streak}
-            </span>
-          </div>
-          <div className="xp-track h-1.5">
-            <div className="xp-fill" style={{ width: `${progress}%` }} />
-          </div>
-        </button>
-        <div className="xl:hidden flex flex-col items-center">
-          <span className="font-display font-black text-xs text-primary">{level}</span>
-          <span className="text-[0.5rem] text-muted-foreground uppercase">niv.</span>
         </div>
       </div>
 
