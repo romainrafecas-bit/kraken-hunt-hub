@@ -7,6 +7,7 @@ import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import krakkenLogo from "@/assets/krakken-logo.png";
 import { Skeleton } from "@/components/ui/skeleton";
 import EmptyState from "@/components/dashboard/EmptyState";
+import { getCategoryLabel } from "@/lib/categoryLabels";
 
 const catHues = [
   "174 72% 46%", "262 52% 58%", "188 78% 52%", "38 92% 56%",
