@@ -19,6 +19,10 @@ const ProductForYouCard = ({ product, rank, isFavorite, onToggleFavorite }: Prop
           src={product.image}
           alt={product.name}
           loading="lazy"
+          referrerPolicy="no-referrer"
+          onError={(e) => {
+            e.currentTarget.style.visibility = "hidden";
+          }}
           className="w-full h-full object-contain p-3 transition-transform duration-500 group-hover:scale-[1.04]"
         />
         {rank != null && rank <= 3 && (
