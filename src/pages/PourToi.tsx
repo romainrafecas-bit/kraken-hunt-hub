@@ -33,7 +33,7 @@ const PourToi = () => {
   return (
     <div className="min-h-screen abyss-gradient">
       <KrakkenSidebar />
-      <main className="pt-16 p-4 lg:p-6 space-y-6">
+      <main className="pt-20 p-4 lg:p-6 space-y-6">
         {/* Hero */}
         <motion.section
           initial={{ opacity: 0, y: 8 }}
